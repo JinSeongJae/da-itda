@@ -51,14 +51,20 @@ export default function Welcome() {
       setLoading(true);
       setError('');
       try {
-        const res = await fetch(`${backendUrl}/api/auth/kakao`, {
-          method: 'POST',
-          headers: { 'content-type': 'application/json' },
-          body: JSON.stringify({ code: response.params.code, redirectUri }),
-        });
+        let res: Response;
+        try {
+          res = await fetch(`${backendUrl}/api/auth/kakao`, {
+            method: 'POST',
+            headers: { 'content-type': 'application/json' },
+            body: JSON.stringify({ code: response.params.code, redirectUri }),
+          });
+        } catch {
+          throw new Error('백엔드 서버에 연결할 수 없어요. 인터넷 연결과 서버 주소를 확인해주세요.');
+        }
+
         if (!res.ok) {
           const body = await res.json().catch(() => ({}));
-          throw new Error(body.error ?? '로그인 처리에 실패했어요.');
+          throw new Error(body.error ?? `로그인 처리에 실패했어요. (${res.status})`);
         }
 
         const { token, user } = await res.json();

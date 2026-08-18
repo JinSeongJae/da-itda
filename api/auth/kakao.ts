@@ -1,4 +1,5 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node';
+import { applyCors } from '../_cors';
 import { query } from '../_db';
 import { signSessionToken } from '../_auth';
 
@@ -20,6 +21,8 @@ interface KakaoUserResponse {
 }
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {
+  if (applyCors(req, res)) return;
+
   if (req.method !== 'POST') {
     res.status(405).json({ error: 'POST 요청만 지원합니다.' });
     return;

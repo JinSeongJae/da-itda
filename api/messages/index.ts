@@ -1,4 +1,5 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node';
+import { applyCors } from '../_cors';
 import { query } from '../_db';
 import { requireUser } from '../_auth';
 
@@ -11,6 +12,8 @@ interface MessageRow {
 }
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {
+  if (applyCors(req, res)) return;
+
   try {
     requireUser(req);
 
