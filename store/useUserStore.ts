@@ -128,7 +128,7 @@ export const useUserStore = create<UserState>()(
         syncSelfProfile(get().usersById[userId]);
       },
 
-      awardBadge: (userId, badgeId) =>
+      awardBadge: (userId, badgeId) => {
         set((state) => {
           const user = state.usersById[userId];
           if (!user || user.badges.includes(badgeId)) return state;
@@ -138,17 +138,21 @@ export const useUserStore = create<UserState>()(
               [userId]: { ...user, badges: [...user.badges, badgeId] },
             },
           };
-        }),
+        });
+        syncSelfProfile(get().usersById[userId]);
+      },
 
-      setVerificationStatus: (userId, status) =>
+      setVerificationStatus: (userId, status) => {
         set((state) => ({
           usersById: {
             ...state.usersById,
             [userId]: { ...state.usersById[userId], verification: status },
           },
-        })),
+        }));
+        syncSelfProfile(get().usersById[userId]);
+      },
 
-      addPoints: (userId, amount) =>
+      addPoints: (userId, amount) => {
         set((state) => {
           const user = state.usersById[userId];
           if (!user) return state;
@@ -158,9 +162,11 @@ export const useUserStore = create<UserState>()(
               [userId]: { ...user, points: user.points + amount },
             },
           };
-        }),
+        });
+        syncSelfProfile(get().usersById[userId]);
+      },
 
-      addVolunteerMinutes: (userId, minutes) =>
+      addVolunteerMinutes: (userId, minutes) => {
         set((state) => {
           const user = state.usersById[userId];
           if (!user) return state;
@@ -170,7 +176,9 @@ export const useUserStore = create<UserState>()(
               [userId]: { ...user, volunteerMinutes: user.volunteerMinutes + minutes },
             },
           };
-        }),
+        });
+        syncSelfProfile(get().usersById[userId]);
+      },
 
       getUserById: (userId) => get().usersById[userId],
 
