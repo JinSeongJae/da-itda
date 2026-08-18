@@ -11,9 +11,15 @@ import { useUserStore } from '../../../store/useUserStore';
 
 export default function MyPage() {
   const currentUserId = useAuthStore((s) => s.currentUserId)!;
+  const logout = useAuthStore((s) => s.logout);
   const user = useUserStore((s) => s.usersById[currentUserId]);
 
   if (!user) return null;
+
+  const handleLogout = () => {
+    logout();
+    router.replace('/(onboarding)/welcome');
+  };
 
   return (
     <SafeAreaView edges={['top']} className="flex-1 bg-white">
@@ -36,6 +42,11 @@ export default function MyPage() {
 
         <Text className="text-sm font-bold text-gray-700 px-4 mb-2 mt-2">획득한 뱃지</Text>
         <BadgeGrid earnedBadgeIds={user.badges} />
+
+        <Pressable onPress={handleLogout} className="flex-row items-center justify-center mt-6">
+          <Feather name="log-out" size={14} color="#ef4444" />
+          <Text className="text-sm text-red-500 ml-1">로그아웃</Text>
+        </Pressable>
       </ScrollView>
     </SafeAreaView>
   );
