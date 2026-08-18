@@ -34,10 +34,14 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     return;
   }
 
-  const clientId = process.env.KAKAO_CLIENT_ID;
-  const clientSecret = process.env.KAKAO_CLIENT_SECRET;
+  // 서버 전용 KAKAO_CLIENT_ID가 Vercel에 별도로 설정되지 않은 경우를 대비해
+  // 클라이언트에도 노출되는(비밀 아님) EXPO_PUBLIC_KAKAO_CLIENT_ID로 폴백한다.
+  const clientId = (process.env.KAKAO_CLIENT_ID || process.env.EXPO_PUBLIC_KAKAO_CLIENT_ID)?.trim();
+  const clientSecret = process.env.KAKAO_CLIENT_SECRET?.trim();
   if (!clientId) {
-    res.status(500).json({ error: 'KAKAO_CLIENT_ID 환경변수가 설정되지 않았습니다.' });
+    res.status(500).json({
+      error: 'KAKAO_CLIENT_ID(또는 EXPO_PUBLIC_KAKAO_CLIENT_ID) 환경변수가 설정되지 않았습니다.',
+    });
     return;
   }
 
@@ -58,7 +62,10 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     const tokenData = (await tokenResponse.json()) as KakaoTokenResponse;
 
     if (!tokenResponse.ok || !tokenData.access_token) {
-      res.status(401).json({ error: tokenData.error_description ?? '카카오 토큰 교환에 실패했습니다.' });
+      res.status(401).json({
+        error: tokenData.error_description ?? '카카오 토큰 교환에 실패했습니다.',
+        kakaoError: tokenData.error,
+      });
       return;
     }
 
