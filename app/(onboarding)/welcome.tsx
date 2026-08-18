@@ -41,9 +41,9 @@ export default function Welcome() {
     }
     if (response.type !== 'success') return;
 
-    const apiBaseUrl = process.env.EXPO_PUBLIC_API_BASE_URL;
-    if (!apiBaseUrl) {
-      setError('EXPO_PUBLIC_API_BASE_URL이 설정되지 않았어요.');
+    const backendUrl = process.env.EXPO_PUBLIC_BACKEND_URL;
+    if (!backendUrl) {
+      setError('EXPO_PUBLIC_BACKEND_URL이 설정되지 않았어요.');
       return;
     }
 
@@ -51,7 +51,7 @@ export default function Welcome() {
       setLoading(true);
       setError('');
       try {
-        const res = await fetch(`${apiBaseUrl}/api/auth/kakao`, {
+        const res = await fetch(`${backendUrl}/api/auth/kakao`, {
           method: 'POST',
           headers: { 'content-type': 'application/json' },
           body: JSON.stringify({ code: response.params.code, redirectUri }),

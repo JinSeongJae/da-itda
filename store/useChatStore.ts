@@ -11,11 +11,11 @@ import { useUserStore } from './useUserStore';
 
 /** Best-effort sync to the Vercel backend — never blocks or breaks the local-only demo flow. */
 function syncMessageToServer(message: ChatMessage): void {
-  const apiBaseUrl = process.env.EXPO_PUBLIC_API_BASE_URL;
+  const backendUrl = process.env.EXPO_PUBLIC_BACKEND_URL;
   const token = useAuthStore.getState().sessionToken;
-  if (!apiBaseUrl || !token) return;
+  if (!backendUrl || !token) return;
 
-  fetch(`${apiBaseUrl}/api/messages`, {
+  fetch(`${backendUrl}/api/messages`, {
     method: 'POST',
     headers: { 'content-type': 'application/json', authorization: `Bearer ${token}` },
     body: JSON.stringify({
@@ -222,12 +222,12 @@ export const useChatStore = create<ChatState>()(
         Object.values(get().threadsById).find((t) => t.matchId === matchId),
 
       syncMessagesFromServer: async (threadId) => {
-        const apiBaseUrl = process.env.EXPO_PUBLIC_API_BASE_URL;
+        const backendUrl = process.env.EXPO_PUBLIC_BACKEND_URL;
         const token = useAuthStore.getState().sessionToken;
-        if (!apiBaseUrl || !token) return;
+        if (!backendUrl || !token) return;
 
         try {
-          const res = await fetch(`${apiBaseUrl}/api/messages?threadId=${encodeURIComponent(threadId)}`, {
+          const res = await fetch(`${backendUrl}/api/messages?threadId=${encodeURIComponent(threadId)}`, {
             headers: { authorization: `Bearer ${token}` },
           });
           if (!res.ok) return;
