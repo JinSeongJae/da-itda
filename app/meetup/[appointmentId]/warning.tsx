@@ -5,35 +5,38 @@ import { router, useLocalSearchParams } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Button } from '../../../components/common/Button';
 import { Header } from '../../../components/common/Header';
+import type { TranslationKey } from '../../../constants/i18n';
+import { useTranslation } from '../../../utils/i18n';
 
-const NOTICE_ITEMS = [
-  '반드시 앱에서 확정된 Safe Zone(안심존)에서만 만나주세요.',
-  '무단 노쇼(No-show)가 반복될 경우 계정 이용이 제한될 수 있어요.',
-  '본래 교류 목적과 다른 부적절한 언행이나 접근은 즉시 신고 및 제재 대상이 됩니다.',
-  '만남 후에는 3초 매너 후기를 꼭 남겨주세요. 안전한 커뮤니티를 함께 만들어가요.',
+const NOTICE_KEYS: TranslationKey[] = [
+  'meetupWarning.item1',
+  'meetupWarning.item2',
+  'meetupWarning.item3',
+  'meetupWarning.item4',
 ];
 
 export default function MeetupWarning() {
+  const { t } = useTranslation();
   const { appointmentId } = useLocalSearchParams<{ appointmentId: string }>();
   const [checked, setChecked] = useState(false);
 
   return (
     <SafeAreaView className="flex-1 bg-white">
-      <Header title="만남 전 안내사항" showBack />
+      <Header title={t('meetupWarning.title')} showBack />
       <ScrollView className="flex-1 px-6 pt-5" contentContainerStyle={{ paddingBottom: 24 }}>
         <View className="items-center mb-5">
           <View className="w-16 h-16 rounded-full bg-amber-100 items-center justify-center mb-3">
             <Feather name="alert-triangle" size={28} color="#b45309" />
           </View>
-          <Text className="text-lg font-extrabold text-gray-800">안전한 만남을 위해 꼭 확인해주세요</Text>
+          <Text className="text-lg font-extrabold text-gray-800">{t('meetupWarning.headline')}</Text>
         </View>
 
-        {NOTICE_ITEMS.map((item, i) => (
+        {NOTICE_KEYS.map((key, i) => (
           <View key={i} className="flex-row items-start mb-3.5">
             <View className="w-5 h-5 rounded-full bg-amber-100 items-center justify-center mr-2.5 mt-0.5">
               <Text className="text-amber-700 text-[10px] font-bold">{i + 1}</Text>
             </View>
-            <Text className="text-sm text-gray-700 flex-1 leading-5">{item}</Text>
+            <Text className="text-sm text-gray-700 flex-1 leading-5">{t(key)}</Text>
           </View>
         ))}
 
@@ -46,11 +49,11 @@ export default function MeetupWarning() {
           >
             {checked && <Feather name="check" size={13} color="#fff" />}
           </View>
-          <Text className="text-sm text-gray-700 flex-1">위 안내사항을 모두 확인했습니다.</Text>
+          <Text className="text-sm text-gray-700 flex-1">{t('meetupWarning.checkbox')}</Text>
         </Pressable>
 
         <Button
-          label="계속하기"
+          label={t('meetupWarning.continue')}
           disabled={!checked}
           onPress={() => router.push(`/meetup/${appointmentId}/qr`)}
         />

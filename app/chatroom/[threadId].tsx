@@ -13,10 +13,12 @@ import { useAuthStore } from '../../store/useAuthStore';
 import { useChatStore } from '../../store/useChatStore';
 import { useUserStore } from '../../store/useUserStore';
 import type { ChatMessage } from '../../types';
+import { useTranslation } from '../../utils/i18n';
 
 const POLL_INTERVAL_MS = 4000;
 
 export default function Chatroom() {
+  const { t, skillLabel } = useTranslation();
   const { threadId } = useLocalSearchParams<{ threadId: string }>();
   const currentUserId = useAuthStore((s) => s.currentUserId)!;
   const usersById = useUserStore((s) => s.usersById);
@@ -45,7 +47,7 @@ export default function Chatroom() {
   if (!thread) {
     return (
       <SafeAreaView className="flex-1 items-center justify-center bg-white">
-        <Text className="text-gray-500">대화방을 찾을 수 없어요.</Text>
+        <Text className="text-gray-500">{t('chatroom.notFound')}</Text>
       </SafeAreaView>
     );
   }
@@ -56,9 +58,11 @@ export default function Chatroom() {
 
   const smartReplySuggestions = counterpart
     ? [
-        counterpart.skillsOffered[0] && `${counterpart.skillsOffered[0].label} 알려주실 수 있나요?`,
-        counterpart.skillsWanted[0] && `${counterpart.skillsWanted[0].label}은 제가 도와드릴 수 있어요!`,
-        '이번 주에 시간 괜찮으신 날 있으세요?',
+        counterpart.skillsOffered[0] &&
+          t('chatroom.smartReply1', { skill: skillLabel(counterpart.skillsOffered[0]) }),
+        counterpart.skillsWanted[0] &&
+          t('chatroom.smartReply2', { skill: skillLabel(counterpart.skillsWanted[0]) }),
+        t('chatroom.smartReply3'),
       ].filter((s): s is string => Boolean(s))
     : [];
 
@@ -75,8 +79,8 @@ export default function Chatroom() {
         </Pressable>
         {counterpart && <Avatar uri={counterpart.avatarUrl} size={34} />}
         <Text className="ml-2.5 text-[17px] font-bold text-gray-900 flex-1" numberOfLines={1}>
-          {counterpart?.name ?? '대화 상대'}
-          {thread.isDirectChannel ? ' · 단짝 이웃' : ''}
+          {counterpart?.name ?? t('chatroom.defaultCounterpart')}
+          {thread.isDirectChannel ? ` · ${t('chat.directChannelTag')}` : ''}
         </Text>
       </View>
 

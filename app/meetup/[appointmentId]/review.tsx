@@ -10,8 +10,10 @@ import { useAppointmentStore } from '../../../store/useAppointmentStore';
 import { useAuthStore } from '../../../store/useAuthStore';
 import { useMatchStore } from '../../../store/useMatchStore';
 import { useReviewStore } from '../../../store/useReviewStore';
+import { useTranslation } from '../../../utils/i18n';
 
 export default function MeetupReview() {
+  const { t } = useTranslation();
   const { appointmentId } = useLocalSearchParams<{ appointmentId: string }>();
   const currentUserId = useAuthStore((s) => s.currentUserId)!;
   const appointment = useAppointmentStore((s) => s.appointmentsById[appointmentId]);
@@ -33,8 +35,8 @@ export default function MeetupReview() {
   if (!appointment || !match || !counterpartId) {
     return (
       <SafeAreaView className="flex-1 bg-white">
-        <Header title="3초 후기" showBack />
-        <Text className="text-center text-gray-500 mt-10">약속 정보를 찾을 수 없어요.</Text>
+        <Header title={t('review.title')} showBack />
+        <Text className="text-center text-gray-500 mt-10">{t('review.notFound')}</Text>
       </SafeAreaView>
     );
   }
@@ -71,25 +73,26 @@ export default function MeetupReview() {
 
   return (
     <SafeAreaView className="flex-1 bg-white">
-      <Header title="3초 안전·매너 후기" showBack />
+      <Header title={t('review.headerTitle')} showBack />
       <View className="flex-1 px-6 pt-5">
         {!submitted ? (
           <ReviewChecklist onSubmit={handleSubmit} />
         ) : (
           <View className="items-center pt-10">
             <Feather name="check-circle" size={40} color="#10b981" />
-            <Text className="text-lg font-bold text-gray-800 mt-4">후기 제출 완료!</Text>
+            <Text className="text-lg font-bold text-gray-800 mt-4">{t('review.submitted')}</Text>
             {ownWasPositive ? (
               <>
                 <Text className="text-gray-500 text-sm text-center mt-2 px-4">
-                  상대방의 후기도 함께 확인되면 "단짝 이웃" 뱃지가 발급돼요.{'\n'}
+                  {t('review.badgeInfo')}
+                  {'\n'}
                   {counterpartAlreadyReviewed
-                    ? '상대방 후기를 확인하는 중이에요...'
-                    : '아직 상대방이 후기를 남기지 않았어요.'}
+                    ? t('review.checkingCounterpart')
+                    : t('review.waitingCounterpart')}
                 </Text>
                 {!counterpartAlreadyReviewed && (
                   <Button
-                    label="상대방 후기 시뮬레이션 (테스트용)"
+                    label={t('review.simulateButton')}
                     variant="outline"
                     className="mt-6"
                     onPress={handleSimulateCounterpart}
@@ -97,11 +100,9 @@ export default function MeetupReview() {
                 )}
               </>
             ) : (
-              <Text className="text-gray-500 text-sm text-center mt-2 px-4">
-                소중한 의견 감사해요. 안전 관련 응답은 운영팀이 확인할 수 있어요.
-              </Text>
+              <Text className="text-gray-500 text-sm text-center mt-2 px-4">{t('review.negativeThanks')}</Text>
             )}
-            <Button label="채팅방으로 돌아가기" variant="ghost" className="mt-4" onPress={() => router.back()} />
+            <Button label={t('review.backToChat')} variant="ghost" className="mt-4" onPress={() => router.back()} />
           </View>
         )}
       </View>

@@ -1,8 +1,10 @@
 import { Feather } from '@expo/vector-icons';
 import { Tabs } from 'expo-router';
 import { COLORS } from '../../constants/theme';
+import { useTranslation } from '../../utils/i18n';
 
 export default function TabsLayout() {
+  const { t } = useTranslation();
   return (
     <Tabs
       screenOptions={{
@@ -26,21 +28,21 @@ export default function TabsLayout() {
       <Tabs.Screen
         name="index"
         options={{
-          title: '홈',
+          title: t('tabs.home'),
           tabBarIcon: ({ color, size }) => <Feather name="home" color={color} size={size} />,
         }}
       />
       <Tabs.Screen
         name="community"
         options={{
-          title: '커뮤니티',
+          title: t('tabs.community'),
           tabBarIcon: ({ color, size }) => <Feather name="users" color={color} size={size} />,
         }}
       />
       <Tabs.Screen
         name="chat"
         options={{
-          title: '채팅',
+          title: t('tabs.chat'),
           tabBarIcon: ({ color, size }) => (
             <Feather name="message-circle" color={color} size={size} />
           ),
@@ -49,7 +51,7 @@ export default function TabsLayout() {
       <Tabs.Screen
         name="mypage"
         options={{
-          title: '마이페이지',
+          title: t('tabs.mypage'),
           tabBarIcon: ({ color, size }) => <Feather name="user" color={color} size={size} />,
         }}
       />

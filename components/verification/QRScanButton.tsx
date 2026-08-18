@@ -1,8 +1,10 @@
 import { useState } from 'react';
 import { Feather } from '@expo/vector-icons';
 import { ActivityIndicator, Pressable, Text } from 'react-native';
+import { useTranslation } from '../../utils/i18n';
 
 export function QRScanButton({ onScanned, disabled }: { onScanned: () => void; disabled?: boolean }) {
+  const { t } = useTranslation();
   const [scanning, setScanning] = useState(false);
 
   const handlePress = () => {
@@ -25,7 +27,7 @@ export function QRScanButton({ onScanned, disabled }: { onScanned: () => void; d
         <Feather name="camera" size={18} color="#fff" style={{ marginRight: 8 }} />
       )}
       <Text className="text-white text-base font-semibold ml-2">
-        {scanning ? '스캔 중...' : 'QR 스캔하여 체크인'}
+        {scanning ? t('qrScan.scanning') : t('qrScan.button')}
       </Text>
     </Pressable>
   );

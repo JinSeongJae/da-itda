@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { Feather } from '@expo/vector-icons';
 import { Pressable, Text, View } from 'react-native';
 import { Button } from '../common/Button';
+import { useTranslation } from '../../utils/i18n';
 
 interface Answers {
   metAtSafeZone: boolean | null;
@@ -20,6 +21,7 @@ function YesNoRow({
   onChange: (v: boolean) => void;
   warning?: boolean;
 }) {
+  const { t } = useTranslation();
   return (
     <View className={`rounded-2xl p-4 mb-3 ${warning ? 'bg-amber-50' : 'bg-gray-50'}`}>
       <View className="flex-row items-start mb-3">
@@ -33,13 +35,17 @@ function YesNoRow({
           onPress={() => onChange(true)}
           className={`flex-1 py-2.5 rounded-xl items-center ${value === true ? 'bg-primary-500' : 'bg-white border border-gray-300'}`}
         >
-          <Text className={`text-sm font-semibold ${value === true ? 'text-white' : 'text-gray-600'}`}>예</Text>
+          <Text className={`text-sm font-semibold ${value === true ? 'text-white' : 'text-gray-600'}`}>
+            {t('review.yes')}
+          </Text>
         </Pressable>
         <Pressable
           onPress={() => onChange(false)}
           className={`flex-1 py-2.5 rounded-xl items-center ml-3 ${value === false ? 'bg-primary-500' : 'bg-white border border-gray-300'}`}
         >
-          <Text className={`text-sm font-semibold ${value === false ? 'text-white' : 'text-gray-600'}`}>아니오</Text>
+          <Text className={`text-sm font-semibold ${value === false ? 'text-white' : 'text-gray-600'}`}>
+            {t('review.no')}
+          </Text>
         </Pressable>
       </View>
     </View>
@@ -57,31 +63,30 @@ export function ReviewChecklist({
     hadUncomfortableIncident: null,
   });
 
+  const { t } = useTranslation();
   const isComplete = Object.values(answers).every((v) => v !== null);
 
   return (
     <View>
       <YesNoRow
-        question="1. 약속된 Safe Zone에서 만났나요?"
+        question={t('review.q1')}
         value={answers.metAtSafeZone}
         onChange={(v) => setAnswers((a) => ({ ...a, metAtSafeZone: v }))}
       />
       <YesNoRow
-        question="2. 상호 재능 교류가 원활하게 이루어졌나요?"
+        question={t('review.q2')}
         value={answers.exchangeWentWell}
         onChange={(v) => setAnswers((a) => ({ ...a, exchangeWentWell: v }))}
       />
       <YesNoRow
-        question="3. 불쾌한 언행이나 본래 목적 외 접근이 있었나요?"
+        question={t('review.q3')}
         value={answers.hadUncomfortableIncident}
         onChange={(v) => setAnswers((a) => ({ ...a, hadUncomfortableIncident: v }))}
         warning
       />
-      <Text className="text-xs text-gray-400 mb-4 -mt-1">
-        * 3번 질문은 부정적인 상황을 묻는 질문이에요. 안전한 만남이었다면 "아니오"를 선택해주세요.
-      </Text>
+      <Text className="text-xs text-gray-400 mb-4 -mt-1">{t('review.warningHint')}</Text>
       <Button
-        label="후기 제출하기"
+        label={t('review.submit')}
         disabled={!isComplete}
         onPress={() =>
           isComplete &&

@@ -10,11 +10,13 @@ import { Header } from '../../../components/common/Header';
 import { useAppointmentStore } from '../../../store/useAppointmentStore';
 import { useAuthStore } from '../../../store/useAuthStore';
 import { useUserStore } from '../../../store/useUserStore';
+import { useTranslation } from '../../../utils/i18n';
 
 const REWARD_POINTS = 10;
 const REWARD_VOLUNTEER_MINUTES = 30;
 
 export default function MeetupQr() {
+  const { t } = useTranslation();
   const { appointmentId } = useLocalSearchParams<{ appointmentId: string }>();
   const currentUserId = useAuthStore((s) => s.currentUserId)!;
   const appointment = useAppointmentStore((s) => s.appointmentsById[appointmentId]);
@@ -27,8 +29,8 @@ export default function MeetupQr() {
   if (!appointment) {
     return (
       <SafeAreaView className="flex-1 bg-white">
-        <Header title="현장 인증" showBack />
-        <Text className="text-center text-gray-500 mt-10">약속 정보를 찾을 수 없어요.</Text>
+        <Header title={t('meetupQr.title')} showBack />
+        <Text className="text-center text-gray-500 mt-10">{t('meetupQr.notFound')}</Text>
       </SafeAreaView>
     );
   }
@@ -46,19 +48,17 @@ export default function MeetupQr() {
 
   return (
     <SafeAreaView className="flex-1 bg-white">
-      <Header title="현장 인증" showBack />
+      <Header title={t('meetupQr.title')} showBack />
       <View className="flex-1 px-6 pt-6">
-        <Text className="text-gray-500 text-sm mb-5 text-center">
-          Safe Zone에 도착했다면 QR을 스캔해서 출석을 인증해주세요.
-        </Text>
+        <Text className="text-gray-500 text-sm mb-5 text-center">{t('meetupQr.subtitle')}</Text>
         <QRDisplay token={appointment.qrToken ?? '------------'} />
 
         {checkedIn ? (
           <View className="bg-primary-50 rounded-2xl p-4 mt-5 items-center">
             <Feather name="check-circle" size={22} color="#10b981" />
-            <Text className="text-primary-700 font-bold mt-2">체크인 완료!</Text>
+            <Text className="text-primary-700 font-bold mt-2">{t('meetupQr.checkedInTitle')}</Text>
             <Text className="text-primary-600 text-xs mt-1">
-              +{REWARD_POINTS} 포인트 · +{REWARD_VOLUNTEER_MINUTES}분 봉사시간 적립
+              {t('meetupQr.reward', { points: REWARD_POINTS, minutes: REWARD_VOLUNTEER_MINUTES })}
             </Text>
           </View>
         ) : (
@@ -67,7 +67,7 @@ export default function MeetupQr() {
 
         {checkedIn && (
           <Button
-            label="3초 후기 남기러 가기"
+            label={t('meetupQr.reviewButton')}
             className="mt-4"
             onPress={() => router.push(`/meetup/${appointmentId}/review`)}
           />

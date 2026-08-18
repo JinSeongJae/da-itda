@@ -10,11 +10,13 @@ import { ALL_SKILLS } from '../../../mocks/skills';
 import { useAuthStore } from '../../../store/useAuthStore';
 import { useUserStore } from '../../../store/useUserStore';
 import type { Skill } from '../../../types';
+import { useTranslation } from '../../../utils/i18n';
 
 function RemovableTag({ skill, onRemove }: { skill: Skill; onRemove: () => void }) {
+  const { skillLabel } = useTranslation();
   return (
     <View className="flex-row items-center bg-primary-100 rounded-full pl-3 pr-1.5 py-1 mr-2 mb-2">
-      <Text className="text-xs font-medium text-primary-700 mr-1">{skill.label}</Text>
+      <Text className="text-xs font-medium text-primary-700 mr-1">{skillLabel(skill)}</Text>
       <Pressable onPress={onRemove} hitSlop={6}>
         <Feather name="x" size={13} color="#047857" />
       </Pressable>
@@ -23,15 +25,17 @@ function RemovableTag({ skill, onRemove }: { skill: Skill; onRemove: () => void 
 }
 
 function AddableChip({ skill, onAdd }: { skill: Skill; onAdd: () => void }) {
+  const { skillLabel } = useTranslation();
   return (
     <Pressable onPress={onAdd} className="flex-row items-center bg-gray-100 rounded-full px-3 py-1 mr-2 mb-2">
       <Feather name="plus" size={12} color="#6b7280" />
-      <Text className="text-xs text-gray-600 ml-1">{skill.label}</Text>
+      <Text className="text-xs text-gray-600 ml-1">{skillLabel(skill)}</Text>
     </Pressable>
   );
 }
 
 export default function EditProfile() {
+  const { t } = useTranslation();
   const currentUserId = useAuthStore((s) => s.currentUserId)!;
   const user = useUserStore((s) => s.usersById[currentUserId]);
   const updateProfile = useUserStore((s) => s.updateProfile);
@@ -66,7 +70,7 @@ export default function EditProfile() {
 
   return (
     <SafeAreaView className="flex-1 bg-white">
-      <Header title="프로필 수정" showBack />
+      <Header title={t('edit.title')} showBack />
       <ScrollView className="flex-1 px-6 pt-5" contentContainerStyle={{ paddingBottom: 24 }}>
         <View className="items-center mb-6">
           <Pressable onPress={handlePickAvatar} className="relative">
@@ -75,26 +79,26 @@ export default function EditProfile() {
               <Feather name="camera" size={13} color="#fff" />
             </View>
           </Pressable>
-          <Text className="text-xs text-gray-500 mt-2">탭해서 프로필 사진 변경</Text>
+          <Text className="text-xs text-gray-500 mt-2">{t('edit.changePhoto')}</Text>
         </View>
 
-        <Text className="text-sm font-bold text-gray-700 mb-2">소개</Text>
+        <Text className="text-sm font-bold text-gray-700 mb-2">{t('edit.bioLabel')}</Text>
         <TextInput
           value={bio}
           onChangeText={setBio}
           multiline
           numberOfLines={3}
-          placeholder="이웃들에게 나를 짧게 소개해보세요"
+          placeholder={t('edit.bioPlaceholder')}
           placeholderTextColor="#9ca3af"
           className="border border-gray-300 rounded-2xl px-4 py-3 text-sm text-gray-800 mb-6"
           textAlignVertical="top"
         />
 
-        <Text className="text-sm font-bold text-gray-700 mb-1">줄 수 있어요</Text>
-        <Text className="text-xs text-gray-400 mb-2.5">태그를 눌러 빼거나, 아래에서 더 추가해보세요</Text>
+        <Text className="text-sm font-bold text-gray-700 mb-1">{t('mypage.offeredLabel')}</Text>
+        <Text className="text-xs text-gray-400 mb-2.5">{t('edit.tagHint')}</Text>
         <View className="flex-row flex-wrap mb-2">
           {user.skillsOffered.length === 0 ? (
-            <Text className="text-xs text-gray-400 mb-2">아직 등록된 항목이 없어요</Text>
+            <Text className="text-xs text-gray-400 mb-2">{t('mypage.noItems')}</Text>
           ) : (
             user.skillsOffered.map((s) => (
               <RemovableTag key={s.id} skill={s} onRemove={() => removeSkillOffered(currentUserId, s.id)} />
@@ -107,11 +111,11 @@ export default function EditProfile() {
           ))}
         </View>
 
-        <Text className="text-sm font-bold text-gray-700 mb-1">받고 싶어요</Text>
-        <Text className="text-xs text-gray-400 mb-2.5">태그를 눌러 빼거나, 아래에서 더 추가해보세요</Text>
+        <Text className="text-sm font-bold text-gray-700 mb-1">{t('mypage.wantedLabel')}</Text>
+        <Text className="text-xs text-gray-400 mb-2.5">{t('edit.tagHint')}</Text>
         <View className="flex-row flex-wrap mb-2">
           {user.skillsWanted.length === 0 ? (
-            <Text className="text-xs text-gray-400 mb-2">아직 등록된 항목이 없어요</Text>
+            <Text className="text-xs text-gray-400 mb-2">{t('mypage.noItems')}</Text>
           ) : (
             user.skillsWanted.map((s) => (
               <RemovableTag key={s.id} skill={s} onRemove={() => removeSkillWanted(currentUserId, s.id)} />
@@ -126,7 +130,7 @@ export default function EditProfile() {
       </ScrollView>
 
       <View className="px-6 pt-3 pb-4 border-t border-gray-100 bg-white">
-        <Button label="저장하기" onPress={() => updateProfile(currentUserId, { bio })} />
+        <Button label={t('edit.save')} onPress={() => updateProfile(currentUserId, { bio })} />
       </View>
     </SafeAreaView>
   );

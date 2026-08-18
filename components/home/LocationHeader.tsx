@@ -3,10 +3,12 @@ import { Feather } from '@expo/vector-icons';
 import { Modal, Pressable, Text, View } from 'react-native';
 import { NOTIFICATIONS } from '../../mocks/notifications';
 import { formatRelativeTime } from '../../utils/formatters';
+import { useTranslation } from '../../utils/i18n';
 
 const DISTRICTS = ['중산동', '진량읍'];
 
 export function LocationHeader({ city, district }: { city: string; district: string }) {
+  const { t } = useTranslation();
   const [pickerOpen, setPickerOpen] = useState(false);
   const [bellOpen, setBellOpen] = useState(false);
   const [selected, setSelected] = useState(district);
@@ -31,7 +33,7 @@ export function LocationHeader({ city, district }: { city: string; district: str
       <Modal visible={pickerOpen} transparent animationType="fade" onRequestClose={() => setPickerOpen(false)}>
         <Pressable className="flex-1 bg-black/30 justify-end" onPress={() => setPickerOpen(false)}>
           <View className="bg-white rounded-t-[28px] px-6 pt-7 pb-8">
-            <Text className="text-xl font-extrabold text-gray-900 mb-5">동네 선택</Text>
+            <Text className="text-xl font-extrabold text-gray-900 mb-5">{t('locationHeader.pickTitle')}</Text>
             {DISTRICTS.map((d) => (
               <Pressable
                 key={d}
@@ -54,7 +56,7 @@ export function LocationHeader({ city, district }: { city: string; district: str
       <Modal visible={bellOpen} transparent animationType="fade" onRequestClose={() => setBellOpen(false)}>
         <Pressable className="flex-1 bg-black/30 justify-end" onPress={() => setBellOpen(false)}>
           <View className="bg-white rounded-t-[28px] px-6 pt-7 pb-8 max-h-[70%]">
-            <Text className="text-xl font-extrabold text-gray-900 mb-4">알림</Text>
+            <Text className="text-xl font-extrabold text-gray-900 mb-4">{t('locationHeader.notifTitle')}</Text>
             {NOTIFICATIONS.map((n) => (
               <View key={n.id} className="py-4 border-t border-gray-100">
                 <Text className="text-[15px] font-semibold text-gray-800">{n.title}</Text>

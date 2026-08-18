@@ -5,10 +5,12 @@ import { router } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Button } from '../../components/common/Button';
 import { Header } from '../../components/common/Header';
+import { LanguagePicker } from '../../components/common/LanguagePicker';
 import { ALL_SKILLS } from '../../mocks/skills';
 import { useAuthStore } from '../../store/useAuthStore';
 import { useUserStore } from '../../store/useUserStore';
 import type { Skill } from '../../types';
+import { useTranslation } from '../../utils/i18n';
 
 function SkillChip({
   skill,
@@ -35,6 +37,7 @@ function SkillChip({
 }
 
 export default function InterestSelection() {
+  const { t } = useTranslation();
   const currentUserId = useAuthStore((s) => s.currentUserId);
   const completeOnboarding = useAuthStore((s) => s.completeOnboarding);
   const updateProfile = useUserStore((s) => s.updateProfile);
@@ -70,29 +73,29 @@ export default function InterestSelection() {
 
   return (
     <SafeAreaView className="flex-1 bg-white">
-      <Header title="관심사 설정" showBack />
+      <Header title={t('interestSelection.title')} showBack right={<LanguagePicker />} />
       <ScrollView className="flex-1 px-6 pt-4" contentContainerStyle={{ paddingBottom: 24 }}>
-        <Text className="text-gray-500 mb-5 leading-5">
-          이름과 관심사를 알려주시면 AI가 딱 맞는 이웃을 찾아드려요.
-        </Text>
+        <Text className="text-gray-500 mb-5 leading-5">{t('interestSelection.subtitle')}</Text>
 
-        <Text className="text-sm font-semibold text-gray-700 mb-2">이름</Text>
+        <Text className="text-sm font-semibold text-gray-700 mb-2">{t('interestSelection.nameLabel')}</Text>
         <View className="flex-row items-center border border-gray-300 rounded-2xl px-4 mb-6">
           <Feather name="user" size={16} color="#9ca3af" />
           <TextInput
             value={name}
             onChangeText={setName}
-            placeholder="이웃들에게 보여질 이름"
+            placeholder={t('interestSelection.namePlaceholder')}
             placeholderTextColor="#9ca3af"
             className="flex-1 py-3.5 ml-2 text-base text-gray-800"
           />
         </View>
 
         <View className="flex-row items-center justify-between mb-2">
-          <Text className="text-sm font-semibold text-gray-700">줄 수 있어요</Text>
-          <Text className="text-xs text-gray-400">{offeredIds.length}개 선택됨</Text>
+          <Text className="text-sm font-semibold text-gray-700">{t('interestSelection.offeredLabel')}</Text>
+          <Text className="text-xs text-gray-400">
+            {t('interestSelection.selectedCount', { count: offeredIds.length })}
+          </Text>
         </View>
-        <Text className="text-xs text-gray-400 mb-3">내가 이웃에게 나눠줄 수 있는 재능을 골라주세요</Text>
+        <Text className="text-xs text-gray-400 mb-3">{t('interestSelection.offeredHint')}</Text>
         <View className="flex-row flex-wrap mb-5">
           {ALL_SKILLS.map((skill) => (
             <SkillChip
@@ -105,10 +108,12 @@ export default function InterestSelection() {
         </View>
 
         <View className="flex-row items-center justify-between mb-2">
-          <Text className="text-sm font-semibold text-gray-700">받고 싶어요</Text>
-          <Text className="text-xs text-gray-400">{wantedIds.length}개 선택됨</Text>
+          <Text className="text-sm font-semibold text-gray-700">{t('interestSelection.wantedLabel')}</Text>
+          <Text className="text-xs text-gray-400">
+            {t('interestSelection.selectedCount', { count: wantedIds.length })}
+          </Text>
         </View>
-        <Text className="text-xs text-gray-400 mb-3">이웃에게 배우고 싶은 재능을 골라주세요</Text>
+        <Text className="text-xs text-gray-400 mb-3">{t('interestSelection.wantedHint')}</Text>
         <View className="flex-row flex-wrap mb-2">
           {ALL_SKILLS.map((skill) => (
             <SkillChip
@@ -124,10 +129,10 @@ export default function InterestSelection() {
       <View className="px-6 pt-3 pb-4 border-t border-gray-100 bg-white">
         {!canSave && (
           <Text className="text-xs text-gray-400 text-center mb-2">
-            이름을 입력하고 줄 수 있어요·받고 싶어요를 각각 1개 이상 선택해주세요
+            {t('interestSelection.validationHint')}
           </Text>
         )}
-        <Button label="저장하고 이웃 추천받기" onPress={handleSave} disabled={!canSave} />
+        <Button label={t('interestSelection.saveButton')} onPress={handleSave} disabled={!canSave} />
       </View>
     </SafeAreaView>
   );

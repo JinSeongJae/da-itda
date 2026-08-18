@@ -7,8 +7,10 @@ import { EmptyState } from '../../../components/common/EmptyState';
 import { useAuthStore } from '../../../store/useAuthStore';
 import { useChatStore } from '../../../store/useChatStore';
 import { useUserStore } from '../../../store/useUserStore';
+import { useTranslation } from '../../../utils/i18n';
 
 export default function ChatList() {
+  const { t } = useTranslation();
   const currentUserId = useAuthStore((s) => s.currentUserId)!;
   const threadsById = useChatStore((s) => s.threadsById);
   const fetchThreads = useChatStore((s) => s.fetchThreads);
@@ -27,7 +29,7 @@ export default function ChatList() {
   return (
     <SafeAreaView edges={['top']} className="flex-1 bg-white">
       <View className="px-6 pt-6 pb-2">
-        <Text className="text-[28px] font-extrabold text-gray-900">채팅</Text>
+        <Text className="text-[28px] font-extrabold text-gray-900">{t('tabs.chat')}</Text>
       </View>
       <FlatList
         data={threads}
@@ -49,8 +51,8 @@ export default function ChatList() {
         ListEmptyComponent={
           <EmptyState
             iconName="message-circle"
-            title="아직 대화가 없어요"
-            description="홈에서 매칭하기를 눌러 새로운 이웃을 만나보세요."
+            title={t('chat.emptyTitle')}
+            description={t('chat.emptyDescription')}
           />
         }
       />

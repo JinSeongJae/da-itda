@@ -2,6 +2,7 @@ import { Feather } from '@expo/vector-icons';
 import { Pressable, Text, View } from 'react-native';
 import { SAFE_ZONE_TYPE_META } from '../../constants/theme';
 import type { SafeZone } from '../../types';
+import { useTranslation } from '../../utils/i18n';
 
 export function SafeZonePicker({
   zones,
@@ -12,9 +13,10 @@ export function SafeZonePicker({
   selectedId: string | null;
   onSelect: (id: string) => void;
 }) {
+  const { t } = useTranslation();
   return (
     <View>
-      <Text className="text-sm font-semibold text-gray-700 mb-2">AI 추천 안심존</Text>
+      <Text className="text-sm font-semibold text-gray-700 mb-2">{t('safeZone.aiLabel')}</Text>
       {zones.map((zone, index) => {
         const meta = SAFE_ZONE_TYPE_META[zone.type];
         const selected = selectedId === zone.id;
@@ -37,7 +39,7 @@ export function SafeZonePicker({
                     {index === 0 && (
                       <View className="flex-row items-center bg-primary-50 rounded-full px-1.5 py-0.5 ml-1.5">
                         <Feather name="award" size={9} color="#059669" />
-                        <Text className="text-[9px] font-bold text-primary-700 ml-0.5">추천</Text>
+                        <Text className="text-[9px] font-bold text-primary-700 ml-0.5">{t('safeZone.recommended')}</Text>
                       </View>
                     )}
                   </View>
@@ -47,7 +49,7 @@ export function SafeZonePicker({
               {selected && <Feather name="check-circle" size={20} color="#10b981" />}
             </View>
             <Text className="text-xs text-primary-600 font-semibold mt-2">
-              AI 안심 지수 {zone.safetyScore}점
+              {t('safeZone.scoreLabel', { score: zone.safetyScore })}
             </Text>
           </Pressable>
         );

@@ -15,8 +15,10 @@ import { useMatchStore } from '../../store/useMatchStore';
 import { useUserStore } from '../../store/useUserStore';
 import { generateAppointmentSuggestion } from '../../utils/gemini';
 import { formatDateTime } from '../../utils/formatters';
+import { useTranslation } from '../../utils/i18n';
 
 export default function AppointmentFormScreen() {
+  const { t } = useTranslation();
   const { threadId } = useLocalSearchParams<{ threadId: string }>();
   const currentUserId = useAuthStore((s) => s.currentUserId)!;
   const usersById = useUserStore((s) => s.usersById);
@@ -54,8 +56,8 @@ export default function AppointmentFormScreen() {
   if (!thread || !match || !counterpart) {
     return (
       <SafeAreaView className="flex-1 bg-white">
-        <Header title="약속 잡기" showBack />
-        <Text className="text-center text-gray-500 mt-10">대화 정보를 찾을 수 없어요.</Text>
+        <Header title={t('appointmentForm.title')} showBack />
+        <Text className="text-center text-gray-500 mt-10">{t('appointmentForm.notFound')}</Text>
       </SafeAreaView>
     );
   }
@@ -119,7 +121,7 @@ export default function AppointmentFormScreen() {
     attachAppointmentMessage(
       thread.id,
       appointment.id,
-      `${formatDateTime(appointment.date, appointment.time)} · ${zone?.name ?? '안심존'}에서 만나요!${purposeText}`
+      `${formatDateTime(appointment.date, appointment.time)} · ${zone?.name ?? t('appointmentCard.defaultZone')}에서 만나요!${purposeText}`
     );
 
     router.back();
@@ -127,15 +129,15 @@ export default function AppointmentFormScreen() {
 
   return (
     <SafeAreaView className="flex-1 bg-white">
-      <Header title="약속 잡기 (원터치)" showBack />
+      <Header title={t('appointmentForm.title')} showBack />
       <ScrollView className="flex-1 px-6 pt-5" contentContainerStyle={{ paddingBottom: 24 }}>
         <Text className="text-gray-500 text-sm mb-5">
-          {counterpart.name}님과의 만남을 날짜·시간·장소까지 한번에 정해보세요.
+          {t('appointmentForm.subtitle', { name: counterpart.name })}
         </Text>
 
         {!!process.env.EXPO_PUBLIC_GEMINI_API_KEY && (
           <Button
-            label={aiSuggesting ? 'AI가 약속을 추천하는 중...' : 'AI 약속 추천받기'}
+            label={aiSuggesting ? t('appointmentForm.aiSuggesting') : t('appointmentForm.aiSuggestButton')}
             variant="secondary"
             loading={aiSuggesting}
             onPress={handleAiSuggest}
@@ -144,14 +146,14 @@ export default function AppointmentFormScreen() {
         )}
 
         <DateTimePickerField
-          label="날짜"
+          label={t('appointmentForm.dateLabel')}
           mode="date"
           value={date}
           onChange={setDate}
           displayText={format(date, 'yyyy년 M월 d일')}
         />
         <DateTimePickerField
-          label="시간"
+          label={t('appointmentForm.timeLabel')}
           mode="time"
           value={time}
           onChange={setTime}
@@ -164,11 +166,11 @@ export default function AppointmentFormScreen() {
           onSelect={setSafeZoneId}
         />
 
-        <Text className="text-sm font-semibold text-gray-700 mb-2 mt-1">약속 목적</Text>
+        <Text className="text-sm font-semibold text-gray-700 mb-2 mt-1">{t('appointmentForm.purposeLabel')}</Text>
         <TextInput
           value={purpose}
           onChangeText={setPurpose}
-          placeholder="예: 생활 영어 & 아도보 요리 교류"
+          placeholder={t('appointmentForm.purposePlaceholder')}
           placeholderTextColor="#9ca3af"
           className="border border-gray-300 rounded-2xl px-4 py-3 text-sm text-gray-800 mb-4"
         />
@@ -176,11 +178,11 @@ export default function AppointmentFormScreen() {
         <View className="flex-row items-center bg-primary-50 rounded-2xl p-3.5 mt-2 mb-6">
           <Feather name="check-circle" size={14} color="#059669" />
           <Text className="text-xs text-primary-700 font-medium ml-2 flex-1">
-            {formatDateTime(dateStr, timeStr)} · {selectedZone?.name ?? '장소를 선택해주세요'}
+            {formatDateTime(dateStr, timeStr)} · {selectedZone?.name ?? t('appointmentForm.pickPlace')}
           </Text>
         </View>
 
-        <Button label="약속 확정하기" onPress={handleConfirm} disabled={!selectedZone} />
+        <Button label={t('appointmentForm.confirmButton')} onPress={handleConfirm} disabled={!selectedZone} />
       </ScrollView>
     </SafeAreaView>
   );

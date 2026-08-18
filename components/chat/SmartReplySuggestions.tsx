@@ -1,4 +1,5 @@
 import { ActivityIndicator, Pressable, ScrollView, Text, View } from 'react-native';
+import { useTranslation } from '../../utils/i18n';
 
 export function SmartReplySuggestions({
   suggestions,
@@ -11,6 +12,7 @@ export function SmartReplySuggestions({
   loading?: boolean;
   loadingLabel?: string;
 }) {
+  const { t } = useTranslation();
   if (suggestions.length === 0 && !loading) return null;
 
   return (
@@ -19,7 +21,7 @@ export function SmartReplySuggestions({
         <View className="flex-row items-center px-4">
           <ActivityIndicator size="small" color="#10b981" />
           <Text className="ml-2 text-xs text-gray-400" numberOfLines={1}>
-            {loadingLabel ?? '답장을 작성 중이에요...'}
+            {loadingLabel ?? t('chatroom.replyLoading')}
           </Text>
         </View>
       ) : (

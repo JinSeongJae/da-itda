@@ -1,10 +1,12 @@
 import { useEffect, useRef, useState } from 'react';
 import { Dimensions, FlatList, Text, View } from 'react-native';
 import type { SuccessStory } from '../../mocks/successStories';
+import { useTranslation } from '../../utils/i18n';
 
 const CARD_WIDTH = Math.min(Dimensions.get('window').width - 48, 400);
 
 export function SuccessStoryCarousel({ stories }: { stories: SuccessStory[] }) {
+  const { t } = useTranslation();
   const listRef = useRef<FlatList<SuccessStory>>(null);
   const [index, setIndex] = useState(0);
 
@@ -24,7 +26,7 @@ export function SuccessStoryCarousel({ stories }: { stories: SuccessStory[] }) {
 
   return (
     <View className="mt-10">
-      <Text className="text-[13px] font-semibold text-gray-400 mb-3">실시간 매칭 성공 소식</Text>
+      <Text className="text-[13px] font-semibold text-gray-400 mb-3">{t('home.successFeedLabel')}</Text>
       <FlatList
         ref={listRef}
         data={stories}

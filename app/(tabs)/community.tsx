@@ -6,8 +6,10 @@ import { SEED_COMMUNITY_POSTS } from '../../mocks/communityPosts';
 import { SEED_USERS } from '../../mocks/users';
 import { useAuthStore } from '../../store/useAuthStore';
 import { useMatchStore } from '../../store/useMatchStore';
+import { useTranslation } from '../../utils/i18n';
 
 export default function CommunityScreen() {
+  const { t } = useTranslation();
   const currentUserId = useAuthStore((s) => s.currentUserId)!;
   const microGroups = useMatchStore((s) => s.microGroups);
   const toggleMicroGroupInterest = useMatchStore((s) => s.toggleMicroGroupInterest);
@@ -15,7 +17,7 @@ export default function CommunityScreen() {
   return (
     <SafeAreaView edges={['top']} className="flex-1 bg-white">
       <View className="px-6 pt-6 pb-2">
-        <Text className="text-[28px] font-extrabold text-gray-900">커뮤니티</Text>
+        <Text className="text-[28px] font-extrabold text-gray-900">{t('tabs.community')}</Text>
       </View>
       <ScrollView className="flex-1 px-6" contentContainerStyle={{ paddingBottom: 40 }}>
         <MicroGroupList

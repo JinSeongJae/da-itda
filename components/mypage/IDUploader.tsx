@@ -2,8 +2,10 @@ import { useState } from 'react';
 import { Feather } from '@expo/vector-icons';
 import { Image, Pressable, Text, View } from 'react-native';
 import * as ImagePicker from 'expo-image-picker';
+import { useTranslation } from '../../utils/i18n';
 
 export function IDUploader({ onPicked }: { onPicked: (uri: string) => void }) {
+  const { t } = useTranslation();
   const [preview, setPreview] = useState<string | null>(null);
 
   const handlePick = async () => {
@@ -30,7 +32,7 @@ export function IDUploader({ onPicked }: { onPicked: (uri: string) => void }) {
       ) : (
         <>
           <Feather name="upload" size={26} color="#9ca3af" />
-          <Text className="text-sm text-gray-500 mt-2">신분증 · 외국인등록증 사진 업로드</Text>
+          <Text className="text-sm text-gray-500 mt-2">{t('uploader.placeholder')}</Text>
         </>
       )}
     </Pressable>

@@ -13,8 +13,10 @@ import { useChatStore } from '../../store/useChatStore';
 import { useMatchStore } from '../../store/useMatchStore';
 import { useUserStore } from '../../store/useUserStore';
 import { rankCandidates } from '../../utils/matchAlgorithm';
+import { useTranslation } from '../../utils/i18n';
 
 export default function Home() {
+  const { t } = useTranslation();
   const currentUserId = useAuthStore((s) => s.currentUserId)!;
   const usersById = useUserStore((s) => s.usersById);
   const currentUser = usersById[currentUserId];
@@ -57,8 +59,7 @@ export default function Home() {
       <LocationHeader city={currentUser.location.city} district={currentUser.location.district} />
       <ScrollView className="flex-1 px-6" contentContainerStyle={{ paddingBottom: 40 }}>
         <Text className="text-[28px] leading-9 font-extrabold text-gray-900 mt-6">
-          안녕하세요,{'\n'}
-          {currentUser.name}님
+          {t('home.greeting', { name: currentUser.name })}
         </Text>
 
         {upcomingAppointment && upcomingCounterpart && (
@@ -66,13 +67,11 @@ export default function Home() {
         )}
 
         <View className="mt-10">
-          <Text className="text-[13px] font-semibold text-gray-400 mb-1">오늘의 AI 추천</Text>
-          <Text className="text-xl font-extrabold text-gray-900 mb-1">이런 이웃은 어때요?</Text>
+          <Text className="text-[13px] font-semibold text-gray-400 mb-1">{t('home.recommendedLabel')}</Text>
+          <Text className="text-xl font-extrabold text-gray-900 mb-1">{t('home.recommendedTitle')}</Text>
           {topRecommendations.length === 0 ? (
             <View className="py-10 items-center">
-              <Text className="text-sm text-gray-400 text-center leading-5">
-                아직 추천할 이웃이 없어요.{'\n'}곧 새로운 이웃이 가입하면 여기 채워질 거예요!
-              </Text>
+              <Text className="text-sm text-gray-400 text-center leading-5">{t('home.noRecommendations')}</Text>
             </View>
           ) : (
             <View className="mt-3">

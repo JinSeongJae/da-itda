@@ -9,19 +9,22 @@ import { useAuthStore } from '../../../store/useAuthStore';
 import { useUserStore } from '../../../store/useUserStore';
 import { useVerificationStore } from '../../../store/useVerificationStore';
 import type { VerificationDocumentType } from '../../../types';
+import type { TranslationKey } from '../../../constants/i18n';
+import { useTranslation } from '../../../utils/i18n';
 
-const DOC_TYPES: { value: VerificationDocumentType; label: string }[] = [
-  { value: 'id-card', label: '주민등록증 / 운전면허증' },
-  { value: 'foreign-registration-card', label: '외국인등록증' },
+const DOC_TYPES: { value: VerificationDocumentType; labelKey: TranslationKey }[] = [
+  { value: 'id-card', labelKey: 'verification.docIdCard' },
+  { value: 'foreign-registration-card', labelKey: 'verification.docForeignCard' },
 ];
 
 const STEPS = [
-  { key: 'submit', label: '제출' },
-  { key: 'review', label: '검토 중' },
-  { key: 'done', label: '인증 완료' },
-] as const;
+  { key: 'submit', labelKey: 'verification.stepSubmit' },
+  { key: 'review', labelKey: 'verification.stepReview' },
+  { key: 'done', labelKey: 'verification.stepDone' },
+] as const satisfies { key: string; labelKey: TranslationKey }[];
 
 export default function VerificationScreen() {
+  const { t } = useTranslation();
   const currentUserId = useAuthStore((s) => s.currentUserId)!;
   const user = useUserStore((s) => s.usersById[currentUserId]);
   const submitVerification = useVerificationStore((s) => s.submitVerification);
@@ -38,11 +41,9 @@ export default function VerificationScreen() {
 
   return (
     <SafeAreaView className="flex-1 bg-white">
-      <Header title="수동 안심인증" showBack />
+      <Header title={t('verification.title')} showBack />
       <ScrollView className="flex-1 px-6 pt-5" contentContainerStyle={{ paddingBottom: 24 }}>
-        <Text className="text-gray-500 text-sm mb-5">
-          제출하신 서류는 OCR 자동 인식 없이, 운영팀이 직접 육안으로 확인 후 승인해드려요.
-        </Text>
+        <Text className="text-gray-500 text-sm mb-5">{t('verification.subtitle')}</Text>
 
         <View className="flex-row items-center justify-center mb-7">
           {STEPS.map((step, i) => (
@@ -58,7 +59,7 @@ export default function VerificationScreen() {
                   )}
                 </View>
                 <Text className={`text-[11px] mt-1 ${i <= currentStepIndex ? 'text-gray-700 font-semibold' : 'text-gray-400'}`}>
-                  {step.label}
+                  {t(step.labelKey)}
                 </Text>
               </View>
               {i < STEPS.length - 1 && (
@@ -73,12 +74,12 @@ export default function VerificationScreen() {
             <View className="w-16 h-16 rounded-full bg-primary-500 items-center justify-center mb-3">
               <Feather name="shield" size={28} color="#fff" />
             </View>
-            <Text className="text-primary-700 font-bold">인증 완료</Text>
-            <Text className="text-primary-600 text-xs mt-1">안심인증 뱃지가 부여됐어요</Text>
+            <Text className="text-primary-700 font-bold">{t('verification.verifiedTitle')}</Text>
+            <Text className="text-primary-600 text-xs mt-1">{t('verification.verifiedSubtitle')}</Text>
           </View>
         ) : (
           <>
-            <Text className="text-sm font-bold text-gray-700 mb-2">서류 종류</Text>
+            <Text className="text-sm font-bold text-gray-700 mb-2">{t('verification.docTypeLabel')}</Text>
             <View className="flex-row mb-4 gap-2">
               {DOC_TYPES.map((d) => (
                 <Pressable
@@ -87,7 +88,7 @@ export default function VerificationScreen() {
                   className={`flex-1 rounded-xl py-2.5 items-center ${docType === d.value ? 'bg-primary-500' : 'bg-gray-100'}`}
                 >
                   <Text className={`text-xs font-semibold ${docType === d.value ? 'text-white' : 'text-gray-600'}`}>
-                    {d.label}
+                    {t(d.labelKey)}
                   </Text>
                 </Pressable>
               ))}
@@ -98,22 +99,18 @@ export default function VerificationScreen() {
             {status === 'pending' && (
               <View className="flex-row items-center bg-amber-50 rounded-2xl px-4 py-3 mt-3">
                 <Feather name="clock" size={14} color="#b45309" />
-                <Text className="text-amber-700 text-xs ml-2 flex-1">
-                  검토 대기 중이에요. 영업일 기준 1~2일 이내 완료돼요.
-                </Text>
+                <Text className="text-amber-700 text-xs ml-2 flex-1">{t('verification.pending')}</Text>
               </View>
             )}
             {status === 'rejected' && (
               <View className="flex-row items-center bg-red-50 rounded-2xl px-4 py-3 mt-3">
                 <Feather name="alert-circle" size={14} color="#ef4444" />
-                <Text className="text-red-500 text-xs ml-2 flex-1">
-                  반려되었어요. 서류를 다시 확인 후 제출해주세요.
-                </Text>
+                <Text className="text-red-500 text-xs ml-2 flex-1">{t('verification.rejected')}</Text>
               </View>
             )}
 
             <Button
-              label={status === 'pending' ? '재제출하기' : '제출하기'}
+              label={status === 'pending' ? t('verification.resubmit') : t('verification.submit')}
               className="mt-4"
               disabled={!imageUri}
               onPress={() => imageUri && submitVerification(currentUserId, docType, imageUri)}
@@ -123,18 +120,18 @@ export default function VerificationScreen() {
               <View className="mt-8 p-3.5 bg-gray-50 rounded-2xl border border-dashed border-gray-300">
                 <View className="flex-row items-center mb-2">
                   <Feather name="tool" size={11} color="#9ca3af" />
-                  <Text className="text-xs font-bold text-gray-400 ml-1.5">DEV TOOLS · 관리자 검토 시뮬레이션</Text>
+                  <Text className="text-xs font-bold text-gray-400 ml-1.5">{t('verification.devTools')}</Text>
                 </View>
                 <View className="flex-row gap-2">
                   <Button
-                    label="승인 처리"
+                    label={t('verification.approve')}
                     variant="outline"
                     fullWidth={false}
                     className="flex-1"
                     onPress={() => mockAdminApprove(currentUserId)}
                   />
                   <Button
-                    label="반려 처리"
+                    label={t('verification.reject')}
                     variant="outline"
                     fullWidth={false}
                     className="flex-1 ml-2"
