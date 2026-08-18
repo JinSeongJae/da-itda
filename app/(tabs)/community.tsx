@@ -14,8 +14,9 @@ export default function CommunityScreen() {
 
   return (
     <SafeAreaView edges={['top']} className="flex-1 bg-gray-50">
-      <View className="px-4 py-3 border-b border-gray-100 bg-white">
+      <View className="px-4 py-3.5 bg-white shadow-sm shadow-gray-200">
         <Text className="text-xl font-extrabold text-gray-800">커뮤니티</Text>
+        <Text className="text-xs text-gray-400 mt-0.5">동네 소모임과 이웃들의 이야기를 둘러보세요</Text>
       </View>
       <ScrollView className="flex-1 px-4" contentContainerStyle={{ paddingBottom: 32 }}>
         <MicroGroupList

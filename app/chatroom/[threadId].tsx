@@ -69,11 +69,19 @@ export default function Chatroom() {
 
   return (
     <SafeAreaView edges={['top']} className="flex-1 bg-white">
-      <View className="flex-row items-center px-3 py-2 border-b border-gray-100">
-        <Pressable onPress={() => router.back()} hitSlop={12} className="mr-1">
-          <Feather name="chevron-left" size={24} color="#111827" />
+      <View className="flex-row items-center px-3 py-2.5 bg-white shadow-sm shadow-gray-200">
+        <Pressable
+          onPress={() => router.back()}
+          hitSlop={12}
+          className="w-9 h-9 rounded-full bg-gray-50 items-center justify-center mr-1 active:bg-gray-100"
+        >
+          <Feather name="chevron-left" size={22} color="#111827" />
         </Pressable>
-        {counterpart && <Avatar uri={counterpart.avatarUrl} size={36} />}
+        {counterpart && (
+          <View className="rounded-full p-0.5 border border-gray-100">
+            <Avatar uri={counterpart.avatarUrl} size={36} />
+          </View>
+        )}
         <Text className="ml-2 text-base font-bold text-gray-800 flex-1" numberOfLines={1}>
           {counterpart?.name ?? '대화 상대'}
           {thread.isDirectChannel ? ' · 단짝 이웃' : ''}

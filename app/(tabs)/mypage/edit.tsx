@@ -75,7 +75,7 @@ export default function EditProfile() {
               <Feather name="camera" size={13} color="#fff" />
             </View>
           </Pressable>
-          <Text className="text-xs text-gray-500 mt-2">프로필 사진 변경</Text>
+          <Text className="text-xs text-gray-500 mt-2">탭해서 프로필 사진 변경</Text>
         </View>
 
         <Text className="text-sm font-bold text-gray-700 mb-2">소개</Text>
@@ -84,15 +84,22 @@ export default function EditProfile() {
           onChangeText={setBio}
           multiline
           numberOfLines={3}
+          placeholder="이웃들에게 나를 짧게 소개해보세요"
+          placeholderTextColor="#9ca3af"
           className="border border-gray-300 rounded-2xl px-4 py-3 text-sm text-gray-800 mb-6"
           textAlignVertical="top"
         />
 
-        <Text className="text-sm font-bold text-gray-700 mb-2">줄 수 있어요</Text>
+        <Text className="text-sm font-bold text-gray-700 mb-1">줄 수 있어요</Text>
+        <Text className="text-xs text-gray-400 mb-2.5">태그를 눌러 빼거나, 아래에서 더 추가해보세요</Text>
         <View className="flex-row flex-wrap mb-2">
-          {user.skillsOffered.map((s) => (
-            <RemovableTag key={s.id} skill={s} onRemove={() => removeSkillOffered(currentUserId, s.id)} />
-          ))}
+          {user.skillsOffered.length === 0 ? (
+            <Text className="text-xs text-gray-400 mb-2">아직 등록된 항목이 없어요</Text>
+          ) : (
+            user.skillsOffered.map((s) => (
+              <RemovableTag key={s.id} skill={s} onRemove={() => removeSkillOffered(currentUserId, s.id)} />
+            ))
+          )}
         </View>
         <View className="flex-row flex-wrap mb-6">
           {availableToOffer.map((s) => (
@@ -100,20 +107,27 @@ export default function EditProfile() {
           ))}
         </View>
 
-        <Text className="text-sm font-bold text-gray-700 mb-2">받고 싶어요</Text>
+        <Text className="text-sm font-bold text-gray-700 mb-1">받고 싶어요</Text>
+        <Text className="text-xs text-gray-400 mb-2.5">태그를 눌러 빼거나, 아래에서 더 추가해보세요</Text>
         <View className="flex-row flex-wrap mb-2">
-          {user.skillsWanted.map((s) => (
-            <RemovableTag key={s.id} skill={s} onRemove={() => removeSkillWanted(currentUserId, s.id)} />
-          ))}
+          {user.skillsWanted.length === 0 ? (
+            <Text className="text-xs text-gray-400 mb-2">아직 등록된 항목이 없어요</Text>
+          ) : (
+            user.skillsWanted.map((s) => (
+              <RemovableTag key={s.id} skill={s} onRemove={() => removeSkillWanted(currentUserId, s.id)} />
+            ))
+          )}
         </View>
         <View className="flex-row flex-wrap mb-8">
           {availableToWant.map((s) => (
             <AddableChip key={s.id} skill={s} onAdd={() => addSkillWanted(currentUserId, s)} />
           ))}
         </View>
-
-        <Button label="저장하기" onPress={() => updateProfile(currentUserId, { bio })} />
       </ScrollView>
+
+      <View className="px-5 pt-3 pb-4 border-t border-gray-100 bg-white">
+        <Button label="저장하기" onPress={() => updateProfile(currentUserId, { bio })} />
+      </View>
     </SafeAreaView>
   );
 }

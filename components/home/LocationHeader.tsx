@@ -13,12 +13,16 @@ export function LocationHeader({ city, district }: { city: string; district: str
   const unreadCount = NOTIFICATIONS.filter((n) => !n.read).length;
 
   return (
-    <View className="flex-row items-center justify-between px-4 py-3 bg-white border-b border-gray-100">
-      <Pressable onPress={() => setPickerOpen(true)} className="flex-row items-center">
-        <Text className="text-base font-bold text-gray-800">
+    <View className="flex-row items-center justify-between px-4 py-3 bg-white shadow-sm shadow-gray-200">
+      <Pressable
+        onPress={() => setPickerOpen(true)}
+        className="flex-row items-center bg-gray-50 rounded-full pl-3 pr-2.5 py-1.5"
+      >
+        <Feather name="map-pin" size={13} color="#059669" />
+        <Text className="text-sm font-bold text-gray-800 ml-1.5">
           {city} {selected}
         </Text>
-        <Feather name="chevron-down" size={18} color="#374151" style={{ marginLeft: 4 }} />
+        <Feather name="chevron-down" size={16} color="#9ca3af" style={{ marginLeft: 2 }} />
       </Pressable>
 
       <Pressable onPress={() => setBellOpen(true)} hitSlop={12} className="relative">

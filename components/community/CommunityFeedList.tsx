@@ -1,3 +1,4 @@
+import { Feather } from '@expo/vector-icons';
 import { Text, View } from 'react-native';
 import { Avatar } from '../common/Avatar';
 import { Card } from '../common/Card';
@@ -21,7 +22,8 @@ export function CommunityFeedList({
   return (
     <View className="mt-4">
       <View className="flex-row items-center mb-3">
-        <Text className="text-base font-bold text-gray-800">동네 교류 게시판</Text>
+        <Feather name="message-square" size={15} color="#059669" />
+        <Text className="text-base font-bold text-gray-800 ml-1.5">동네 교류 게시판</Text>
       </View>
       {posts.map((post) => {
         const author = usersById[post.authorId];

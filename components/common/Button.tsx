@@ -1,6 +1,7 @@
+import { Feather } from '@expo/vector-icons';
 import { ActivityIndicator, Pressable, Text, type PressableProps } from 'react-native';
 
-type Variant = 'primary' | 'secondary' | 'outline' | 'ghost' | 'danger';
+type Variant = 'primary' | 'secondary' | 'outline' | 'ghost' | 'danger' | 'kakao';
 
 interface ButtonProps extends Omit<PressableProps, 'children'> {
   label: string;
@@ -15,6 +16,7 @@ const VARIANT_CONTAINER: Record<Variant, string> = {
   outline: 'bg-transparent border border-gray-300 active:bg-gray-50',
   ghost: 'bg-transparent active:bg-gray-100',
   danger: 'bg-red-500 active:bg-red-600',
+  kakao: 'bg-[#FEE500] active:bg-[#f5dc00]',
 };
 
 const VARIANT_TEXT: Record<Variant, string> = {
@@ -23,6 +25,7 @@ const VARIANT_TEXT: Record<Variant, string> = {
   outline: 'text-gray-700',
   ghost: 'text-gray-700',
   danger: 'text-white',
+  kakao: 'text-[#191919]',
 };
 
 export function Button({
@@ -44,9 +47,12 @@ export function Button({
       {loading && (
         <ActivityIndicator
           size="small"
-          color={variant === 'primary' || variant === 'danger' ? '#fff' : '#10b981'}
+          color={variant === 'primary' || variant === 'danger' ? '#fff' : variant === 'kakao' ? '#191919' : '#10b981'}
           style={{ marginRight: 8 }}
         />
+      )}
+      {!loading && variant === 'kakao' && (
+        <Feather name="message-circle" size={17} color="#191919" style={{ marginRight: 6 }} />
       )}
       <Text className={`text-base font-bold ${VARIANT_TEXT[variant]}`}>{label}</Text>
     </Pressable>

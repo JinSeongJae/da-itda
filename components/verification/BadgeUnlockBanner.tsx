@@ -5,8 +5,10 @@ import type { Badge } from '../../types';
 export function BadgeUnlockBanner({ badge }: { badge: Badge }) {
   return (
     <View className="items-center py-6">
-      <View className="w-24 h-24 rounded-full bg-primary-100 items-center justify-center mb-5">
-        <Feather name={badge.iconName as any} size={40} color="#10b981" />
+      <View className="w-32 h-32 rounded-full bg-primary-50 items-center justify-center mb-5">
+        <View className="w-24 h-24 rounded-full bg-primary-500 items-center justify-center shadow-md shadow-primary-200">
+          <Feather name={badge.iconName as any} size={38} color="#fff" />
+        </View>
       </View>
       <Text className="text-2xl font-extrabold text-gray-800">{badge.name} 뱃지 획득!</Text>
       <Text className="text-gray-500 text-center mt-2 px-8">{badge.description}</Text>

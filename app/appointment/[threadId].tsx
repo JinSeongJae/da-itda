@@ -1,4 +1,5 @@
 import { useMemo, useState } from 'react';
+import { Feather } from '@expo/vector-icons';
 import { ScrollView, Text, TextInput, View } from 'react-native';
 import { router, useLocalSearchParams } from 'expo-router';
 import { format, parse } from 'date-fns';
@@ -172,8 +173,9 @@ export default function AppointmentFormScreen() {
           className="border border-gray-300 rounded-2xl px-4 py-3 text-sm text-gray-800 mb-4"
         />
 
-        <View className="bg-gray-50 rounded-2xl p-3.5 mt-2 mb-6">
-          <Text className="text-xs text-gray-500">
+        <View className="flex-row items-center bg-primary-50 rounded-2xl p-3.5 mt-2 mb-6">
+          <Feather name="check-circle" size={14} color="#059669" />
+          <Text className="text-xs text-primary-700 font-medium ml-2 flex-1">
             {formatDateTime(dateStr, timeStr)} · {selectedZone?.name ?? '장소를 선택해주세요'}
           </Text>
         </View>

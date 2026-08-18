@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
+import { Feather } from '@expo/vector-icons';
 import { Dimensions, FlatList, Text, View } from 'react-native';
 import type { SuccessStory } from '../../mocks/successStories';
 
@@ -35,15 +36,31 @@ export function SuccessStoryCarousel({ stories }: { stories: SuccessStory[] }) {
         snapToInterval={CARD_WIDTH}
         decelerationRate="fast"
         getItemLayout={(_, i) => ({ length: CARD_WIDTH, offset: CARD_WIDTH * i, index: i })}
+        onMomentumScrollEnd={(e) => setIndex(Math.round(e.nativeEvent.contentOffset.x / CARD_WIDTH))}
         renderItem={({ item }) => (
           <View
             style={{ width: CARD_WIDTH }}
-            className="bg-primary-50 border border-primary-100 rounded-2xl p-4 mr-0"
+            className="bg-primary-50 border border-primary-100 rounded-3xl p-4 mr-0 flex-row items-center"
           >
-            <Text className="text-primary-800 text-sm font-semibold">{item.text}</Text>
+            <View className="bg-white rounded-full w-9 h-9 items-center justify-center mr-3">
+              <Feather name="heart" size={16} color="#059669" />
+            </View>
+            <Text className="text-primary-800 text-sm font-semibold flex-1">{item.text}</Text>
           </View>
         )}
       />
+      {stories.length > 1 && (
+        <View className="flex-row justify-center mt-2.5">
+          {stories.map((s, i) => (
+            <View
+              key={s.id}
+              className={`rounded-full mx-0.5 ${
+                i === index ? 'bg-primary-500 w-4 h-1.5' : 'bg-gray-200 w-1.5 h-1.5'
+              }`}
+            />
+          ))}
+        </View>
+      )}
     </View>
   );
 }

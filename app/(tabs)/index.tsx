@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { Feather } from '@expo/vector-icons';
 import { ScrollView, Text, View } from 'react-native';
 import { router } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -60,20 +61,32 @@ export default function Home() {
           <ConfirmedAppointmentBanner appointment={upcomingAppointment} counterpart={upcomingCounterpart} />
         )}
 
+        <Text className="text-xl font-extrabold text-gray-800 mt-5">
+          안녕하세요, {currentUser.name}님
+        </Text>
+        <Text className="text-sm text-gray-400 mt-1 mb-1">오늘도 새로운 이웃과 재능을 나눠보세요</Text>
+
         <View className="mt-4">
-          <Text className="text-base font-bold text-gray-800 mb-3">오늘의 AI 추천 이웃</Text>
+          <View className="flex-row items-center mb-3">
+            <Feather name="star" size={15} color="#059669" />
+            <Text className="text-base font-bold text-gray-800 ml-1.5">오늘의 AI 추천 이웃</Text>
+          </View>
           {topRecommendations.length === 0 ? (
-            <Text className="text-sm text-gray-400 py-6 text-center">
-              아직 추천할 이웃이 없어요. 곧 새로운 이웃이 가입하면 여기 채워질 거예요!
-            </Text>
+            <View className="bg-white rounded-3xl border border-gray-100 py-8 items-center">
+              <Feather name="users" size={22} color="#d1d5db" />
+              <Text className="text-sm text-gray-400 mt-2 text-center px-6">
+                아직 추천할 이웃이 없어요.{'\n'}곧 새로운 이웃이 가입하면 여기 채워질 거예요!
+              </Text>
+            </View>
           ) : (
-            topRecommendations.map(({ candidate, compatibilityScore }) => (
+            topRecommendations.map(({ candidate, compatibilityScore }, index) => (
               <RecommendedNeighborCard
                 key={candidate.id}
                 candidate={candidate}
                 compatibilityScore={compatibilityScore}
                 onMatch={() => handleMatch(candidate.id)}
                 matching={matchingWithId === candidate.id}
+                topPick={index === 0}
               />
             ))
           )}

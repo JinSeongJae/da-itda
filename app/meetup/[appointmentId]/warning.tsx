@@ -29,8 +29,10 @@ export default function MeetupWarning() {
         </View>
 
         {NOTICE_ITEMS.map((item, i) => (
-          <View key={i} className="flex-row items-start mb-3">
-            <Text className="text-amber-600 font-bold mr-2">{i + 1}.</Text>
+          <View key={i} className="flex-row items-start mb-3.5">
+            <View className="w-5 h-5 rounded-full bg-amber-100 items-center justify-center mr-2.5 mt-0.5">
+              <Text className="text-amber-700 text-[10px] font-bold">{i + 1}</Text>
+            </View>
             <Text className="text-sm text-gray-700 flex-1 leading-5">{item}</Text>
           </View>
         ))}

@@ -44,28 +44,37 @@ export default function VerificationScreen() {
           제출하신 서류는 OCR 자동 인식 없이, 운영팀이 직접 육안으로 확인 후 승인해드려요.
         </Text>
 
-        <View className="flex-row items-center justify-center mb-6">
+        <View className="flex-row items-center justify-center mb-7">
           {STEPS.map((step, i) => (
             <View key={step.key} className="flex-row items-center">
-              <View
-                className={`w-8 h-8 rounded-full items-center justify-center ${i <= currentStepIndex ? 'bg-primary-500' : 'bg-gray-200'}`}
-              >
-                {i < currentStepIndex ? (
-                  <Feather name="check" size={14} color="#fff" />
-                ) : (
-                  <Text className={`text-xs font-bold ${i <= currentStepIndex ? 'text-white' : 'text-gray-500'}`}>{i + 1}</Text>
-                )}
+              <View className="items-center">
+                <View
+                  className={`w-9 h-9 rounded-full items-center justify-center ${i <= currentStepIndex ? 'bg-primary-500' : 'bg-gray-200'}`}
+                >
+                  {i < currentStepIndex ? (
+                    <Feather name="check" size={15} color="#fff" />
+                  ) : (
+                    <Text className={`text-xs font-bold ${i <= currentStepIndex ? 'text-white' : 'text-gray-500'}`}>{i + 1}</Text>
+                  )}
+                </View>
+                <Text className={`text-[11px] mt-1 ${i <= currentStepIndex ? 'text-gray-700 font-semibold' : 'text-gray-400'}`}>
+                  {step.label}
+                </Text>
               </View>
-              <Text className="text-[11px] text-gray-500 mx-1.5">{step.label}</Text>
-              {i < STEPS.length - 1 && <View className="w-6 h-px bg-gray-300 mr-1.5" />}
+              {i < STEPS.length - 1 && (
+                <View className={`w-8 h-0.5 mx-1 mb-4 ${i < currentStepIndex ? 'bg-primary-400' : 'bg-gray-200'}`} />
+              )}
             </View>
           ))}
         </View>
 
         {status === 'verified' ? (
-          <View className="items-center bg-primary-50 rounded-2xl py-8">
-            <Feather name="shield" size={36} color="#10b981" />
-            <Text className="text-primary-700 font-bold mt-3">인증 완료 (안심인증 뱃지 부여)</Text>
+          <View className="items-center bg-primary-50 rounded-3xl py-10 border border-primary-100">
+            <View className="w-16 h-16 rounded-full bg-primary-500 items-center justify-center mb-3">
+              <Feather name="shield" size={28} color="#fff" />
+            </View>
+            <Text className="text-primary-700 font-bold">인증 완료</Text>
+            <Text className="text-primary-600 text-xs mt-1">안심인증 뱃지가 부여됐어요</Text>
           </View>
         ) : (
           <>
@@ -87,14 +96,20 @@ export default function VerificationScreen() {
             <IDUploader onPicked={setImageUri} />
 
             {status === 'pending' && (
-              <Text className="text-amber-600 text-xs text-center mt-3">
-                검토 대기 중이에요. 영업일 기준 1~2일 이내 완료돼요.
-              </Text>
+              <View className="flex-row items-center bg-amber-50 rounded-2xl px-4 py-3 mt-3">
+                <Feather name="clock" size={14} color="#b45309" />
+                <Text className="text-amber-700 text-xs ml-2 flex-1">
+                  검토 대기 중이에요. 영업일 기준 1~2일 이내 완료돼요.
+                </Text>
+              </View>
             )}
             {status === 'rejected' && (
-              <Text className="text-red-500 text-xs text-center mt-3">
-                반려되었어요. 서류를 다시 확인 후 제출해주세요.
-              </Text>
+              <View className="flex-row items-center bg-red-50 rounded-2xl px-4 py-3 mt-3">
+                <Feather name="alert-circle" size={14} color="#ef4444" />
+                <Text className="text-red-500 text-xs ml-2 flex-1">
+                  반려되었어요. 서류를 다시 확인 후 제출해주세요.
+                </Text>
+              </View>
             )}
 
             <Button
@@ -105,8 +120,11 @@ export default function VerificationScreen() {
             />
 
             {status === 'pending' && (
-              <View className="mt-8 p-3 bg-gray-50 rounded-2xl">
-                <Text className="text-xs font-bold text-gray-400 mb-2">DEV TOOLS (관리자 검토 시뮬레이션)</Text>
+              <View className="mt-8 p-3.5 bg-gray-50 rounded-2xl border border-dashed border-gray-300">
+                <View className="flex-row items-center mb-2">
+                  <Feather name="tool" size={11} color="#9ca3af" />
+                  <Text className="text-xs font-bold text-gray-400 ml-1.5">DEV TOOLS · 관리자 검토 시뮬레이션</Text>
+                </View>
                 <View className="flex-row gap-2">
                   <Button
                     label="승인 처리"

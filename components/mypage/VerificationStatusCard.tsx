@@ -15,7 +15,7 @@ export function VerificationStatusCard({ status }: { status: VerificationStatus 
   return (
     <Pressable
       onPress={() => router.push('/(tabs)/mypage/verification')}
-      className="flex-row items-center justify-between mx-4 mb-4 p-4 rounded-2xl border border-gray-100 bg-white"
+      className="flex-row items-center justify-between mx-4 mb-4 p-4 rounded-3xl border border-gray-100/80 bg-white shadow-md shadow-gray-200"
     >
       <View className="flex-row items-center flex-1">
         <View className="w-10 h-10 rounded-full items-center justify-center mr-3" style={{ backgroundColor: `${meta.color}1A` }}>

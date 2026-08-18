@@ -6,8 +6,13 @@ import type { User } from '../../types';
 
 export function ProfileHeader({ user }: { user: User }) {
   return (
-    <View className="items-center px-6 pt-6 pb-2">
-      <Avatar uri={user.avatarUrl} size={88} />
+    <View className="items-center pb-2">
+      <View className="w-full h-20 bg-primary-500 absolute top-0 rounded-b-[32px]" />
+      <View className="pt-8">
+        <View className="rounded-full p-1 bg-white shadow-md shadow-gray-300">
+          <Avatar uri={user.avatarUrl} size={88} />
+        </View>
+      </View>
       <View className="flex-row items-center mt-3">
         <Text className="text-xl font-extrabold text-gray-800">{user.name}</Text>
         {user.verification === 'verified' && (

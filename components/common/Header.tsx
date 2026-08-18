@@ -10,11 +10,15 @@ interface HeaderProps {
 
 export function Header({ title, showBack = false, right }: HeaderProps) {
   return (
-    <View className="flex-row items-center justify-between px-4 py-3 bg-white border-b border-gray-100">
+    <View className="flex-row items-center justify-between px-4 py-3.5 bg-white shadow-sm shadow-gray-200">
       <View className="flex-row items-center flex-1">
         {showBack && (
-          <Pressable onPress={() => router.back()} hitSlop={12} className="mr-2">
-            <Feather name="chevron-left" size={24} color="#111827" />
+          <Pressable
+            onPress={() => router.back()}
+            hitSlop={12}
+            className="w-9 h-9 rounded-full bg-gray-50 items-center justify-center mr-2 active:bg-gray-100"
+          >
+            <Feather name="chevron-left" size={22} color="#111827" />
           </Pressable>
         )}
         <Text className="text-lg font-bold text-gray-800" numberOfLines={1}>

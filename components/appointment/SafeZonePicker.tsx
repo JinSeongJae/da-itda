@@ -30,10 +30,17 @@ export function SafeZonePicker({
                   <Feather name={meta?.iconName as any} size={15} color="#047857" />
                 </View>
                 <View className="flex-1">
-                  <Text className="text-sm font-bold text-gray-800" numberOfLines={1}>
-                    {index === 0 ? '⭐ ' : ''}
-                    {zone.name}
-                  </Text>
+                  <View className="flex-row items-center">
+                    <Text className="text-sm font-bold text-gray-800" numberOfLines={1}>
+                      {zone.name}
+                    </Text>
+                    {index === 0 && (
+                      <View className="flex-row items-center bg-primary-50 rounded-full px-1.5 py-0.5 ml-1.5">
+                        <Feather name="award" size={9} color="#059669" />
+                        <Text className="text-[9px] font-bold text-primary-700 ml-0.5">추천</Text>
+                      </View>
+                    )}
+                  </View>
                   <Text className="text-xs text-gray-500">{meta?.label} · {zone.hours.open}~{zone.hours.close}</Text>
                 </View>
               </View>

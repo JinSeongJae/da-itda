@@ -1,9 +1,11 @@
 import { useEffect, useState } from 'react';
-import { Text, View } from 'react-native';
+import { Feather } from '@expo/vector-icons';
+import { Image, Text, View } from 'react-native';
 import { router } from 'expo-router';
 import * as AuthSession from 'expo-auth-session';
 import * as WebBrowser from 'expo-web-browser';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import Svg, { Defs, RadialGradient, Rect, Stop } from 'react-native-svg';
 import { Button } from '../../components/common/Button';
 import { GYEONGSAN_CENTER } from '../../constants/theme';
 import { useAuthStore } from '../../store/useAuthStore';
@@ -108,21 +110,44 @@ export default function Welcome() {
 
   return (
     <SafeAreaView className="flex-1 bg-white">
-      <View className="flex-1 items-center justify-center px-6">
-        <View className="w-20 h-20 rounded-3xl bg-primary-500 items-center justify-center mb-5">
-          <Text className="text-white text-3xl font-extrabold">다</Text>
+      <Svg width="100%" height="60%" style={{ position: 'absolute', top: 0, left: 0 }}>
+        <Defs>
+          <RadialGradient id="glow" cx="50%" cy="0%" r="75%">
+            <Stop offset="0" stopColor="#6ee7b7" stopOpacity={0.35} />
+            <Stop offset="1" stopColor="#6ee7b7" stopOpacity={0} />
+          </RadialGradient>
+        </Defs>
+        <Rect width="100%" height="100%" fill="url(#glow)" />
+      </Svg>
+
+      <View className="flex-1 items-center justify-between px-6 pt-16 pb-10">
+        <View className="items-center mt-10">
+          <Image
+            source={require('../../assets/splash-icon.png')}
+            style={{ width: 132, height: 132 }}
+            resizeMode="contain"
+          />
+          <Text className="text-3xl font-extrabold text-gray-800 mt-4">다잇다</Text>
+          <Text className="text-gray-500 mt-2.5 text-center leading-6">
+            이웃과 재능을 나누는{'\n'}가장 안전한 하이퍼로컬 커뮤니티
+          </Text>
         </View>
-        <Text className="text-2xl font-extrabold text-gray-800">다잇다</Text>
-        <Text className="text-gray-500 mt-2 text-center mb-10">
-          이웃과 재능을 나누는{'\n'}가장 안전한 하이퍼로컬 커뮤니티
-        </Text>
-        <Button
-          label={loading ? '로그인 처리 중...' : '카카오로 시작하기'}
-          onPress={() => promptAsync()}
-          loading={loading}
-          disabled={!request || loading}
-        />
-        {!!error && <Text className="text-red-500 text-sm mt-4 text-center">{error}</Text>}
+
+        <View className="w-full">
+          <Button
+            label={loading ? '로그인 처리 중...' : '카카오로 시작하기'}
+            variant="kakao"
+            onPress={() => promptAsync()}
+            loading={loading}
+            disabled={!request || loading}
+          />
+          {!!error && (
+            <View className="flex-row items-center bg-red-50 rounded-2xl px-4 py-3 mt-4">
+              <Feather name="alert-circle" size={15} color="#ef4444" />
+              <Text className="text-red-500 text-xs ml-2 flex-1">{error}</Text>
+            </View>
+          )}
+        </View>
       </View>
     </SafeAreaView>
   );
