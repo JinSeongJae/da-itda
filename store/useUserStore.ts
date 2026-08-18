@@ -1,8 +1,22 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 import type { BadgeId, Skill, TimeSlot, User, VerificationStatus } from '../types';
-import { SEED_USERS } from '../mocks/users';
 import { asyncStorageAdapter } from './storage';
+import { useAuthStore } from './useAuthStore';
+
+/** Best-effort sync of the caller's own profile to the backend — never blocks or throws. */
+function syncSelfProfile(user: User | undefined): void {
+  if (!user) return;
+  const { currentUserId, sessionToken } = useAuthStore.getState();
+  const backendUrl = process.env.EXPO_PUBLIC_BACKEND_URL;
+  if (!backendUrl || !sessionToken || user.id !== currentUserId) return;
+
+  fetch(`${backendUrl}/api/users/me`, {
+    method: 'PUT',
+    headers: { 'content-type': 'application/json', authorization: `Bearer ${sessionToken}` },
+    body: JSON.stringify(user),
+  }).catch(() => {});
+}
 
 interface UserState {
   usersById: Record<string, User>;
@@ -18,27 +32,31 @@ interface UserState {
   addPoints: (userId: string, amount: number) => void;
   addVolunteerMinutes: (userId: string, minutes: number) => void;
   getUserById: (userId: string) => User | undefined;
+  /** Fetches every onboarded real user from the backend and merges them in. No-op if not configured. */
+  fetchAllUsers: () => Promise<void>;
 }
 
 export const useUserStore = create<UserState>()(
   persist(
     (set, get) => ({
-      usersById: SEED_USERS,
+      usersById: {},
 
       addUser: (user) =>
         set((state) => ({
           usersById: { ...state.usersById, [user.id]: user },
         })),
 
-      updateProfile: (userId, patch) =>
+      updateProfile: (userId, patch) => {
         set((state) => ({
           usersById: {
             ...state.usersById,
             [userId]: { ...state.usersById[userId], ...patch },
           },
-        })),
+        }));
+        syncSelfProfile(get().usersById[userId]);
+      },
 
-      addSkillOffered: (userId, skill) =>
+      addSkillOffered: (userId, skill) => {
         set((state) => {
           const user = state.usersById[userId];
           if (!user || user.skillsOffered.some((s) => s.id === skill.id)) return state;
@@ -48,9 +66,11 @@ export const useUserStore = create<UserState>()(
               [userId]: { ...user, skillsOffered: [...user.skillsOffered, skill] },
             },
           };
-        }),
+        });
+        syncSelfProfile(get().usersById[userId]);
+      },
 
-      removeSkillOffered: (userId, skillId) =>
+      removeSkillOffered: (userId, skillId) => {
         set((state) => {
           const user = state.usersById[userId];
           if (!user) return state;
@@ -63,9 +83,11 @@ export const useUserStore = create<UserState>()(
               },
             },
           };
-        }),
+        });
+        syncSelfProfile(get().usersById[userId]);
+      },
 
-      addSkillWanted: (userId, skill) =>
+      addSkillWanted: (userId, skill) => {
         set((state) => {
           const user = state.usersById[userId];
           if (!user || user.skillsWanted.some((s) => s.id === skill.id)) return state;
@@ -75,9 +97,11 @@ export const useUserStore = create<UserState>()(
               [userId]: { ...user, skillsWanted: [...user.skillsWanted, skill] },
             },
           };
-        }),
+        });
+        syncSelfProfile(get().usersById[userId]);
+      },
 
-      removeSkillWanted: (userId, skillId) =>
+      removeSkillWanted: (userId, skillId) => {
         set((state) => {
           const user = state.usersById[userId];
           if (!user) return state;
@@ -90,15 +114,19 @@ export const useUserStore = create<UserState>()(
               },
             },
           };
-        }),
+        });
+        syncSelfProfile(get().usersById[userId]);
+      },
 
-      setAvailability: (userId, availability) =>
+      setAvailability: (userId, availability) => {
         set((state) => ({
           usersById: {
             ...state.usersById,
             [userId]: { ...state.usersById[userId], availability },
           },
-        })),
+        }));
+        syncSelfProfile(get().usersById[userId]);
+      },
 
       awardBadge: (userId, badgeId) =>
         set((state) => {
@@ -145,6 +173,30 @@ export const useUserStore = create<UserState>()(
         }),
 
       getUserById: (userId) => get().usersById[userId],
+
+      fetchAllUsers: async () => {
+        const backendUrl = process.env.EXPO_PUBLIC_BACKEND_URL;
+        const token = useAuthStore.getState().sessionToken;
+        if (!backendUrl || !token) return;
+
+        try {
+          const res = await fetch(`${backendUrl}/api/users`, {
+            headers: { authorization: `Bearer ${token}` },
+          });
+          if (!res.ok) return;
+
+          const { users } = (await res.json()) as { users: User[] };
+          set((state) => {
+            const merged = { ...state.usersById };
+            for (const user of users) {
+              if (user?.id) merged[user.id] = user;
+            }
+            return { usersById: merged };
+          });
+        } catch {
+          // 백엔드 미배포/오프라인 — 로컬 상태 그대로 유지
+        }
+      },
     }),
     {
       name: 'daitda-users',

@@ -10,10 +10,12 @@ export function RecommendedNeighborCard({
   candidate,
   compatibilityScore,
   onMatch,
+  matching = false,
 }: {
   candidate: User;
   compatibilityScore: number;
   onMatch: () => void;
+  matching?: boolean;
 }) {
   return (
     <Card className="mb-3">
@@ -39,7 +41,7 @@ export function RecommendedNeighborCard({
           </View>
         </View>
       </View>
-      <Button label="매칭하기" onPress={onMatch} className="mt-3" />
+      <Button label="매칭하기" onPress={onMatch} loading={matching} disabled={matching} className="mt-3" />
     </Card>
   );
 }

@@ -11,11 +11,21 @@ interface MessageRow {
   created_at: string;
 }
 
+async function assertParticipant(threadId: string, userId: string): Promise<void> {
+  const rows = await query<{ id: string }>(
+    'SELECT id FROM threads WHERE id = $1 AND (user_a_id = $2 OR user_b_id = $2)',
+    [threadId, userId]
+  );
+  if (!rows[0]) {
+    throw Object.assign(new Error('이 채팅방에 접근할 권한이 없습니다.'), { statusCode: 403 });
+  }
+}
+
 export default async function handler(req: VercelRequest, res: VercelResponse) {
   if (applyCors(req, res)) return;
 
   try {
-    requireUser(req);
+    const userId = requireUser(req);
 
     if (req.method === 'GET') {
       const threadId = typeof req.query.threadId === 'string' ? req.query.threadId : undefined;
@@ -23,6 +33,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         res.status(400).json({ error: 'threadId 쿼리 파라미터가 필요합니다.' });
         return;
       }
+      await assertParticipant(threadId, userId);
 
       const rows = await query<MessageRow>(
         `SELECT id, thread_id, sender_id, text, created_at
@@ -48,6 +59,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         res.status(400).json({ error: 'id, threadId, senderId, text가 필요합니다.' });
         return;
       }
+      await assertParticipant(threadId, userId);
 
       await query(
         `INSERT INTO messages (id, thread_id, sender_id, text, created_at)

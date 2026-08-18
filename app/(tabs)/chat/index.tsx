@@ -1,3 +1,4 @@
+import { useEffect } from 'react';
 import { FlatList, Text, View } from 'react-native';
 import { router } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -10,7 +11,14 @@ import { useUserStore } from '../../../store/useUserStore';
 export default function ChatList() {
   const currentUserId = useAuthStore((s) => s.currentUserId)!;
   const threadsById = useChatStore((s) => s.threadsById);
+  const fetchThreads = useChatStore((s) => s.fetchThreads);
   const usersById = useUserStore((s) => s.usersById);
+  const fetchAllUsers = useUserStore((s) => s.fetchAllUsers);
+
+  useEffect(() => {
+    fetchThreads();
+    fetchAllUsers();
+  }, [fetchThreads, fetchAllUsers]);
 
   const threads = Object.values(threadsById)
     .filter((t) => t.participantIds.includes(currentUserId))

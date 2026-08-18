@@ -4,13 +4,6 @@ const GEMINI_ENDPOINT = `https://generativelanguage.googleapis.com/v1beta/models
 const BASE_SYSTEM_INSTRUCTION =
   "너는 '다잇다' 앱의 다정한 한국어 동네 이웃 AI 보조야. 사용자와 따뜻하게 한국어로 대화하며 재능 교류와 모임 약속을 도와줘.";
 
-const WARM_FALLBACK_REPLY = '미안해요, 지금은 답장을 생각하는 중이에요. 조금 있다가 다시 이야기해줄래요? 😊';
-
-export interface GeminiChatTurn {
-  role: 'user' | 'model';
-  text: string;
-}
-
 function extractText(data: any): string | undefined {
   const parts = data?.candidates?.[0]?.content?.parts;
   if (!Array.isArray(parts)) return undefined;
@@ -19,23 +12,6 @@ function extractText(data: any): string | undefined {
     .join('')
     .trim();
   return text.length > 0 ? text : undefined;
-}
-
-function buildNeighborSystemInstruction({
-  partnerName,
-  partnerSkills,
-  partnerLocation,
-}: {
-  partnerName: string;
-  partnerSkills: string;
-  partnerLocation?: string;
-}): string {
-  const base =
-    `너는 '다잇다' 앱에서 '사용자'와 대화하는 이웃 '${partnerName}'이야. ` +
-    `네가 가진 재능/관심사(${partnerSkills})를 바탕으로 다정하고 자연스러운 한국어로 사용자와 대화하며, ` +
-    `재능 교류 및 약속 잡기를 도와줘. 로봇이나 AI라는 티를 내지 말고 실제 동네 이웃처럼 친근하게 대화해줘.`;
-
-  return partnerLocation ? `${base} 너는 ${partnerLocation}에 살고 있어.` : base;
 }
 
 async function callGemini(apiKey: string, body: Record<string, unknown>): Promise<any> {
@@ -51,33 +27,6 @@ async function callGemini(apiKey: string, body: Record<string, unknown>): Promis
   }
 
   return response.json();
-}
-
-export async function generateGeminiReply({
-  apiKey,
-  partnerName,
-  partnerSkills,
-  partnerLocation,
-  history,
-}: {
-  apiKey: string;
-  partnerName: string;
-  partnerSkills: string;
-  partnerLocation?: string;
-  history: GeminiChatTurn[];
-}): Promise<string> {
-  try {
-    const systemInstruction = buildNeighborSystemInstruction({ partnerName, partnerSkills, partnerLocation });
-    const data = await callGemini(apiKey, {
-      systemInstruction: { parts: [{ text: `${BASE_SYSTEM_INSTRUCTION}\n\n${systemInstruction}` }] },
-      contents: history.map((turn) => ({ role: turn.role, parts: [{ text: turn.text }] })),
-      generationConfig: { maxOutputTokens: 300 },
-    });
-
-    return extractText(data) ?? WARM_FALLBACK_REPLY;
-  } catch {
-    return WARM_FALLBACK_REPLY;
-  }
 }
 
 export interface AppointmentSuggestion {

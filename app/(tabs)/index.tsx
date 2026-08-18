@@ -1,3 +1,4 @@
+import { useEffect, useState } from 'react';
 import { ScrollView, Text, View } from 'react-native';
 import { router } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -17,11 +18,16 @@ export default function Home() {
   const currentUserId = useAuthStore((s) => s.currentUserId)!;
   const usersById = useUserStore((s) => s.usersById);
   const currentUser = usersById[currentUserId];
+  const fetchAllUsers = useUserStore((s) => s.fetchAllUsers);
 
-  const confirmMatch = useMatchStore((s) => s.confirmMatch);
   const getMatchById = useMatchStore((s) => s.getMatchById);
-  const createThreadForMatch = useChatStore((s) => s.createThreadForMatch);
+  const createOrFetchThreadWithUser = useChatStore((s) => s.createOrFetchThreadWithUser);
   const getUpcomingAppointmentForUser = useAppointmentStore((s) => s.getUpcomingAppointmentForUser);
+  const [matchingWithId, setMatchingWithId] = useState<string | null>(null);
+
+  useEffect(() => {
+    fetchAllUsers();
+  }, [fetchAllUsers]);
 
   if (!currentUser) return null;
 
@@ -34,10 +40,14 @@ export default function Home() {
     upcomingMatch && (upcomingMatch.userAId === currentUserId ? upcomingMatch.userBId : upcomingMatch.userAId);
   const upcomingCounterpart = upcomingCounterpartId ? usersById[upcomingCounterpartId] : undefined;
 
-  const handleMatch = (candidateId: string) => {
-    const match = confirmMatch(currentUserId, candidateId);
-    const thread = createThreadForMatch(match.id);
-    router.push(`/chatroom/${thread.id}`);
+  const handleMatch = async (candidateId: string) => {
+    setMatchingWithId(candidateId);
+    try {
+      const thread = await createOrFetchThreadWithUser(candidateId);
+      router.push(`/chatroom/${thread.id}`);
+    } finally {
+      setMatchingWithId(null);
+    }
   };
 
   return (
@@ -50,14 +60,21 @@ export default function Home() {
 
         <View className="mt-4">
           <Text className="text-base font-bold text-gray-800 mb-3">오늘의 AI 추천 이웃</Text>
-          {topRecommendations.map(({ candidate, compatibilityScore }) => (
-            <RecommendedNeighborCard
-              key={candidate.id}
-              candidate={candidate}
-              compatibilityScore={compatibilityScore}
-              onMatch={() => handleMatch(candidate.id)}
-            />
-          ))}
+          {topRecommendations.length === 0 ? (
+            <Text className="text-sm text-gray-400 py-6 text-center">
+              아직 추천할 이웃이 없어요. 곧 새로운 이웃이 가입하면 여기 채워질 거예요!
+            </Text>
+          ) : (
+            topRecommendations.map(({ candidate, compatibilityScore }) => (
+              <RecommendedNeighborCard
+                key={candidate.id}
+                candidate={candidate}
+                compatibilityScore={compatibilityScore}
+                onMatch={() => handleMatch(candidate.id)}
+                matching={matchingWithId === candidate.id}
+              />
+            ))
+          )}
         </View>
 
         <SuccessStoryCarousel stories={SEED_SUCCESS_STORIES} />

@@ -2,7 +2,6 @@ import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 import type { ActivityCourse, MatchResult, MatchStatus, MicroGroupSuggestion } from '../types';
 import { SEED_ACTIVITY_COURSES } from '../mocks/activityCourses';
-import { SEED_MATCHES } from '../mocks/matches';
 import { SEED_MICRO_GROUPS } from '../mocks/microGroups';
 import { generateId } from '../utils/id';
 import { computeCompatibilityScore, computeMatchFactorScores, generateActivityCourse } from '../utils/matchAlgorithm';
@@ -24,7 +23,7 @@ interface MatchState {
 export const useMatchStore = create<MatchState>()(
   persist(
     (set, get) => ({
-      matches: SEED_MATCHES,
+      matches: [],
       activityCourses: SEED_ACTIVITY_COURSES,
       microGroups: SEED_MICRO_GROUPS,
 

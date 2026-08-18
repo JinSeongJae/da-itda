@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef } from 'react';
 import { FlatList, KeyboardAvoidingView, Platform, Pressable, Text, View } from 'react-native';
 import { router, useLocalSearchParams } from 'expo-router';
 import { Feather } from '@expo/vector-icons';
@@ -13,6 +13,8 @@ import { useChatStore } from '../../store/useChatStore';
 import { useUserStore } from '../../store/useUserStore';
 import type { ChatMessage } from '../../types';
 
+const POLL_INTERVAL_MS = 4000;
+
 export default function Chatroom() {
   const { threadId } = useLocalSearchParams<{ threadId: string }>();
   const currentUserId = useAuthStore((s) => s.currentUserId)!;
@@ -22,15 +24,16 @@ export default function Chatroom() {
   const messages = useChatStore((s) => s.messagesByThread[threadId] ?? []);
   const sendMessage = useChatStore((s) => s.sendMessage);
   const getContextHeader = useChatStore((s) => s.getContextHeader);
-  const generateCounterpartReply = useChatStore((s) => s.generateCounterpartReply);
   const syncMessagesFromServer = useChatStore((s) => s.syncMessagesFromServer);
 
   const listRef = useRef<FlatList<ChatMessage>>(null);
-  const [aiReplying, setAiReplying] = useState(false);
 
+  // 상대방이 실제 사람이라 답장이 언제 올지 모른다 — 화면이 떠 있는 동안 주기적으로 새 메시지를 가져온다.
   useEffect(() => {
     syncMessagesFromServer(threadId);
-  }, [threadId]);
+    const interval = setInterval(() => syncMessagesFromServer(threadId), POLL_INTERVAL_MS);
+    return () => clearInterval(interval);
+  }, [threadId, syncMessagesFromServer]);
 
   if (!thread) {
     return (
@@ -52,13 +55,8 @@ export default function Chatroom() {
       ].filter((s): s is string => Boolean(s))
     : [];
 
-  const handleSend = async (text: string) => {
+  const handleSend = (text: string) => {
     sendMessage(threadId, currentUserId, text);
-    requestAnimationFrame(() => listRef.current?.scrollToEnd({ animated: true }));
-
-    setAiReplying(true);
-    await generateCounterpartReply(threadId, counterpartId);
-    setAiReplying(false);
     requestAnimationFrame(() => listRef.current?.scrollToEnd({ animated: true }));
   };
 
@@ -92,12 +90,7 @@ export default function Chatroom() {
             <MessageBubble message={item} isOwnMessage={item.senderId === currentUserId} />
           )}
         />
-        <SmartReplySuggestions
-          suggestions={smartReplySuggestions}
-          onSelect={handleSend}
-          loading={aiReplying}
-          loadingLabel={`${counterpart?.name ?? '이웃'}님이 답장을 작성 중이에요...`}
-        />
+        <SmartReplySuggestions suggestions={smartReplySuggestions} onSelect={handleSend} />
         <ChatInputBar onSend={handleSend} onOpenAppointment={() => router.push(`/appointment/${threadId}`)} />
       </KeyboardAvoidingView>
     </SafeAreaView>

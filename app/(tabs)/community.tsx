@@ -3,13 +3,12 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { CommunityFeedList } from '../../components/community/CommunityFeedList';
 import { MicroGroupList } from '../../components/home/MicroGroupList';
 import { SEED_COMMUNITY_POSTS } from '../../mocks/communityPosts';
+import { SEED_USERS } from '../../mocks/users';
 import { useAuthStore } from '../../store/useAuthStore';
 import { useMatchStore } from '../../store/useMatchStore';
-import { useUserStore } from '../../store/useUserStore';
 
 export default function CommunityScreen() {
   const currentUserId = useAuthStore((s) => s.currentUserId)!;
-  const usersById = useUserStore((s) => s.usersById);
   const microGroups = useMatchStore((s) => s.microGroups);
   const toggleMicroGroupInterest = useMatchStore((s) => s.toggleMicroGroupInterest);
 
@@ -24,7 +23,7 @@ export default function CommunityScreen() {
           currentUserId={currentUserId}
           onToggleInterest={(groupId) => toggleMicroGroupInterest(groupId, currentUserId)}
         />
-        <CommunityFeedList posts={SEED_COMMUNITY_POSTS} usersById={usersById} />
+        <CommunityFeedList posts={SEED_COMMUNITY_POSTS} usersById={SEED_USERS} />
       </ScrollView>
     </SafeAreaView>
   );

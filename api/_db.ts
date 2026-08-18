@@ -69,6 +69,18 @@ async function createSchema(): Promise<void> {
       created_at TIMESTAMPTZ NOT NULL DEFAULT now()
     );
 
+    ALTER TABLE app_users ADD COLUMN IF NOT EXISTS profile JSONB;
+
+    CREATE TABLE IF NOT EXISTS threads (
+      id TEXT PRIMARY KEY,
+      user_a_id TEXT NOT NULL,
+      user_b_id TEXT NOT NULL,
+      created_at TIMESTAMPTZ NOT NULL DEFAULT now()
+    );
+
+    CREATE INDEX IF NOT EXISTS threads_user_a_id_idx ON threads(user_a_id);
+    CREATE INDEX IF NOT EXISTS threads_user_b_id_idx ON threads(user_b_id);
+
     CREATE TABLE IF NOT EXISTS messages (
       id TEXT PRIMARY KEY,
       thread_id TEXT NOT NULL,

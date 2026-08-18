@@ -1,8 +1,7 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 import type { AIContextHeaderData, ChatMessage, ChatThread, CulturalGuideTip } from '../types';
-import { CULTURAL_GUIDE_TIPS, SEED_MESSAGES_BY_THREAD, SEED_THREADS } from '../mocks/chatMessages';
-import { generateGeminiReply } from '../utils/gemini';
+import { CULTURAL_GUIDE_TIPS } from '../mocks/chatMessages';
 import { generateId } from '../utils/id';
 import { asyncStorageAdapter } from './storage';
 import { useAuthStore } from './useAuthStore';
@@ -28,24 +27,18 @@ function syncMessageToServer(message: ChatMessage): void {
   }).catch(() => {});
 }
 
-const COUNTERPART_REPLY_POOL = [
-  '네 좋아요! 😊',
-  '오 그거 정말 기대돼요!',
-  '알겠습니다, 그때 뵐게요!',
-  '감사해요! 덕분에 많이 배우고 있어요.',
-];
-
 interface ChatState {
   threadsById: Record<string, ChatThread>;
   messagesByThread: Record<string, ChatMessage[]>;
   culturalTips: CulturalGuideTip[];
-  createThreadForMatch: (matchId: string) => ChatThread;
   sendMessage: (threadId: string, senderId: string, text: string) => ChatMessage;
   attachAppointmentMessage: (threadId: string, appointmentId: string, summaryText: string) => void;
   unlockDirectChannel: (threadId: string) => void;
   getContextHeader: (matchId: string) => AIContextHeaderData | undefined;
-  generateCounterpartReply: (threadId: string, counterpartId: string) => Promise<void>;
-  getThreadByMatchId: (matchId: string) => ChatThread | undefined;
+  /** Gets (or creates, via the backend) the real shared thread with another real user. */
+  createOrFetchThreadWithUser: (counterpartId: string) => Promise<ChatThread>;
+  /** Lists every thread the current user participates in, from the backend. No-op if not configured. */
+  fetchThreads: () => Promise<void>;
   /** Hydrates a thread's messages from the Vercel backend, if configured. No-op otherwise. */
   syncMessagesFromServer: (threadId: string) => Promise<void>;
 }
@@ -57,32 +50,9 @@ function detectCulturalTip(text: string, tips: CulturalGuideTip[]): CulturalGuid
 export const useChatStore = create<ChatState>()(
   persist(
     (set, get) => ({
-      threadsById: SEED_THREADS,
-      messagesByThread: SEED_MESSAGES_BY_THREAD,
+      threadsById: {},
+      messagesByThread: {},
       culturalTips: CULTURAL_GUIDE_TIPS,
-
-      createThreadForMatch: (matchId) => {
-        const existing = get().getThreadByMatchId(matchId);
-        if (existing) return existing;
-
-        const match = useMatchStore.getState().getMatchById(matchId);
-        if (!match) throw new Error('매칭 정보를 찾을 수 없습니다.');
-
-        const thread: ChatThread = {
-          id: generateId('thread'),
-          matchId,
-          participantIds: [match.userAId, match.userBId],
-          isDirectChannel: false,
-          createdAt: new Date().toISOString(),
-        };
-
-        set((state) => ({
-          threadsById: { ...state.threadsById, [thread.id]: thread },
-          messagesByThread: { ...state.messagesByThread, [thread.id]: [] },
-        }));
-
-        return thread;
-      },
 
       sendMessage: (threadId, senderId, text) => {
         const message: ChatMessage = {
@@ -179,47 +149,101 @@ export const useChatStore = create<ChatState>()(
         };
       },
 
-      generateCounterpartReply: async (threadId, counterpartId) => {
-        const fallback = () => {
-          const reply = COUNTERPART_REPLY_POOL[Math.floor(Math.random() * COUNTERPART_REPLY_POOL.length)];
-          get().sendMessage(threadId, counterpartId, reply);
+      createOrFetchThreadWithUser: async (counterpartId) => {
+        const currentUserId = useAuthStore.getState().currentUserId;
+        if (!currentUserId) throw new Error('로그인이 필요합니다.');
+
+        // 호환 지수/활동 코스 표시용 매칭 기록은 로컬 계산으로 충분 — 서버엔 스레드만 저장한다.
+        const match = useMatchStore.getState().confirmMatch(currentUserId, counterpartId);
+
+        const backendUrl = process.env.EXPO_PUBLIC_BACKEND_URL;
+        const token = useAuthStore.getState().sessionToken;
+        if (backendUrl && token) {
+          try {
+            const res = await fetch(`${backendUrl}/api/threads`, {
+              method: 'POST',
+              headers: { 'content-type': 'application/json', authorization: `Bearer ${token}` },
+              body: JSON.stringify({ counterpartId }),
+            });
+            if (res.ok) {
+              const { thread: serverThread } = (await res.json()) as {
+                thread: { id: string; participantIds: [string, string]; createdAt: string };
+              };
+              const thread: ChatThread = {
+                id: serverThread.id,
+                matchId: match.id,
+                participantIds: serverThread.participantIds,
+                isDirectChannel: false,
+                createdAt: serverThread.createdAt,
+              };
+              set((state) => ({
+                threadsById: { ...state.threadsById, [thread.id]: thread },
+                messagesByThread: { ...state.messagesByThread, [thread.id]: state.messagesByThread[thread.id] ?? [] },
+              }));
+              return thread;
+            }
+          } catch {
+            // 백엔드 미배포/오프라인 — 아래에서 로컬 전용 스레드로 폴백
+          }
+        }
+
+        // 백엔드가 없거나 실패한 경우: 이 기기에서만 보이는 로컬 스레드로 계속 진행.
+        const existing = Object.values(get().threadsById).find(
+          (t) => t.participantIds.includes(currentUserId) && t.participantIds.includes(counterpartId)
+        );
+        if (existing) return existing;
+
+        const localThread: ChatThread = {
+          id: generateId('thread'),
+          matchId: match.id,
+          participantIds: [currentUserId, counterpartId],
+          isDirectChannel: false,
+          createdAt: new Date().toISOString(),
         };
-
-        const apiKey = process.env.EXPO_PUBLIC_GEMINI_API_KEY;
-        const counterpart = useUserStore.getState().getUserById(counterpartId);
-        const history = (get().messagesByThread[threadId] ?? [])
-          .filter((m) => m.type === 'text')
-          .slice(-10)
-          .map((m) => ({
-            role: (m.senderId === counterpartId ? 'model' : 'user') as 'model' | 'user',
-            text: m.text,
-          }));
-
-        if (!apiKey || !counterpart || history.length === 0 || history[0].role !== 'user') {
-          fallback();
-          return;
-        }
-
-        try {
-          const partnerSkills =
-            counterpart.skillsOffered.map((s) => s.label).join(', ') || '동네 이웃과 어울리기';
-          const partnerLocation = `${counterpart.location.city} ${counterpart.location.district}`;
-
-          const replyText = await generateGeminiReply({
-            apiKey,
-            partnerName: counterpart.name,
-            partnerSkills,
-            partnerLocation,
-            history,
-          });
-          get().sendMessage(threadId, counterpartId, replyText);
-        } catch {
-          fallback();
-        }
+        set((state) => ({
+          threadsById: { ...state.threadsById, [localThread.id]: localThread },
+          messagesByThread: { ...state.messagesByThread, [localThread.id]: [] },
+        }));
+        return localThread;
       },
 
-      getThreadByMatchId: (matchId) =>
-        Object.values(get().threadsById).find((t) => t.matchId === matchId),
+      fetchThreads: async () => {
+        const backendUrl = process.env.EXPO_PUBLIC_BACKEND_URL;
+        const token = useAuthStore.getState().sessionToken;
+        if (!backendUrl || !token) return;
+
+        try {
+          const res = await fetch(`${backendUrl}/api/threads`, {
+            headers: { authorization: `Bearer ${token}` },
+          });
+          if (!res.ok) return;
+
+          const { threads } = (await res.json()) as {
+            threads: { id: string; participantIds: [string, string]; createdAt: string }[];
+          };
+
+          set((state) => {
+            const merged = { ...state.threadsById };
+            for (const t of threads) {
+              const existing = merged[t.id];
+              merged[t.id] = {
+                id: t.id,
+                // 서버는 matchId를 모른다 — 이미 로컬에 있으면 유지하고, 처음 보는 스레드면 빈 문자열로 둔다
+                // (컨텍스트 헤더는 해당 매칭 기록이 없으면 자연히 표시되지 않을 뿐 기능은 그대로 동작).
+                matchId: existing?.matchId ?? '',
+                participantIds: t.participantIds,
+                isDirectChannel: existing?.isDirectChannel ?? false,
+                createdAt: t.createdAt,
+                lastMessagePreview: existing?.lastMessagePreview,
+                lastMessageAt: existing?.lastMessageAt,
+              };
+            }
+            return { threadsById: merged };
+          });
+        } catch {
+          // 오프라인이거나 백엔드 미배포 — 로컬 상태 그대로 유지
+        }
+      },
 
       syncMessagesFromServer: async (threadId) => {
         const backendUrl = process.env.EXPO_PUBLIC_BACKEND_URL;
