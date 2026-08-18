@@ -1,17 +1,60 @@
-import { Pool } from 'pg';
+import { Pool, type PoolConfig } from 'pg';
 
 let pool: Pool | undefined;
 let schemaReady: Promise<void> | undefined;
 
+/**
+ * Builds the pg pool config from DATABASE_URL, correcting the most common
+ * Supabase misconfiguration: pointing the pooler host (6543 / pooler.supabase.com)
+ * at the direct-connection username ("postgres"), which Supabase's PgBouncer
+ * layer rejects with "password authentication failed for user 'postgres'" even
+ * when the password itself is correct — it expects "postgres.<project-ref>".
+ */
+function buildPoolConfig(): PoolConfig {
+  const rawUrl = process.env.DATABASE_URL;
+  if (!rawUrl) {
+    throw new Error('DATABASE_URL 환경변수가 설정되지 않았습니다.');
+  }
+
+  let url: URL;
+  try {
+    url = new URL(rawUrl);
+  } catch {
+    throw new Error('DATABASE_URL이 올바른 URL 형식이 아닙니다.');
+  }
+
+  const isPooler = url.hostname.includes('pooler.supabase.com') || url.port === '6543';
+  const isDirect = url.hostname.startsWith('db.') && url.hostname.includes('supabase.co');
+
+  if (isPooler) {
+    if (url.username === 'postgres') {
+      console.warn(
+        '[db] DATABASE_URL이 Supabase 커넥션 풀러(포트 6543 / pooler.supabase.com)를 ' +
+          '가리키는데 사용자명이 "postgres"입니다. 풀러는 "postgres.<프로젝트 참조>" 형식의 ' +
+          '사용자명이 필요합니다 — Supabase 대시보드 Project Settings → Database → ' +
+          'Connection Pooling 탭에서 연결 문자열을 다시 복사해주세요. 이 값 때문에 비밀번호가 ' +
+          '맞아도 "password authentication failed for user \'postgres\'"가 발생할 수 있습니다.'
+      );
+    }
+    if (!url.searchParams.has('pgbouncer')) {
+      url.searchParams.set('pgbouncer', 'true');
+    }
+  } else if (isDirect && url.port && url.port !== '5432' && url.port !== '') {
+    console.warn(
+      `[db] DATABASE_URL이 다이렉트 연결 호스트(db.*.supabase.co)인데 포트가 ${url.port}입니다. ` +
+        '다이렉트 연결은 5432 포트를 사용해야 합니다.'
+    );
+  }
+
+  return {
+    connectionString: url.toString(),
+    ssl: { rejectUnauthorized: false },
+  };
+}
+
 function getPool(): Pool {
   if (!pool) {
-    if (!process.env.DATABASE_URL) {
-      throw new Error('DATABASE_URL 환경변수가 설정되지 않았습니다.');
-    }
-    pool = new Pool({
-      connectionString: process.env.DATABASE_URL,
-      ssl: { rejectUnauthorized: false },
-    });
+    pool = new Pool(buildPoolConfig());
   }
   return pool;
 }
@@ -50,4 +93,23 @@ export async function query<T = any>(text: string, params?: unknown[]): Promise<
   await ensureSchema();
   const result = await getPool().query(text, params);
   return result.rows as T[];
+}
+
+interface DbTestResult {
+  ok: boolean;
+  detail: string;
+  code?: string;
+}
+
+/** Runs a bare SELECT 1 and reports the exact Postgres/driver error — used by api/debug/db.ts. */
+export async function testConnection(): Promise<DbTestResult> {
+  try {
+    await getPool().query('SELECT 1');
+    return { ok: true, detail: 'DB 연결에 성공했습니다.' };
+  } catch (error) {
+    const pgError = error as { code?: string; message?: string };
+    const detail = pgError.message ?? (error instanceof Error ? error.message : String(error));
+    console.error('[db] connection test failed:', { code: pgError.code, message: detail });
+    return { ok: false, detail, code: pgError.code };
+  }
 }

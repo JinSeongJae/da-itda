@@ -98,22 +98,39 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     const kakaoId = String(profileData.id);
     const name = profileData.kakao_account?.profile?.nickname ?? '새 이웃';
     const avatarUrl = profileData.kakao_account?.profile?.profile_image_url ?? null;
+    const fallbackUserId = `user_kakao_${kakaoId}`;
 
-    const rows = await query<{ id: string; name: string; avatar_url: string | null }>(
-      `INSERT INTO app_users (id, kakao_id, name, avatar_url)
-       VALUES ($1, $2, $3, $4)
-       ON CONFLICT (kakao_id)
-       DO UPDATE SET name = EXCLUDED.name, avatar_url = EXCLUDED.avatar_url
-       RETURNING id, name, avatar_url`,
-      [`user_kakao_${kakaoId}`, kakaoId, name, avatarUrl]
-    );
+    // DB(예: Supabase)가 일시적으로 연결되지 않아도 로그인 자체는 막지 않는다 — 이 세션은
+    // app_users에 저장되지 않으므로 메시지 동기화 등 DB 의존 기능만 제한될 뿐, 로그인은
+    // 계속 진행된다(임시 세션). 원인은 로그로 구체적으로 남긴다.
+    let user = { id: fallbackUserId, name, avatar_url: avatarUrl as string | null };
+    let dbSynced = true;
 
-    const user = rows[0];
+    try {
+      const rows = await query<{ id: string; name: string; avatar_url: string | null }>(
+        `INSERT INTO app_users (id, kakao_id, name, avatar_url)
+         VALUES ($1, $2, $3, $4)
+         ON CONFLICT (kakao_id)
+         DO UPDATE SET name = EXCLUDED.name, avatar_url = EXCLUDED.avatar_url
+         RETURNING id, name, avatar_url`,
+        [fallbackUserId, kakaoId, name, avatarUrl]
+      );
+      user = rows[0];
+    } catch (dbError) {
+      const pgError = dbError as { code?: string; message?: string };
+      console.error('[kakao-auth] DB upsert 실패 — 임시 세션으로 계속 진행:', {
+        code: pgError.code,
+        message: pgError.message ?? String(dbError),
+      });
+      dbSynced = false;
+    }
+
     const token = signSessionToken(user.id);
 
     res.status(200).json({
       token,
       user: { id: user.id, name: user.name, avatarUrl: user.avatar_url ?? undefined },
+      dbSynced,
     });
   } catch (error) {
     res.status(500).json({ error: error instanceof Error ? error.message : '알 수 없는 오류가 발생했습니다.' });
