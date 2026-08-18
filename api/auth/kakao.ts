@@ -20,6 +20,11 @@ interface KakaoUserResponse {
   };
 }
 
+// 카카오 REST API 키(client_id)는 비밀값이 아니라 인가 URL에도 그대로 노출되는 값이라,
+// Vercel에 KAKAO_CLIENT_ID/EXPO_PUBLIC_KAKAO_CLIENT_ID가 설정되지 않은 경우를 위한
+// 최후 fallback으로 실제 발급받은 키를 명시해둔다.
+const DEFAULT_KAKAO_CLIENT_ID = '370ceecb9a042a16a81d317c34c4f972';
+
 export default async function handler(req: VercelRequest, res: VercelResponse) {
   if (applyCors(req, res)) return;
 
@@ -34,16 +39,16 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     return;
   }
 
-  // 서버 전용 KAKAO_CLIENT_ID가 Vercel에 별도로 설정되지 않은 경우를 대비해
-  // 클라이언트에도 노출되는(비밀 아님) EXPO_PUBLIC_KAKAO_CLIENT_ID로 폴백한다.
-  const clientId = (process.env.KAKAO_CLIENT_ID || process.env.EXPO_PUBLIC_KAKAO_CLIENT_ID)?.trim();
-  const clientSecret = process.env.KAKAO_CLIENT_SECRET?.trim();
-  if (!clientId) {
-    res.status(500).json({
-      error: 'KAKAO_CLIENT_ID(또는 EXPO_PUBLIC_KAKAO_CLIENT_ID) 환경변수가 설정되지 않았습니다.',
-    });
-    return;
-  }
+  // 서버 전용 KAKAO_CLIENT_ID가 Vercel에 설정되지 않았다면 클라이언트에도 노출되는
+  // EXPO_PUBLIC_KAKAO_CLIENT_ID로, 그마저도 없다면 하드코딩된 기본값으로 폴백한다.
+  const clientId = (
+    process.env.KAKAO_CLIENT_ID ||
+    process.env.EXPO_PUBLIC_KAKAO_CLIENT_ID ||
+    DEFAULT_KAKAO_CLIENT_ID
+  ).trim();
+  // client_secret은 카카오 콘솔에서 활성화한 경우에만 의미가 있는 값이라 필수가 아니다 —
+  // 설정되어 있지 않으면 아래 스프레드에서 요청 body 자체에 필드가 생기지 않는다.
+  const clientSecret = process.env.KAKAO_CLIENT_SECRET?.trim() || undefined;
 
   try {
     const tokenParams = new URLSearchParams({
@@ -52,6 +57,13 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       redirect_uri: redirectUri,
       code,
       ...(clientSecret ? { client_secret: clientSecret } : {}),
+    });
+
+    console.log('[kakao-auth] token request params:', {
+      client_id: clientId,
+      redirect_uri: redirectUri,
+      code: typeof code === 'string' ? `${code.slice(0, 6)}...(${code.length}자)` : code,
+      client_secret: clientSecret ? '(설정됨, 값은 로그에 남기지 않음)' : '(설정 안 됨 — body에서 생략)',
     });
 
     const tokenResponse = await fetch('https://kauth.kakao.com/oauth/token', {
