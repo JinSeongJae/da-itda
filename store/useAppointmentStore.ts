@@ -5,9 +5,44 @@ import { SEED_APPOINTMENTS } from '../mocks/appointments';
 import { midpoint, sortByDistanceFrom } from '../utils/distance';
 import { generateId, generateQrToken } from '../utils/id';
 import { asyncStorageAdapter } from './storage';
+import { useAuthStore } from './useAuthStore';
 import { useChatStore } from './useChatStore';
 import { useMatchStore } from './useMatchStore';
 import { useSafeZoneStore } from './useSafeZoneStore';
+
+/** Best-effort sync to the Vercel backend — never blocks or breaks the local-first flow. */
+function syncAppointmentToServer(appointment: Appointment): void {
+  const backendUrl = process.env.EXPO_PUBLIC_BACKEND_URL;
+  const token = useAuthStore.getState().sessionToken;
+  if (!backendUrl || !token) return;
+
+  fetch(`${backendUrl}/api/appointments`, {
+    method: 'POST',
+    headers: { 'content-type': 'application/json', authorization: `Bearer ${token}` },
+    body: JSON.stringify({
+      id: appointment.id,
+      threadId: appointment.threadId,
+      matchId: appointment.matchId,
+      date: appointment.date,
+      time: appointment.time,
+      safeZoneId: appointment.safeZoneId,
+      purpose: appointment.purpose,
+      qrToken: appointment.qrToken,
+    }),
+  }).catch(() => {});
+}
+
+function syncCheckInToServer(appointmentId: string): void {
+  const backendUrl = process.env.EXPO_PUBLIC_BACKEND_URL;
+  const token = useAuthStore.getState().sessionToken;
+  if (!backendUrl || !token) return;
+
+  fetch(`${backendUrl}/api/appointments/checkin`, {
+    method: 'POST',
+    headers: { 'content-type': 'application/json', authorization: `Bearer ${token}` },
+    body: JSON.stringify({ appointmentId }),
+  }).catch(() => {});
+}
 
 interface CreateAppointmentInput {
   matchId: string;
@@ -31,6 +66,8 @@ interface AppointmentState {
   getAppointmentById: (appointmentId: string) => Appointment | undefined;
   /** Nearest upcoming confirmed/checked-in appointment involving this user — powers the home screen banner. */
   getUpcomingAppointmentForUser: (userId: string) => Appointment | undefined;
+  /** Fetches every appointment across the current user's threads from the backend and merges them in. No-op if not configured. */
+  fetchAppointments: () => Promise<void>;
 }
 
 export const useAppointmentStore = create<AppointmentState>()(
@@ -56,6 +93,7 @@ export const useAppointmentStore = create<AppointmentState>()(
         set((state) => ({
           appointmentsById: { ...state.appointmentsById, [appointment.id]: appointment },
         }));
+        syncAppointmentToServer(appointment);
         return appointment;
       },
 
@@ -72,6 +110,7 @@ export const useAppointmentStore = create<AppointmentState>()(
         set((state) => ({
           appointmentsById: { ...state.appointmentsById, [appointmentId]: updated },
         }));
+        syncCheckInToServer(appointmentId);
         return updated;
       },
 
@@ -120,6 +159,30 @@ export const useAppointmentStore = create<AppointmentState>()(
           .sort((a, b) => `${a.date}T${a.time}`.localeCompare(`${b.date}T${b.time}`));
 
         return upcoming[0];
+      },
+
+      fetchAppointments: async () => {
+        const backendUrl = process.env.EXPO_PUBLIC_BACKEND_URL;
+        const token = useAuthStore.getState().sessionToken;
+        if (!backendUrl || !token) return;
+
+        try {
+          const res = await fetch(`${backendUrl}/api/appointments`, {
+            headers: { authorization: `Bearer ${token}` },
+          });
+          if (!res.ok) return;
+
+          const { appointments } = (await res.json()) as { appointments: Appointment[] };
+          set((state) => {
+            const merged = { ...state.appointmentsById };
+            for (const appointment of appointments) {
+              if (appointment?.id) merged[appointment.id] = appointment;
+            }
+            return { appointmentsById: merged };
+          });
+        } catch {
+          // 오프라인이거나 백엔드 미배포 — 로컬 상태 그대로 유지
+        }
       },
     }),
     {

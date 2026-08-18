@@ -22,6 +22,8 @@ function syncMessageToServer(message: ChatMessage): void {
       threadId: message.threadId,
       senderId: message.senderId,
       text: message.text,
+      type: message.type,
+      appointmentId: message.appointmentId,
       createdAt: message.createdAt,
     }),
   }).catch(() => {});
@@ -257,7 +259,14 @@ export const useChatStore = create<ChatState>()(
           if (!res.ok) return;
 
           const { messages } = (await res.json()) as {
-            messages: { id: string; senderId: string; text: string; createdAt: string }[];
+            messages: {
+              id: string;
+              senderId: string;
+              text: string;
+              type: ChatMessage['type'];
+              appointmentId?: string;
+              createdAt: string;
+            }[];
           };
 
           set((state) => {
@@ -270,8 +279,9 @@ export const useChatStore = create<ChatState>()(
                   id: m.id,
                   threadId,
                   senderId: m.senderId,
-                  type: 'text',
+                  type: m.type,
                   text: m.text,
+                  appointmentId: m.appointmentId,
                   createdAt: m.createdAt,
                 });
               }

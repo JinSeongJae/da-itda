@@ -8,6 +8,7 @@ import { ChatInputBar } from '../../components/chat/ChatInputBar';
 import { MessageBubble } from '../../components/chat/MessageBubble';
 import { SmartReplySuggestions } from '../../components/chat/SmartReplySuggestions';
 import { Avatar } from '../../components/common/Avatar';
+import { useAppointmentStore } from '../../store/useAppointmentStore';
 import { useAuthStore } from '../../store/useAuthStore';
 import { useChatStore } from '../../store/useChatStore';
 import { useUserStore } from '../../store/useUserStore';
@@ -25,6 +26,7 @@ export default function Chatroom() {
   const sendMessage = useChatStore((s) => s.sendMessage);
   const getContextHeader = useChatStore((s) => s.getContextHeader);
   const syncMessagesFromServer = useChatStore((s) => s.syncMessagesFromServer);
+  const fetchAppointments = useAppointmentStore((s) => s.fetchAppointments);
 
   const listRef = useRef<FlatList<ChatMessage>>(null);
 
@@ -34,6 +36,11 @@ export default function Chatroom() {
     const interval = setInterval(() => syncMessagesFromServer(threadId), POLL_INTERVAL_MS);
     return () => clearInterval(interval);
   }, [threadId, syncMessagesFromServer]);
+
+  // 상대방이 약속을 잡았을 수도 있으니, 채팅 카드/체크인이 보이도록 내 약속 목록도 받아온다.
+  useEffect(() => {
+    fetchAppointments();
+  }, [fetchAppointments]);
 
   if (!thread) {
     return (

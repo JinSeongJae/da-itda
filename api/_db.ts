@@ -89,7 +89,27 @@ async function createSchema(): Promise<void> {
       created_at TIMESTAMPTZ NOT NULL DEFAULT now()
     );
 
+    ALTER TABLE messages ADD COLUMN IF NOT EXISTS type TEXT NOT NULL DEFAULT 'text';
+    ALTER TABLE messages ADD COLUMN IF NOT EXISTS appointment_id TEXT;
+
     CREATE INDEX IF NOT EXISTS messages_thread_id_idx ON messages(thread_id);
+
+    CREATE TABLE IF NOT EXISTS appointments (
+      id TEXT PRIMARY KEY,
+      thread_id TEXT NOT NULL,
+      match_id TEXT NOT NULL,
+      date TEXT NOT NULL,
+      time TEXT NOT NULL,
+      safe_zone_id TEXT NOT NULL,
+      purpose TEXT,
+      status TEXT NOT NULL DEFAULT 'confirmed',
+      created_by TEXT NOT NULL,
+      created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+      qr_token TEXT,
+      check_ins JSONB NOT NULL DEFAULT '[]'
+    );
+
+    CREATE INDEX IF NOT EXISTS appointments_thread_id_idx ON appointments(thread_id);
   `);
 }
 

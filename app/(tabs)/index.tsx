@@ -23,11 +23,13 @@ export default function Home() {
   const getMatchById = useMatchStore((s) => s.getMatchById);
   const createOrFetchThreadWithUser = useChatStore((s) => s.createOrFetchThreadWithUser);
   const getUpcomingAppointmentForUser = useAppointmentStore((s) => s.getUpcomingAppointmentForUser);
+  const fetchAppointments = useAppointmentStore((s) => s.fetchAppointments);
   const [matchingWithId, setMatchingWithId] = useState<string | null>(null);
 
   useEffect(() => {
     fetchAllUsers();
-  }, [fetchAllUsers]);
+    fetchAppointments();
+  }, [fetchAllUsers, fetchAppointments]);
 
   if (!currentUser) return null;
 

@@ -8,6 +8,8 @@ interface MessageRow {
   thread_id: string;
   sender_id: string;
   text: string;
+  type: string;
+  appointment_id: string | null;
   created_at: string;
 }
 
@@ -36,7 +38,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       await assertParticipant(threadId, userId);
 
       const rows = await query<MessageRow>(
-        `SELECT id, thread_id, sender_id, text, created_at
+        `SELECT id, thread_id, sender_id, text, type, appointment_id, created_at
          FROM messages WHERE thread_id = $1 ORDER BY created_at ASC`,
         [threadId]
       );
@@ -47,6 +49,8 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
           threadId: row.thread_id,
           senderId: row.sender_id,
           text: row.text,
+          type: row.type,
+          appointmentId: row.appointment_id ?? undefined,
           createdAt: row.created_at,
         })),
       });
@@ -54,7 +58,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     }
 
     if (req.method === 'POST') {
-      const { id, threadId, senderId, text, createdAt } = req.body ?? {};
+      const { id, threadId, senderId, text, type, appointmentId, createdAt } = req.body ?? {};
       if (!id || !threadId || !senderId || !text) {
         res.status(400).json({ error: 'id, threadId, senderId, text가 필요합니다.' });
         return;
@@ -62,10 +66,10 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       await assertParticipant(threadId, userId);
 
       await query(
-        `INSERT INTO messages (id, thread_id, sender_id, text, created_at)
-         VALUES ($1, $2, $3, $4, COALESCE($5::timestamptz, now()))
+        `INSERT INTO messages (id, thread_id, sender_id, text, type, appointment_id, created_at)
+         VALUES ($1, $2, $3, $4, COALESCE($5, 'text'), $6, COALESCE($7::timestamptz, now()))
          ON CONFLICT (id) DO NOTHING`,
-        [id, threadId, senderId, text, createdAt ?? null]
+        [id, threadId, senderId, text, type ?? null, appointmentId ?? null, createdAt ?? null]
       );
 
       res.status(201).json({ ok: true });
