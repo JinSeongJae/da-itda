@@ -28,6 +28,9 @@ export default function Welcome() {
       clientId: process.env.EXPO_PUBLIC_KAKAO_CLIENT_ID ?? '',
       redirectUri,
       responseType: AuthSession.ResponseType.Code,
+      // 카카오 토큰 엔드포인트는 PKCE code_verifier를 요구하지 않는데, expo-auth-session이
+      // 기본으로 PKCE(code_challenge)를 붙여 보내면 "PKCE validation failed"가 발생한다.
+      usePKCE: false,
     },
     KAKAO_DISCOVERY
   );
@@ -56,7 +59,12 @@ export default function Welcome() {
           res = await fetch(`${backendUrl}/api/auth/kakao`, {
             method: 'POST',
             headers: { 'content-type': 'application/json' },
-            body: JSON.stringify({ code: response.params.code, redirectUri }),
+            body: JSON.stringify({
+              code: response.params.code,
+              redirectUri,
+              // usePKCE: false라 보통 undefined지만, 혹시 존재하면 백엔드로 함께 전달한다.
+              codeVerifier: request?.codeVerifier,
+            }),
           });
         } catch {
           throw new Error('백엔드 서버에 연결할 수 없어요. 인터넷 연결과 서버 주소를 확인해주세요.');

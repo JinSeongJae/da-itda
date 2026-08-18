@@ -33,7 +33,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     return;
   }
 
-  const { code, redirectUri } = req.body ?? {};
+  const { code, redirectUri, codeVerifier } = req.body ?? {};
   if (!code || !redirectUri) {
     res.status(400).json({ error: 'code와 redirectUri가 필요합니다.' });
     return;
@@ -57,6 +57,9 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       redirect_uri: redirectUri,
       code,
       ...(clientSecret ? { client_secret: clientSecret } : {}),
+      // 프론트에서 PKCE(code_challenge)를 사용해 인가받은 경우에만 존재 — 있으면 반드시
+      // 함께 보내야 카카오가 "PKCE validation failed. code_verifier required."를 내지 않는다.
+      ...(codeVerifier ? { code_verifier: codeVerifier } : {}),
     });
 
     console.log('[kakao-auth] token request params:', {
@@ -64,6 +67,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       redirect_uri: redirectUri,
       code: typeof code === 'string' ? `${code.slice(0, 6)}...(${code.length}자)` : code,
       client_secret: clientSecret ? '(설정됨, 값은 로그에 남기지 않음)' : '(설정 안 됨 — body에서 생략)',
+      code_verifier: codeVerifier ? '(전달됨)' : '(없음)',
     });
 
     const tokenResponse = await fetch('https://kauth.kakao.com/oauth/token', {
