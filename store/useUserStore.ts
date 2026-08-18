@@ -1,8 +1,18 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
+import { normalizeSkill } from '../mocks/skills';
 import type { BadgeId, Skill, TimeSlot, User, VerificationStatus } from '../types';
 import { asyncStorageAdapter } from './storage';
 import { useAuthStore } from './useAuthStore';
+
+/** Repairs a user's embedded skill objects (e.g. a stale category from before a taxonomy change) back to their current canonical definitions. */
+function normalizeUser(user: User): User {
+  return {
+    ...user,
+    skillsOffered: user.skillsOffered.map(normalizeSkill),
+    skillsWanted: user.skillsWanted.map(normalizeSkill),
+  };
+}
 
 /** Best-effort sync of the caller's own profile to the backend — never blocks or throws. */
 function syncSelfProfile(user: User | undefined): void {
@@ -43,7 +53,7 @@ export const useUserStore = create<UserState>()(
 
       addUser: (user) =>
         set((state) => ({
-          usersById: { ...state.usersById, [user.id]: user },
+          usersById: { ...state.usersById, [user.id]: normalizeUser(user) },
         })),
 
       updateProfile: (userId, patch) => {
@@ -194,13 +204,22 @@ export const useUserStore = create<UserState>()(
           if (!res.ok) return;
 
           const { users } = (await res.json()) as { users: User[] };
+          const selfId = useAuthStore.getState().currentUserId;
+          let selfChanged = false;
           set((state) => {
             const merged = { ...state.usersById };
             for (const user of users) {
-              if (user?.id) merged[user.id] = user;
+              if (!user?.id) continue;
+              const normalized = normalizeUser(user);
+              if (user.id === selfId && JSON.stringify(normalized) !== JSON.stringify(user)) {
+                selfChanged = true;
+              }
+              merged[user.id] = normalized;
             }
             return { usersById: merged };
           });
+
+          if (selfChanged && selfId) syncSelfProfile(get().usersById[selfId]);
         } catch {
           // 백엔드 미배포/오프라인 — 로컬 상태 그대로 유지
         }
@@ -209,6 +228,12 @@ export const useUserStore = create<UserState>()(
     {
       name: 'daitda-users',
       storage: asyncStorageAdapter,
+      onRehydrateStorage: () => (state) => {
+        if (!state) return;
+        for (const id of Object.keys(state.usersById)) {
+          state.usersById[id] = normalizeUser(state.usersById[id]);
+        }
+      },
     }
   )
 );

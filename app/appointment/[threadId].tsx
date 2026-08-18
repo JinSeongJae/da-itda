@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { Feather } from '@expo/vector-icons';
 import { ScrollView, Text, TextInput, View } from 'react-native';
 import { router, useLocalSearchParams } from 'expo-router';
@@ -16,6 +16,7 @@ import { useUserStore } from '../../store/useUserStore';
 import { generateAppointmentSuggestion } from '../../utils/gemini';
 import { formatDateTime } from '../../utils/formatters';
 import { useTranslation } from '../../utils/i18n';
+import type { RankedSafeZone } from '../../types';
 
 export default function AppointmentFormScreen() {
   const { t } = useTranslation();
@@ -24,7 +25,7 @@ export default function AppointmentFormScreen() {
   const usersById = useUserStore((s) => s.usersById);
   const thread = useChatStore((s) => s.threadsById[threadId]);
   const getMatchById = useMatchStore((s) => s.getMatchById);
-  const recommendSafeZones = useAppointmentStore((s) => s.recommendSafeZones);
+  const recommendSafeZonesWithAI = useAppointmentStore((s) => s.recommendSafeZonesWithAI);
   const createAppointment = useAppointmentStore((s) => s.createAppointment);
   const attachAppointmentMessage = useChatStore((s) => s.attachAppointmentMessage);
   const messages = useChatStore((s) => s.messagesByThread[threadId] ?? []);
@@ -34,11 +35,6 @@ export default function AppointmentFormScreen() {
   const counterpartId = thread?.participantIds.find((id) => id !== currentUserId);
   const currentUser = usersById[currentUserId];
   const counterpart = counterpartId ? usersById[counterpartId] : undefined;
-
-  const zones = useMemo(() => {
-    if (!currentUser || !counterpart) return [];
-    return recommendSafeZones(currentUser.location, counterpart.location);
-  }, [currentUser, counterpart, recommendSafeZones]);
 
   const [date, setDate] = useState(() => {
     const d = new Date();
@@ -50,8 +46,35 @@ export default function AppointmentFormScreen() {
     d.setHours(10, 0, 0, 0);
     return d;
   });
-  const [safeZoneId, setSafeZoneId] = useState<string | null>(zones[0]?.id ?? null);
+  const [zones, setZones] = useState<RankedSafeZone[]>([]);
+  const [zonesLoading, setZonesLoading] = useState(false);
+  const [safeZoneId, setSafeZoneId] = useState<string | null>(null);
   const [purpose, setPurpose] = useState('');
+
+  const loadSafeZones = useCallback(
+    async (override?: { date: Date; time: Date }) => {
+      if (!currentUser || !counterpart) return;
+      setZonesLoading(true);
+      try {
+        const ranked = await recommendSafeZonesWithAI({
+          userA: currentUser,
+          userB: counterpart,
+          meetingDate: format(override?.date ?? date, 'yyyy-MM-dd'),
+          meetingTime: format(override?.time ?? time, 'HH:mm'),
+        });
+        setZones(ranked);
+        setSafeZoneId((prev) => (prev && ranked.some((z) => z.id === prev) ? prev : ranked[0]?.id ?? null));
+      } finally {
+        setZonesLoading(false);
+      }
+    },
+    [currentUser, counterpart, date, time, recommendSafeZonesWithAI]
+  );
+
+  useEffect(() => {
+    loadSafeZones();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [currentUser?.id, counterpart?.id]);
 
   if (!thread || !match || !counterpart) {
     return (
@@ -91,9 +114,12 @@ export default function AppointmentFormScreen() {
         conversationText: conversationText || '(아직 나눈 대화가 없어요)',
       });
 
-      setDate(parse(suggestion.date, 'yyyy-MM-dd', new Date()));
-      setTime(parse(suggestion.time, 'HH:mm', new Date()));
+      const suggestedDate = parse(suggestion.date, 'yyyy-MM-dd', new Date());
+      const suggestedTime = parse(suggestion.time, 'HH:mm', new Date());
+      setDate(suggestedDate);
+      setTime(suggestedTime);
       setPurpose(suggestion.purpose);
+      loadSafeZones({ date: suggestedDate, time: suggestedTime });
     } catch {
       // 조용히 무시 — 사용자가 직접 입력을 이어갈 수 있음
     } finally {
@@ -164,6 +190,8 @@ export default function AppointmentFormScreen() {
           zones={zones}
           selectedId={safeZoneId ?? zones[0]?.id ?? null}
           onSelect={setSafeZoneId}
+          loading={zonesLoading}
+          onRefresh={loadSafeZones}
         />
 
         <Text className="text-sm font-semibold text-gray-700 mb-2 mt-1">{t('appointmentForm.purposeLabel')}</Text>

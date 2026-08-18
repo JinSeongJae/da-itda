@@ -4,6 +4,10 @@ import type { BadgeId } from './badge';
 
 export type VisaType = 'F-6' | 'F-4' | 'E-2' | 'D-2' | 'F-5' | 'none';
 
+export type Gender = 'male' | 'female' | 'unspecified';
+
+export type TalkStyle = 'quiet' | 'lively' | 'no-preference';
+
 export interface LanguageProficiency {
   language: string;
   level: '초급' | '중급' | '고급' | '원어민';
@@ -33,6 +37,8 @@ export interface User {
   avatarUrl?: string;
   bio: string;
   mbti?: string;
+  gender?: Gender;
+  talkStyle?: TalkStyle;
   location: UserLocation;
   languages: LanguageProficiency[];
   skillsOffered: Skill[];

@@ -28,6 +28,15 @@ export type TranslationKey =
   | 'interestSelection.selectedCount'
   | 'interestSelection.saveButton'
   | 'interestSelection.validationHint'
+  | 'profileFields.genderLabel'
+  | 'profileFields.genderMale'
+  | 'profileFields.genderFemale'
+  | 'profileFields.genderUnspecified'
+  | 'profileFields.talkStyleLabel'
+  | 'profileFields.talkStyleHint'
+  | 'profileFields.talkStyleQuiet'
+  | 'profileFields.talkStyleLively'
+  | 'profileFields.talkStyleNoPreference'
   | 'languagePicker.title'
   | 'tabs.home'
   | 'tabs.community'
@@ -88,6 +97,9 @@ export type TranslationKey =
   | 'safeZone.aiLabel'
   | 'safeZone.recommended'
   | 'safeZone.scoreLabel'
+  | 'safeZone.refreshButton'
+  | 'safeZone.refreshing'
+  | 'safeZone.analyzing'
   | 'mypage.pointsLabel'
   | 'mypage.volunteerLabel'
   | 'mypage.badgesLabel'
@@ -166,7 +178,35 @@ export type TranslationKey =
   | 'skill.skill_school_notice'
   | 'skill.skill_local_info'
   | 'skill.skill_korean_cooking'
-  | 'skill.skill_kids_english';
+  | 'skill.skill_kids_english'
+  | 'skill.skill_multicultural_playdate'
+  | 'skill.skill_school_enrollment_help'
+  | 'skill.skill_futsal_partner'
+  | 'skill.skill_hiking_buddy'
+  | 'skill.skill_badminton_partner'
+  | 'skill.skill_morning_jogging'
+  | 'skill.skill_traditional_craft'
+  | 'skill.skill_kpop_dance'
+  | 'skill.skill_photography_walk'
+  | 'skill.skill_home_country_music'
+  | 'skill.skill_smartphone_help'
+  | 'skill.skill_online_banking_help'
+  | 'skill.skill_document_editing_help'
+  | 'skill.skill_basic_coding'
+  | 'skill.skill_visa_info_share'
+  | 'skill.skill_immigration_office_accompany'
+  | 'skill.skill_labor_rights_info'
+  | 'skill.skill_admin_document_help'
+  | 'skillCategory.language'
+  | 'skillCategory.culture'
+  | 'skillCategory.cooking'
+  | 'skillCategory.local-info'
+  | 'skillCategory.parenting'
+  | 'skillCategory.education'
+  | 'skillCategory.sports'
+  | 'skillCategory.hobby-art'
+  | 'skillCategory.tech'
+  | 'skillCategory.legal-admin';
 
 export const TRANSLATIONS: Record<Locale, Record<TranslationKey, string>> = {
   ko: {
@@ -188,6 +228,15 @@ export const TRANSLATIONS: Record<Locale, Record<TranslationKey, string>> = {
     'interestSelection.selectedCount': '{count}개 선택됨',
     'interestSelection.saveButton': '저장하고 이웃 추천받기',
     'interestSelection.validationHint': '이름을 입력하고 줄 수 있어요·받고 싶어요를 각각 1개 이상 선택해주세요',
+    'profileFields.genderLabel': '성별 (선택)',
+    'profileFields.genderMale': '남성',
+    'profileFields.genderFemale': '여성',
+    'profileFields.genderUnspecified': '선택 안 함',
+    'profileFields.talkStyleLabel': '대화 성향 (선택)',
+    'profileFields.talkStyleHint': 'AI가 만남 장소를 추천할 때 참고해요',
+    'profileFields.talkStyleQuiet': '조용한 곳이 좋아요',
+    'profileFields.talkStyleLively': '활기찬 곳이 좋아요',
+    'profileFields.talkStyleNoPreference': '상관없어요',
     'languagePicker.title': '언어 선택',
     'tabs.home': '홈',
     'tabs.community': '커뮤니티',
@@ -248,6 +297,9 @@ export const TRANSLATIONS: Record<Locale, Record<TranslationKey, string>> = {
     'safeZone.aiLabel': 'AI 추천 안심존',
     'safeZone.recommended': '추천',
     'safeZone.scoreLabel': 'AI 안심 지수 {score}점',
+    'safeZone.refreshButton': 'AI 재분석',
+    'safeZone.refreshing': '분석 중...',
+    'safeZone.analyzing': 'AI가 두 분의 동선·시간대·대화 성향을 분석해서 안심존을 고르는 중이에요...',
     'mypage.pointsLabel': '포인트',
     'mypage.volunteerLabel': '봉사 (분)',
     'mypage.badgesLabel': '뱃지',
@@ -327,6 +379,34 @@ export const TRANSLATIONS: Record<Locale, Record<TranslationKey, string>> = {
     'skill.skill_local_info': '경산시 생활 정보 안내',
     'skill.skill_korean_cooking': '한국 가정식 요리',
     'skill.skill_kids_english': '아이 영어 노출 프로그램',
+    'skill.skill_multicultural_playdate': '다문화 가정 아이 놀이 모임',
+    'skill.skill_school_enrollment_help': '자녀 학교 입학·전입학 행정 안내',
+    'skill.skill_futsal_partner': '풋살/축구 같이 하기',
+    'skill.skill_hiking_buddy': '등산 동행',
+    'skill.skill_badminton_partner': '배드민턴 파트너',
+    'skill.skill_morning_jogging': '아침 조깅 모임',
+    'skill.skill_traditional_craft': '전통 공예 나눔',
+    'skill.skill_kpop_dance': 'K-POP 커버댄스',
+    'skill.skill_photography_walk': '사진 산책',
+    'skill.skill_home_country_music': '자국 전통음악·악기 소개',
+    'skill.skill_smartphone_help': '스마트폰·행정앱 사용법',
+    'skill.skill_online_banking_help': '인터넷/모바일 뱅킹 도움',
+    'skill.skill_document_editing_help': '문서 작업 도움',
+    'skill.skill_basic_coding': '기초 코딩 배우기',
+    'skill.skill_visa_info_share': '비자·체류 절차 정보 공유',
+    'skill.skill_immigration_office_accompany': '출입국관리사무소 동행',
+    'skill.skill_labor_rights_info': '근로·임금 기초 정보 공유',
+    'skill.skill_admin_document_help': '행정 서류 작성 도움',
+    'skillCategory.language': '언어',
+    'skillCategory.culture': '문화 교류',
+    'skillCategory.cooking': '요리',
+    'skillCategory.local-info': '생활 정보',
+    'skillCategory.parenting': '육아',
+    'skillCategory.education': '교육',
+    'skillCategory.sports': '스포츠/운동',
+    'skillCategory.hobby-art': '취미/예술',
+    'skillCategory.tech': 'IT/컴퓨터',
+    'skillCategory.legal-admin': '법률/행정 상담',
   },
   en: {
     'welcome.tagline': 'The safest hyperlocal community\nfor sharing talents with your neighbors',
@@ -347,6 +427,15 @@ export const TRANSLATIONS: Record<Locale, Record<TranslationKey, string>> = {
     'interestSelection.selectedCount': '{count} selected',
     'interestSelection.saveButton': 'Save & get matched',
     'interestSelection.validationHint': 'Enter your name and pick at least one skill in each category',
+    'profileFields.genderLabel': 'Gender (optional)',
+    'profileFields.genderMale': 'Male',
+    'profileFields.genderFemale': 'Female',
+    'profileFields.genderUnspecified': 'Prefer not to say',
+    'profileFields.talkStyleLabel': 'Talk style (optional)',
+    'profileFields.talkStyleHint': "Helps AI pick the right kind of meetup spot for you",
+    'profileFields.talkStyleQuiet': 'I like quiet places',
+    'profileFields.talkStyleLively': 'I like lively places',
+    'profileFields.talkStyleNoPreference': 'No preference',
     'languagePicker.title': 'Choose a language',
     'tabs.home': 'Home',
     'tabs.community': 'Community',
@@ -407,6 +496,9 @@ export const TRANSLATIONS: Record<Locale, Record<TranslationKey, string>> = {
     'safeZone.aiLabel': 'AI-recommended safe zones',
     'safeZone.recommended': 'Recommended',
     'safeZone.scoreLabel': 'AI safety score: {score}',
+    'safeZone.refreshButton': 'Re-analyze with AI',
+    'safeZone.refreshing': 'Analyzing...',
+    'safeZone.analyzing': "AI is analyzing your routes, meeting time, and talk styles to pick a safe zone...",
     'mypage.pointsLabel': 'Points',
     'mypage.volunteerLabel': 'Volunteer (min)',
     'mypage.badgesLabel': 'Badges',
@@ -490,6 +582,34 @@ export const TRANSLATIONS: Record<Locale, Record<TranslationKey, string>> = {
     'skill.skill_local_info': 'Gyeongsan living info guide',
     'skill.skill_korean_cooking': 'Korean home cooking',
     'skill.skill_kids_english': "Kids' English exposure program",
+    'skill.skill_multicultural_playdate': 'Multicultural family playdates',
+    'skill.skill_school_enrollment_help': 'Help with school enrollment/transfer paperwork',
+    'skill.skill_futsal_partner': 'Play futsal/soccer together',
+    'skill.skill_hiking_buddy': 'Hiking companion',
+    'skill.skill_badminton_partner': 'Badminton partner',
+    'skill.skill_morning_jogging': 'Morning jogging group',
+    'skill.skill_traditional_craft': 'Traditional craft sharing',
+    'skill.skill_kpop_dance': 'K-pop cover dance',
+    'skill.skill_photography_walk': 'Photography walk',
+    'skill.skill_home_country_music': 'Home-country traditional music/instruments',
+    'skill.skill_smartphone_help': 'Smartphone & government-app help',
+    'skill.skill_online_banking_help': 'Online/mobile banking help',
+    'skill.skill_document_editing_help': 'Document editing help',
+    'skill.skill_basic_coding': 'Learn basic coding',
+    'skill.skill_visa_info_share': 'Visa/residency process info sharing',
+    'skill.skill_immigration_office_accompany': 'Immigration office accompaniment',
+    'skill.skill_labor_rights_info': 'Basic labor/wage info sharing',
+    'skill.skill_admin_document_help': 'Help with admin paperwork',
+    'skillCategory.language': 'Language',
+    'skillCategory.culture': 'Culture exchange',
+    'skillCategory.cooking': 'Cooking',
+    'skillCategory.local-info': 'Local info',
+    'skillCategory.parenting': 'Parenting',
+    'skillCategory.education': 'Education',
+    'skillCategory.sports': 'Sports & exercise',
+    'skillCategory.hobby-art': 'Hobbies & arts',
+    'skillCategory.tech': 'Tech',
+    'skillCategory.legal-admin': 'Legal & admin',
   },
   tl: {
     'welcome.tagline': 'Ang pinakaligtas na hyperlocal na komunidad\npara sa pagbabahagi ng talento sa mga kapitbahay',
@@ -511,6 +631,15 @@ export const TRANSLATIONS: Record<Locale, Record<TranslationKey, string>> = {
     'interestSelection.selectedCount': '{count} napili',
     'interestSelection.saveButton': 'I-save at humanap ng katugma',
     'interestSelection.validationHint': 'Ilagay ang iyong pangalan at pumili ng hindi bababa sa isa sa bawat kategorya',
+    'profileFields.genderLabel': 'Kasarian (opsyonal)',
+    'profileFields.genderMale': 'Lalaki',
+    'profileFields.genderFemale': 'Babae',
+    'profileFields.genderUnspecified': 'Mas gusto kong hindi sabihin',
+    'profileFields.talkStyleLabel': 'Istilo ng pag-uusap (opsyonal)',
+    'profileFields.talkStyleHint': 'Tumutulong ito sa AI na pumili ng tamang lugar para sa inyo',
+    'profileFields.talkStyleQuiet': 'Mas gusto ko ang tahimik na lugar',
+    'profileFields.talkStyleLively': 'Mas gusto ko ang maliksing lugar',
+    'profileFields.talkStyleNoPreference': 'Wala akong preference',
     'languagePicker.title': 'Pumili ng wika',
     'tabs.home': 'Home',
     'tabs.community': 'Komunidad',
@@ -571,6 +700,9 @@ export const TRANSLATIONS: Record<Locale, Record<TranslationKey, string>> = {
     'safeZone.aiLabel': 'Mga inirerekomendang ligtas na lugar',
     'safeZone.recommended': 'Rekomendado',
     'safeZone.scoreLabel': 'AI safety score: {score}',
+    'safeZone.refreshButton': 'I-analyze ulit gamit ang AI',
+    'safeZone.refreshing': 'Sinusuri...',
+    'safeZone.analyzing': 'Sinusuri ng AI ang inyong ruta, oras ng pagkikita, at istilo ng pag-uusap para pumili ng ligtas na lugar...',
     'mypage.pointsLabel': 'Puntos',
     'mypage.volunteerLabel': 'Boluntaryo (min)',
     'mypage.badgesLabel': 'Mga badge',
@@ -654,6 +786,34 @@ export const TRANSLATIONS: Record<Locale, Record<TranslationKey, string>> = {
     'skill.skill_local_info': 'Impormasyon sa pamumuhay sa Gyeongsan',
     'skill.skill_korean_cooking': 'Lutong-bahay na Koreano',
     'skill.skill_kids_english': 'Programa sa pagkilala ng Ingles para sa bata',
+    'skill.skill_multicultural_playdate': 'Playdate ng mga anak ng multicultural na pamilya',
+    'skill.skill_school_enrollment_help': 'Tulong sa paperwork ng pagpapatala/paglipat ng paaralan',
+    'skill.skill_futsal_partner': 'Maglaro ng futsal/soccer nang sama-sama',
+    'skill.skill_hiking_buddy': 'Kasama sa pag-hiking',
+    'skill.skill_badminton_partner': 'Kasosyo sa badminton',
+    'skill.skill_morning_jogging': 'Grupo ng umagang jogging',
+    'skill.skill_traditional_craft': 'Pagbahagi ng tradisyunal na crafts',
+    'skill.skill_kpop_dance': 'K-pop cover dance',
+    'skill.skill_photography_walk': 'Paglalakad habang kumukuha ng litrato',
+    'skill.skill_home_country_music': 'Tradisyunal na musika/instrumento ng sariling bansa',
+    'skill.skill_smartphone_help': 'Tulong sa smartphone at mga government app',
+    'skill.skill_online_banking_help': 'Tulong sa online/mobile banking',
+    'skill.skill_document_editing_help': 'Tulong sa pag-edit ng dokumento',
+    'skill.skill_basic_coding': 'Matuto ng basic coding',
+    'skill.skill_visa_info_share': 'Pagbahagi ng impormasyon sa visa/paninirahan',
+    'skill.skill_immigration_office_accompany': 'Samahan sa immigration office',
+    'skill.skill_labor_rights_info': 'Batayang impormasyon sa paggawa/sahod',
+    'skill.skill_admin_document_help': 'Tulong sa administratibong papeles',
+    'skillCategory.language': 'Wika',
+    'skillCategory.culture': 'Palitan ng kultura',
+    'skillCategory.cooking': 'Pagluluto',
+    'skillCategory.local-info': 'Lokal na impormasyon',
+    'skillCategory.parenting': 'Pag-aaruga ng anak',
+    'skillCategory.education': 'Edukasyon',
+    'skillCategory.sports': 'Sports at ehersisyo',
+    'skillCategory.hobby-art': 'Hobby at sining',
+    'skillCategory.tech': 'Teknolohiya',
+    'skillCategory.legal-admin': 'Legal at administratibo',
   },
   vi: {
     'welcome.tagline': 'Cộng đồng siêu địa phương an toàn nhất\nđể chia sẻ tài năng với hàng xóm',
@@ -675,6 +835,15 @@ export const TRANSLATIONS: Record<Locale, Record<TranslationKey, string>> = {
     'interestSelection.selectedCount': 'Đã chọn {count}',
     'interestSelection.saveButton': 'Lưu và tìm hàng xóm phù hợp',
     'interestSelection.validationHint': 'Nhập tên và chọn ít nhất một mục trong mỗi danh mục',
+    'profileFields.genderLabel': 'Giới tính (không bắt buộc)',
+    'profileFields.genderMale': 'Nam',
+    'profileFields.genderFemale': 'Nữ',
+    'profileFields.genderUnspecified': 'Không muốn nêu rõ',
+    'profileFields.talkStyleLabel': 'Phong cách trò chuyện (không bắt buộc)',
+    'profileFields.talkStyleHint': 'Giúp AI chọn địa điểm gặp mặt phù hợp cho bạn',
+    'profileFields.talkStyleQuiet': 'Tôi thích nơi yên tĩnh',
+    'profileFields.talkStyleLively': 'Tôi thích nơi náo nhiệt',
+    'profileFields.talkStyleNoPreference': 'Không có yêu cầu',
     'languagePicker.title': 'Chọn ngôn ngữ',
     'tabs.home': 'Trang chủ',
     'tabs.community': 'Cộng đồng',
@@ -735,6 +904,9 @@ export const TRANSLATIONS: Record<Locale, Record<TranslationKey, string>> = {
     'safeZone.aiLabel': 'Khu vực an toàn AI gợi ý',
     'safeZone.recommended': 'Đề xuất',
     'safeZone.scoreLabel': 'Điểm an toàn AI: {score}',
+    'safeZone.refreshButton': 'Phân tích lại bằng AI',
+    'safeZone.refreshing': 'Đang phân tích...',
+    'safeZone.analyzing': 'AI đang phân tích lộ trình, thời gian gặp mặt và phong cách trò chuyện của hai bạn để chọn khu vực an toàn...',
     'mypage.pointsLabel': 'Điểm',
     'mypage.volunteerLabel': 'Tình nguyện (phút)',
     'mypage.badgesLabel': 'Huy hiệu',
@@ -817,5 +989,33 @@ export const TRANSLATIONS: Record<Locale, Record<TranslationKey, string>> = {
     'skill.skill_local_info': 'Thông tin sinh hoạt tại Gyeongsan',
     'skill.skill_korean_cooking': 'Nấu ăn gia đình Hàn Quốc',
     'skill.skill_kids_english': 'Chương trình tiếp cận tiếng Anh cho trẻ',
+    'skill.skill_multicultural_playdate': 'Buổi chơi cho trẻ gia đình đa văn hóa',
+    'skill.skill_school_enrollment_help': 'Hỗ trợ thủ tục nhập học/chuyển trường cho con',
+    'skill.skill_futsal_partner': 'Cùng chơi futsal/bóng đá',
+    'skill.skill_hiking_buddy': 'Bạn đồng hành leo núi',
+    'skill.skill_badminton_partner': 'Bạn chơi cầu lông',
+    'skill.skill_morning_jogging': 'Nhóm chạy bộ buổi sáng',
+    'skill.skill_traditional_craft': 'Chia sẻ thủ công truyền thống',
+    'skill.skill_kpop_dance': 'Nhảy cover K-pop',
+    'skill.skill_photography_walk': 'Đi bộ chụp ảnh',
+    'skill.skill_home_country_music': 'Giới thiệu âm nhạc/nhạc cụ truyền thống quê hương',
+    'skill.skill_smartphone_help': 'Hướng dẫn dùng smartphone & app hành chính',
+    'skill.skill_online_banking_help': 'Hỗ trợ ngân hàng trực tuyến/di động',
+    'skill.skill_document_editing_help': 'Hỗ trợ soạn tài liệu',
+    'skill.skill_basic_coding': 'Học lập trình cơ bản',
+    'skill.skill_visa_info_share': 'Chia sẻ thông tin visa/thủ tục cư trú',
+    'skill.skill_immigration_office_accompany': 'Đi cùng đến văn phòng xuất nhập cảnh',
+    'skill.skill_labor_rights_info': 'Chia sẻ thông tin cơ bản về lao động/lương',
+    'skill.skill_admin_document_help': 'Hỗ trợ giấy tờ hành chính',
+    'skillCategory.language': 'Ngôn ngữ',
+    'skillCategory.culture': 'Giao lưu văn hóa',
+    'skillCategory.cooking': 'Nấu ăn',
+    'skillCategory.local-info': 'Thông tin địa phương',
+    'skillCategory.parenting': 'Nuôi dạy con',
+    'skillCategory.education': 'Giáo dục',
+    'skillCategory.sports': 'Thể thao & vận động',
+    'skillCategory.hobby-art': 'Sở thích & nghệ thuật',
+    'skillCategory.tech': 'Công nghệ',
+    'skillCategory.legal-admin': 'Pháp lý & hành chính',
   },
 };

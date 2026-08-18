@@ -1,22 +1,43 @@
 import { Feather } from '@expo/vector-icons';
 import { Pressable, Text, View } from 'react-native';
 import { SAFE_ZONE_TYPE_META } from '../../constants/theme';
-import type { SafeZone } from '../../types';
+import type { RankedSafeZone } from '../../types';
 import { useTranslation } from '../../utils/i18n';
 
 export function SafeZonePicker({
   zones,
   selectedId,
   onSelect,
+  loading = false,
+  onRefresh,
 }: {
-  zones: SafeZone[];
+  zones: RankedSafeZone[];
   selectedId: string | null;
   onSelect: (id: string) => void;
+  loading?: boolean;
+  onRefresh?: () => void;
 }) {
   const { t } = useTranslation();
   return (
     <View>
-      <Text className="text-sm font-semibold text-gray-700 mb-2">{t('safeZone.aiLabel')}</Text>
+      <View className="flex-row items-center justify-between mb-2">
+        <Text className="text-sm font-semibold text-gray-700">{t('safeZone.aiLabel')}</Text>
+        {!!onRefresh && (
+          <Pressable onPress={onRefresh} disabled={loading} hitSlop={6} className="flex-row items-center px-1 py-1">
+            <Feather name="refresh-cw" size={12} color={loading ? '#d1d5db' : '#059669'} />
+            <Text className={`text-[11px] font-semibold ml-1 ${loading ? 'text-gray-300' : 'text-primary-600'}`}>
+              {loading ? t('safeZone.refreshing') : t('safeZone.refreshButton')}
+            </Text>
+          </Pressable>
+        )}
+      </View>
+
+      {loading && zones.length === 0 && (
+        <View className="border border-gray-100 rounded-2xl p-3.5 mb-2.5 bg-gray-50">
+          <Text className="text-xs text-gray-400 leading-5">{t('safeZone.analyzing')}</Text>
+        </View>
+      )}
+
       {zones.map((zone, index) => {
         const meta = SAFE_ZONE_TYPE_META[zone.type];
         const selected = selectedId === zone.id;
@@ -49,8 +70,13 @@ export function SafeZonePicker({
               {selected && <Feather name="check-circle" size={20} color="#10b981" />}
             </View>
             <Text className="text-xs text-primary-600 font-semibold mt-2">
-              {t('safeZone.scoreLabel', { score: zone.safetyScore })}
+              {t('safeZone.scoreLabel', { score: zone.matchScore })}
             </Text>
+            {!!zone.aiRationale && (
+              <Text className="text-[11px] text-gray-500 mt-1 leading-4" numberOfLines={2}>
+                {zone.aiRationale}
+              </Text>
+            )}
           </Pressable>
         );
       })}

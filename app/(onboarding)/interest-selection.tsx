@@ -6,11 +6,39 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { Button } from '../../components/common/Button';
 import { Header } from '../../components/common/Header';
 import { LanguagePicker } from '../../components/common/LanguagePicker';
-import { ALL_SKILLS } from '../../mocks/skills';
+import { ALL_SKILLS, groupSkillsByCategory, SKILL_CATEGORY_ORDER } from '../../mocks/skills';
 import { useAuthStore } from '../../store/useAuthStore';
 import { useUserStore } from '../../store/useUserStore';
-import type { Skill } from '../../types';
+import type { Gender, Skill, TalkStyle } from '../../types';
 import { useTranslation } from '../../utils/i18n';
+import type { TranslationKey } from '../../constants/i18n';
+
+const SKILLS_BY_CATEGORY = groupSkillsByCategory(ALL_SKILLS);
+
+const GENDER_OPTIONS: { value: Gender; key: TranslationKey }[] = [
+  { value: 'female', key: 'profileFields.genderFemale' },
+  { value: 'male', key: 'profileFields.genderMale' },
+  { value: 'unspecified', key: 'profileFields.genderUnspecified' },
+];
+
+const TALK_STYLE_OPTIONS: { value: TalkStyle; key: TranslationKey }[] = [
+  { value: 'quiet', key: 'profileFields.talkStyleQuiet' },
+  { value: 'lively', key: 'profileFields.talkStyleLively' },
+  { value: 'no-preference', key: 'profileFields.talkStyleNoPreference' },
+];
+
+function OptionChip({ label, selected, onPress }: { label: string; selected: boolean; onPress: () => void }) {
+  return (
+    <Pressable
+      onPress={onPress}
+      className={`rounded-full px-3.5 py-2 mr-2 mb-2 border ${
+        selected ? 'bg-primary-500 border-primary-500' : 'bg-white border-gray-200'
+      }`}
+    >
+      <Text className={`text-xs font-semibold ${selected ? 'text-white' : 'text-gray-700'}`}>{label}</Text>
+    </Pressable>
+  );
+}
 
 function SkillChip({
   skill,
@@ -21,6 +49,7 @@ function SkillChip({
   selected: boolean;
   onToggle: () => void;
 }) {
+  const { skillLabel } = useTranslation();
   return (
     <Pressable
       onPress={onToggle}
@@ -30,9 +59,44 @@ function SkillChip({
     >
       {selected && <Feather name="check" size={12} color="#fff" style={{ marginRight: 4 }} />}
       <Text className={`text-xs font-semibold ${selected ? 'text-white' : 'text-gray-700'}`}>
-        {skill.label}
+        {skillLabel(skill)}
       </Text>
     </Pressable>
+  );
+}
+
+function GroupedSkillChips({
+  selectedIds,
+  onToggle,
+}: {
+  selectedIds: string[];
+  onToggle: (id: string) => void;
+}) {
+  const { t } = useTranslation();
+  return (
+    <>
+      {SKILL_CATEGORY_ORDER.map((category) => {
+        const skills = SKILLS_BY_CATEGORY[category];
+        if (!skills || skills.length === 0) return null;
+        return (
+          <View key={category} className="mb-1">
+            <Text className="text-[11px] font-semibold text-gray-400 mb-2">
+              {t(`skillCategory.${category}` as TranslationKey)}
+            </Text>
+            <View className="flex-row flex-wrap mb-2">
+              {skills.map((skill) => (
+                <SkillChip
+                  key={skill.id}
+                  skill={skill}
+                  selected={selectedIds.includes(skill.id)}
+                  onToggle={() => onToggle(skill.id)}
+                />
+              ))}
+            </View>
+          </View>
+        );
+      })}
+    </>
   );
 }
 
@@ -46,6 +110,8 @@ export default function InterestSelection() {
   const [name, setName] = useState(existingUser?.name ?? '');
   const [offeredIds, setOfferedIds] = useState<string[]>([]);
   const [wantedIds, setWantedIds] = useState<string[]>([]);
+  const [gender, setGender] = useState<Gender>(existingUser?.gender ?? 'unspecified');
+  const [talkStyle, setTalkStyle] = useState<TalkStyle>(existingUser?.talkStyle ?? 'no-preference');
 
   const toggle = (setFn: typeof setOfferedIds, id: string) =>
     setFn((prev) => (prev.includes(id) ? prev.filter((s) => s !== id) : [...prev, id]));
@@ -60,6 +126,8 @@ export default function InterestSelection() {
 
     updateProfile(currentUserId, {
       name: name.trim(),
+      gender,
+      talkStyle,
       skillsOffered,
       skillsWanted,
       availability: [
@@ -96,15 +164,8 @@ export default function InterestSelection() {
           </Text>
         </View>
         <Text className="text-xs text-gray-400 mb-3">{t('interestSelection.offeredHint')}</Text>
-        <View className="flex-row flex-wrap mb-5">
-          {ALL_SKILLS.map((skill) => (
-            <SkillChip
-              key={skill.id}
-              skill={skill}
-              selected={offeredIds.includes(skill.id)}
-              onToggle={() => toggle(setOfferedIds, skill.id)}
-            />
-          ))}
+        <View className="mb-4">
+          <GroupedSkillChips selectedIds={offeredIds} onToggle={(id) => toggle(setOfferedIds, id)} />
         </View>
 
         <View className="flex-row items-center justify-between mb-2">
@@ -114,13 +175,31 @@ export default function InterestSelection() {
           </Text>
         </View>
         <Text className="text-xs text-gray-400 mb-3">{t('interestSelection.wantedHint')}</Text>
+        <View className="mb-1">
+          <GroupedSkillChips selectedIds={wantedIds} onToggle={(id) => toggle(setWantedIds, id)} />
+        </View>
+
+        <Text className="text-sm font-semibold text-gray-700 mb-2 mt-4">{t('profileFields.genderLabel')}</Text>
+        <View className="flex-row flex-wrap mb-1">
+          {GENDER_OPTIONS.map((opt) => (
+            <OptionChip
+              key={opt.value}
+              label={t(opt.key)}
+              selected={gender === opt.value}
+              onPress={() => setGender(opt.value)}
+            />
+          ))}
+        </View>
+
+        <Text className="text-sm font-semibold text-gray-700 mb-1 mt-3">{t('profileFields.talkStyleLabel')}</Text>
+        <Text className="text-xs text-gray-400 mb-2">{t('profileFields.talkStyleHint')}</Text>
         <View className="flex-row flex-wrap mb-2">
-          {ALL_SKILLS.map((skill) => (
-            <SkillChip
-              key={skill.id}
-              skill={skill}
-              selected={wantedIds.includes(skill.id)}
-              onToggle={() => toggle(setWantedIds, skill.id)}
+          {TALK_STYLE_OPTIONS.map((opt) => (
+            <OptionChip
+              key={opt.value}
+              label={t(opt.key)}
+              selected={talkStyle === opt.value}
+              onPress={() => setTalkStyle(opt.value)}
             />
           ))}
         </View>

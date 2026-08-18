@@ -1,10 +1,14 @@
 export type SkillCategory =
   | 'language'
   | 'cooking'
-  | 'education'
-  | 'local-info'
   | 'culture'
-  | 'craft';
+  | 'local-info'
+  | 'education'
+  | 'parenting'
+  | 'sports'
+  | 'hobby-art'
+  | 'tech'
+  | 'legal-admin';
 
 export interface Skill {
   id: string;

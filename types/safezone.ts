@@ -26,3 +26,12 @@ export interface SafeZone {
   phone?: string;
   isPartnered: boolean;
 }
+
+/** A SafeZone re-ranked for a specific pair of users — by the AI router when available, else the distance fallback. */
+export interface RankedSafeZone extends SafeZone {
+  /** Final score shown to the user: the AI match score when aiRanked is true, else safetyScore. */
+  matchScore: number;
+  /** One-sentence AI rationale for why this spot fits this specific pair/time. Undefined when using the fallback ranking. */
+  aiRationale?: string;
+  aiRanked: boolean;
+}

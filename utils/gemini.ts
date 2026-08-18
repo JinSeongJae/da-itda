@@ -84,3 +84,105 @@ export async function generateAppointmentSuggestion({
   }
   return parsed as AppointmentSuggestion;
 }
+
+export interface SafeZoneCandidateInput {
+  id: string;
+  name: string;
+  type: string;
+  hours: string;
+  distanceFromMidpointKm: number;
+  footTraffic: number;
+  lighting: number;
+  crimeRateInverse: number;
+  cctvCoverage: number;
+}
+
+export interface SafeZoneRecommendationContext {
+  meetingDateTime: string;
+  userAGender?: string;
+  userBGender?: string;
+  talkStyleSummary: string;
+  commonInterests: string[];
+}
+
+export interface SafeZoneRecommendation {
+  safeZoneId: string;
+  matchScore: number;
+  rationale: string;
+}
+
+export async function generateSafeZoneRecommendations({
+  apiKey,
+  candidates,
+  context,
+}: {
+  apiKey: string;
+  candidates: SafeZoneCandidateInput[];
+  context: SafeZoneRecommendationContext;
+}): Promise<SafeZoneRecommendation[]> {
+  const candidateLines = candidates
+    .map(
+      (c, i) =>
+        `${i + 1}. id=${c.id} / ${c.name} (${c.type}) · 중간지점에서 ${c.distanceFromMidpointKm.toFixed(1)}km · ` +
+        `운영시간 ${c.hours} · 유동인구지수 ${c.footTraffic} · 조명 ${c.lighting} · 치안(범죄율 역지표) ${c.crimeRateInverse} · CCTV ${c.cctvCoverage}`
+    )
+    .join('\n');
+
+  const data = await callGemini(apiKey, {
+    systemInstruction: {
+      parts: [
+        {
+          text:
+            `${BASE_SYSTEM_INSTRUCTION}\n\n` +
+            '너는 두 이웃의 첫 만남을 위한 "안심 오프라인 스팟"을 추천하는 안전 공간 추천 전문가야. ' +
+            '시간대별 유동인구·치안 지표, 장소의 개방성, 두 사람 위치의 중간 지점, 대화 성향(시끄러운 곳 vs 조용한 곳), ' +
+            '성별 조합, 공통 관심사를 종합적으로 고려해서 후보 장소 각각에 0~100 사이의 안심 매치 점수를 매기고, ' +
+            '한국어로 한 문장씩 추천 이유를 작성해줘. 반드시 주어진 후보의 id만 사용하고, 매치 점수가 높은 순서로 정렬해서 응답해.',
+        },
+      ],
+    },
+    contents: [
+      {
+        role: 'user',
+        parts: [
+          {
+            text:
+              `[만남 정보]\n` +
+              `일시: ${context.meetingDateTime}\n` +
+              `성별 조합: ${context.userAGender ?? '미공개'} · ${context.userBGender ?? '미공개'}\n` +
+              `대화 성향: ${context.talkStyleSummary}\n` +
+              `공통 관심사: ${context.commonInterests.join(', ') || '없음'}\n\n` +
+              `[후보 장소 목록]\n${candidateLines}`,
+          },
+        ],
+      },
+    ],
+    generationConfig: {
+      maxOutputTokens: 600,
+      responseMimeType: 'application/json',
+      responseSchema: {
+        type: 'array',
+        items: {
+          type: 'object',
+          properties: {
+            safeZoneId: { type: 'string', description: '후보 목록의 id 값 그대로' },
+            matchScore: { type: 'number', description: '0-100 사이의 안심 매치 점수' },
+            rationale: { type: 'string', description: '추천 이유를 한국어 한 문장으로' },
+          },
+          required: ['safeZoneId', 'matchScore', 'rationale'],
+        },
+      },
+    },
+  });
+
+  const text = extractText(data);
+  if (!text) {
+    throw new Error('Gemini 응답에서 안심존 추천 결과를 찾을 수 없어요.');
+  }
+
+  const parsed = JSON.parse(text);
+  if (!Array.isArray(parsed) || parsed.length === 0) {
+    throw new Error('Gemini 안심존 추천 결과가 올바르지 않아요.');
+  }
+  return parsed as SafeZoneRecommendation[];
+}

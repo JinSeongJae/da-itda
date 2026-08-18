@@ -6,11 +6,37 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { Avatar } from '../../../components/common/Avatar';
 import { Button } from '../../../components/common/Button';
 import { Header } from '../../../components/common/Header';
-import { ALL_SKILLS } from '../../../mocks/skills';
+import { ALL_SKILLS, groupSkillsByCategory, SKILL_CATEGORY_ORDER } from '../../../mocks/skills';
 import { useAuthStore } from '../../../store/useAuthStore';
 import { useUserStore } from '../../../store/useUserStore';
-import type { Skill } from '../../../types';
+import type { Gender, Skill, TalkStyle } from '../../../types';
 import { useTranslation } from '../../../utils/i18n';
+import type { TranslationKey } from '../../../constants/i18n';
+
+const GENDER_OPTIONS: { value: Gender; key: TranslationKey }[] = [
+  { value: 'female', key: 'profileFields.genderFemale' },
+  { value: 'male', key: 'profileFields.genderMale' },
+  { value: 'unspecified', key: 'profileFields.genderUnspecified' },
+];
+
+const TALK_STYLE_OPTIONS: { value: TalkStyle; key: TranslationKey }[] = [
+  { value: 'quiet', key: 'profileFields.talkStyleQuiet' },
+  { value: 'lively', key: 'profileFields.talkStyleLively' },
+  { value: 'no-preference', key: 'profileFields.talkStyleNoPreference' },
+];
+
+function OptionChip({ label, selected, onPress }: { label: string; selected: boolean; onPress: () => void }) {
+  return (
+    <Pressable
+      onPress={onPress}
+      className={`rounded-full px-3.5 py-2 mr-2 mb-2 border ${
+        selected ? 'bg-primary-500 border-primary-500' : 'bg-white border-gray-200'
+      }`}
+    >
+      <Text className={`text-xs font-semibold ${selected ? 'text-white' : 'text-gray-700'}`}>{label}</Text>
+    </Pressable>
+  );
+}
 
 function RemovableTag({ skill, onRemove }: { skill: Skill; onRemove: () => void }) {
   const { skillLabel } = useTranslation();
@@ -34,6 +60,31 @@ function AddableChip({ skill, onAdd }: { skill: Skill; onAdd: () => void }) {
   );
 }
 
+function GroupedAddableChips({ skills, onAdd }: { skills: Skill[]; onAdd: (skill: Skill) => void }) {
+  const { t } = useTranslation();
+  const grouped = groupSkillsByCategory(skills);
+  return (
+    <>
+      {SKILL_CATEGORY_ORDER.map((category) => {
+        const categorySkills = grouped[category];
+        if (!categorySkills || categorySkills.length === 0) return null;
+        return (
+          <View key={category} className="mb-1">
+            <Text className="text-[11px] font-semibold text-gray-400 mb-2">
+              {t(`skillCategory.${category}` as TranslationKey)}
+            </Text>
+            <View className="flex-row flex-wrap mb-2">
+              {categorySkills.map((skill) => (
+                <AddableChip key={skill.id} skill={skill} onAdd={() => onAdd(skill)} />
+              ))}
+            </View>
+          </View>
+        );
+      })}
+    </>
+  );
+}
+
 export default function EditProfile() {
   const { t } = useTranslation();
   const currentUserId = useAuthStore((s) => s.currentUserId)!;
@@ -45,6 +96,8 @@ export default function EditProfile() {
   const removeSkillWanted = useUserStore((s) => s.removeSkillWanted);
 
   const [bio, setBio] = useState(user?.bio ?? '');
+  const [gender, setGender] = useState<Gender>(user?.gender ?? 'unspecified');
+  const [talkStyle, setTalkStyle] = useState<TalkStyle>(user?.talkStyle ?? 'no-preference');
 
   const handlePickAvatar = async () => {
     const permission = await ImagePicker.requestMediaLibraryPermissionsAsync();
@@ -105,10 +158,8 @@ export default function EditProfile() {
             ))
           )}
         </View>
-        <View className="flex-row flex-wrap mb-6">
-          {availableToOffer.map((s) => (
-            <AddableChip key={s.id} skill={s} onAdd={() => addSkillOffered(currentUserId, s)} />
-          ))}
+        <View className="mb-4">
+          <GroupedAddableChips skills={availableToOffer} onAdd={(s) => addSkillOffered(currentUserId, s)} />
         </View>
 
         <Text className="text-sm font-bold text-gray-700 mb-1">{t('mypage.wantedLabel')}</Text>
@@ -122,15 +173,38 @@ export default function EditProfile() {
             ))
           )}
         </View>
+        <View className="mb-4">
+          <GroupedAddableChips skills={availableToWant} onAdd={(s) => addSkillWanted(currentUserId, s)} />
+        </View>
+
+        <Text className="text-sm font-bold text-gray-700 mb-2">{t('profileFields.genderLabel')}</Text>
+        <View className="flex-row flex-wrap mb-1">
+          {GENDER_OPTIONS.map((opt) => (
+            <OptionChip
+              key={opt.value}
+              label={t(opt.key)}
+              selected={gender === opt.value}
+              onPress={() => setGender(opt.value)}
+            />
+          ))}
+        </View>
+
+        <Text className="text-sm font-bold text-gray-700 mb-1 mt-3">{t('profileFields.talkStyleLabel')}</Text>
+        <Text className="text-xs text-gray-400 mb-2">{t('profileFields.talkStyleHint')}</Text>
         <View className="flex-row flex-wrap mb-8">
-          {availableToWant.map((s) => (
-            <AddableChip key={s.id} skill={s} onAdd={() => addSkillWanted(currentUserId, s)} />
+          {TALK_STYLE_OPTIONS.map((opt) => (
+            <OptionChip
+              key={opt.value}
+              label={t(opt.key)}
+              selected={talkStyle === opt.value}
+              onPress={() => setTalkStyle(opt.value)}
+            />
           ))}
         </View>
       </ScrollView>
 
       <View className="px-6 pt-3 pb-4 border-t border-gray-100 bg-white">
-        <Button label={t('edit.save')} onPress={() => updateProfile(currentUserId, { bio })} />
+        <Button label={t('edit.save')} onPress={() => updateProfile(currentUserId, { bio, gender, talkStyle })} />
       </View>
     </SafeAreaView>
   );
