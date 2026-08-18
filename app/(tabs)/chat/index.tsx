@@ -26,13 +26,14 @@ export default function ChatList() {
 
   return (
     <SafeAreaView edges={['top']} className="flex-1 bg-white">
-      <View className="px-4 py-3.5 shadow-sm shadow-gray-200">
-        <Text className="text-xl font-extrabold text-gray-800">채팅</Text>
+      <View className="px-6 pt-6 pb-2">
+        <Text className="text-[28px] font-extrabold text-gray-900">채팅</Text>
       </View>
       <FlatList
         data={threads}
         keyExtractor={(t) => t.id}
-        ItemSeparatorComponent={() => <View className="h-px bg-gray-100 ml-[76px]" />}
+        contentContainerStyle={{ paddingHorizontal: 24 }}
+        ItemSeparatorComponent={() => <View className="h-px bg-gray-100" />}
         renderItem={({ item }) => {
           const counterpartId = item.participantIds.find((id) => id !== currentUserId);
           const counterpart = counterpartId ? usersById[counterpartId] : undefined;

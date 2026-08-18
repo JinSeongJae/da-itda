@@ -128,7 +128,7 @@ export default function AppointmentFormScreen() {
   return (
     <SafeAreaView className="flex-1 bg-white">
       <Header title="약속 잡기 (원터치)" showBack />
-      <ScrollView className="flex-1 px-5 pt-5" contentContainerStyle={{ paddingBottom: 24 }}>
+      <ScrollView className="flex-1 px-6 pt-5" contentContainerStyle={{ paddingBottom: 24 }}>
         <Text className="text-gray-500 text-sm mb-5">
           {counterpart.name}님과의 만남을 날짜·시간·장소까지 한번에 정해보세요.
         </Text>

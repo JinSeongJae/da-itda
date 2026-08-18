@@ -1,5 +1,4 @@
 import { useEffect, useState } from 'react';
-import { Feather } from '@expo/vector-icons';
 import { ScrollView, Text, View } from 'react-native';
 import { router } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -54,41 +53,40 @@ export default function Home() {
   };
 
   return (
-    <SafeAreaView edges={['top']} className="flex-1 bg-gray-50">
+    <SafeAreaView edges={['top']} className="flex-1 bg-white">
       <LocationHeader city={currentUser.location.city} district={currentUser.location.district} />
-      <ScrollView className="flex-1 px-4" contentContainerStyle={{ paddingBottom: 32 }}>
+      <ScrollView className="flex-1 px-6" contentContainerStyle={{ paddingBottom: 40 }}>
+        <Text className="text-[28px] leading-9 font-extrabold text-gray-900 mt-6">
+          안녕하세요,{'\n'}
+          {currentUser.name}님
+        </Text>
+
         {upcomingAppointment && upcomingCounterpart && (
           <ConfirmedAppointmentBanner appointment={upcomingAppointment} counterpart={upcomingCounterpart} />
         )}
 
-        <Text className="text-xl font-extrabold text-gray-800 mt-5">
-          안녕하세요, {currentUser.name}님
-        </Text>
-        <Text className="text-sm text-gray-400 mt-1 mb-1">오늘도 새로운 이웃과 재능을 나눠보세요</Text>
-
-        <View className="mt-4">
-          <View className="flex-row items-center mb-3">
-            <Feather name="star" size={15} color="#059669" />
-            <Text className="text-base font-bold text-gray-800 ml-1.5">오늘의 AI 추천 이웃</Text>
-          </View>
+        <View className="mt-10">
+          <Text className="text-[13px] font-semibold text-gray-400 mb-1">오늘의 AI 추천</Text>
+          <Text className="text-xl font-extrabold text-gray-900 mb-1">이런 이웃은 어때요?</Text>
           {topRecommendations.length === 0 ? (
-            <View className="bg-white rounded-3xl border border-gray-100 py-8 items-center">
-              <Feather name="users" size={22} color="#d1d5db" />
-              <Text className="text-sm text-gray-400 mt-2 text-center px-6">
+            <View className="py-10 items-center">
+              <Text className="text-sm text-gray-400 text-center leading-5">
                 아직 추천할 이웃이 없어요.{'\n'}곧 새로운 이웃이 가입하면 여기 채워질 거예요!
               </Text>
             </View>
           ) : (
-            topRecommendations.map(({ candidate, compatibilityScore }, index) => (
-              <RecommendedNeighborCard
-                key={candidate.id}
-                candidate={candidate}
-                compatibilityScore={compatibilityScore}
-                onMatch={() => handleMatch(candidate.id)}
-                matching={matchingWithId === candidate.id}
-                topPick={index === 0}
-              />
-            ))
+            <View className="mt-3">
+              {topRecommendations.map(({ candidate, compatibilityScore }, index) => (
+                <RecommendedNeighborCard
+                  key={candidate.id}
+                  candidate={candidate}
+                  compatibilityScore={compatibilityScore}
+                  onMatch={() => handleMatch(candidate.id)}
+                  matching={matchingWithId === candidate.id}
+                  topPick={index === 0}
+                />
+              ))}
+            </View>
           )}
         </View>
 

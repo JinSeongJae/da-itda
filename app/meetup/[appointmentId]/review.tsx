@@ -72,7 +72,7 @@ export default function MeetupReview() {
   return (
     <SafeAreaView className="flex-1 bg-white">
       <Header title="3초 안전·매너 후기" showBack />
-      <View className="flex-1 px-5 pt-5">
+      <View className="flex-1 px-6 pt-5">
         {!submitted ? (
           <ReviewChecklist onSubmit={handleSubmit} />
         ) : (

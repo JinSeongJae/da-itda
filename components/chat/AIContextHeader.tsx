@@ -4,7 +4,7 @@ import type { AIContextHeaderData } from '../../types';
 
 export function AIContextHeader({ data }: { data: AIContextHeaderData }) {
   return (
-    <View className="bg-primary-50 border-b border-primary-100 px-4 py-2.5 flex-row items-start">
+    <View className="bg-primary-50 px-6 py-3 flex-row items-start">
       <Feather name="cpu" size={16} color="#047857" style={{ marginTop: 2 }} />
       <View className="ml-2 flex-1">
         <Text className="text-primary-800 text-xs font-semibold">

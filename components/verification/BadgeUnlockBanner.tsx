@@ -6,7 +6,7 @@ export function BadgeUnlockBanner({ badge }: { badge: Badge }) {
   return (
     <View className="items-center py-6">
       <View className="w-32 h-32 rounded-full bg-primary-50 items-center justify-center mb-5">
-        <View className="w-24 h-24 rounded-full bg-primary-500 items-center justify-center shadow-md shadow-primary-200">
+        <View className="w-24 h-24 rounded-full bg-primary-500 items-center justify-center">
           <Feather name={badge.iconName as any} size={38} color="#fff" />
         </View>
       </View>

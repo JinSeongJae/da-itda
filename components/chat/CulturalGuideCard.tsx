@@ -6,7 +6,7 @@ export function CulturalGuideCard({ text }: { text: string }) {
   const [expanded, setExpanded] = useState(true);
 
   return (
-    <View className="self-center bg-amber-50 border border-amber-200 rounded-2xl px-3 py-2 my-2 max-w-[85%]">
+    <View className="self-center bg-amber-50 rounded-2xl px-3.5 py-2.5 my-2 max-w-[85%]">
       <Pressable onPress={() => setExpanded((e) => !e)} className="flex-row items-center">
         <Feather name="info" size={14} color="#b45309" />
         <Text className="ml-1.5 text-amber-800 text-xs font-bold">AI 문화 맥락 가이드</Text>

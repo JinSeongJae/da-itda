@@ -14,21 +14,19 @@ export function ChatListItem({
   onPress: () => void;
 }) {
   return (
-    <Pressable onPress={onPress} className="flex-row items-center px-4 py-3.5 active:bg-gray-50">
-      <View className="rounded-full p-0.5 border border-gray-100">
-        <Avatar uri={counterpart.avatarUrl} size={52} />
-      </View>
-      <View className="ml-3 flex-1">
+    <Pressable onPress={onPress} className="flex-row items-center py-4">
+      <Avatar uri={counterpart.avatarUrl} size={52} />
+      <View className="ml-3.5 flex-1">
         <View className="flex-row items-center">
-          <Text className="text-base font-bold text-gray-800">{counterpart.name}</Text>
+          <Text className="text-[16px] font-bold text-gray-900">{counterpart.name}</Text>
           {thread.isDirectChannel && <Tag label="단짝 이웃" tone="primary" />}
         </View>
-        <Text className="text-gray-500 text-sm mt-0.5" numberOfLines={1}>
+        <Text className="text-gray-400 text-[13px] mt-0.5" numberOfLines={1}>
           {thread.lastMessagePreview ?? '대화를 시작해보세요'}
         </Text>
       </View>
       {thread.lastMessageAt && (
-        <Text className="text-gray-400 text-xs">{formatRelativeTime(thread.lastMessageAt)}</Text>
+        <Text className="text-gray-300 text-xs">{formatRelativeTime(thread.lastMessageAt)}</Text>
       )}
     </Pressable>
   );

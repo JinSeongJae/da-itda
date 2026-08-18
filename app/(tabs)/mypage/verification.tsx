@@ -39,7 +39,7 @@ export default function VerificationScreen() {
   return (
     <SafeAreaView className="flex-1 bg-white">
       <Header title="수동 안심인증" showBack />
-      <ScrollView className="flex-1 px-5 pt-5" contentContainerStyle={{ paddingBottom: 24 }}>
+      <ScrollView className="flex-1 px-6 pt-5" contentContainerStyle={{ paddingBottom: 24 }}>
         <Text className="text-gray-500 text-sm mb-5">
           제출하신 서류는 OCR 자동 인식 없이, 운영팀이 직접 육안으로 확인 후 승인해드려요.
         </Text>
@@ -69,7 +69,7 @@ export default function VerificationScreen() {
         </View>
 
         {status === 'verified' ? (
-          <View className="items-center bg-primary-50 rounded-3xl py-10 border border-primary-100">
+          <View className="items-center bg-primary-50 rounded-3xl py-10">
             <View className="w-16 h-16 rounded-full bg-primary-500 items-center justify-center mb-3">
               <Feather name="shield" size={28} color="#fff" />
             </View>

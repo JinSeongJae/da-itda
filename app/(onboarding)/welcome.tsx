@@ -5,7 +5,6 @@ import { router } from 'expo-router';
 import * as AuthSession from 'expo-auth-session';
 import * as WebBrowser from 'expo-web-browser';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import Svg, { Defs, RadialGradient, Rect, Stop } from 'react-native-svg';
 import { Button } from '../../components/common/Button';
 import { GYEONGSAN_CENTER } from '../../constants/theme';
 import { useAuthStore } from '../../store/useAuthStore';
@@ -110,25 +109,15 @@ export default function Welcome() {
 
   return (
     <SafeAreaView className="flex-1 bg-white">
-      <Svg width="100%" height="60%" style={{ position: 'absolute', top: 0, left: 0 }}>
-        <Defs>
-          <RadialGradient id="glow" cx="50%" cy="0%" r="75%">
-            <Stop offset="0" stopColor="#6ee7b7" stopOpacity={0.35} />
-            <Stop offset="1" stopColor="#6ee7b7" stopOpacity={0} />
-          </RadialGradient>
-        </Defs>
-        <Rect width="100%" height="100%" fill="url(#glow)" />
-      </Svg>
-
       <View className="flex-1 items-center justify-between px-6 pt-16 pb-10">
         <View className="items-center mt-10">
           <Image
             source={require('../../assets/splash-icon.png')}
-            style={{ width: 132, height: 132 }}
+            style={{ width: 108, height: 108 }}
             resizeMode="contain"
           />
-          <Text className="text-3xl font-extrabold text-gray-800 mt-4">다잇다</Text>
-          <Text className="text-gray-500 mt-2.5 text-center leading-6">
+          <Text className="text-[30px] font-extrabold text-gray-900 mt-6">다잇다</Text>
+          <Text className="text-gray-400 mt-2.5 text-center leading-6">
             이웃과 재능을 나누는{'\n'}가장 안전한 하이퍼로컬 커뮤니티
           </Text>
         </View>

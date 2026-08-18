@@ -7,7 +7,7 @@ export function BadgeGrid({ earnedBadgeIds }: { earnedBadgeIds: BadgeId[] }) {
   const allBadges = Object.values(BADGES);
 
   return (
-    <View className="flex-row flex-wrap px-4">
+    <View className="flex-row flex-wrap px-5">
       {allBadges.map((badge) => {
         const earned = earnedBadgeIds.includes(badge.id);
         return (

@@ -13,31 +13,25 @@ export function LocationHeader({ city, district }: { city: string; district: str
   const unreadCount = NOTIFICATIONS.filter((n) => !n.read).length;
 
   return (
-    <View className="flex-row items-center justify-between px-4 py-3 bg-white shadow-sm shadow-gray-200">
-      <Pressable
-        onPress={() => setPickerOpen(true)}
-        className="flex-row items-center bg-gray-50 rounded-full pl-3 pr-2.5 py-1.5"
-      >
-        <Feather name="map-pin" size={13} color="#059669" />
-        <Text className="text-sm font-bold text-gray-800 ml-1.5">
+    <View className="flex-row items-center justify-between px-6 pt-2 pb-1 bg-white">
+      <Pressable onPress={() => setPickerOpen(true)} className="flex-row items-center">
+        <Text className="text-[15px] font-semibold text-gray-500">
           {city} {selected}
         </Text>
         <Feather name="chevron-down" size={16} color="#9ca3af" style={{ marginLeft: 2 }} />
       </Pressable>
 
       <Pressable onPress={() => setBellOpen(true)} hitSlop={12} className="relative">
-        <Feather name="bell" size={22} color="#374151" />
+        <Feather name="bell" size={21} color="#9ca3af" />
         {unreadCount > 0 && (
-          <View className="absolute -top-1 -right-1 bg-red-500 rounded-full w-4 h-4 items-center justify-center">
-            <Text className="text-white text-[10px] font-bold">{unreadCount}</Text>
-          </View>
+          <View className="absolute -top-0.5 -right-0.5 bg-primary-500 rounded-full w-2 h-2" />
         )}
       </Pressable>
 
       <Modal visible={pickerOpen} transparent animationType="fade" onRequestClose={() => setPickerOpen(false)}>
         <Pressable className="flex-1 bg-black/30 justify-end" onPress={() => setPickerOpen(false)}>
-          <View className="bg-white rounded-t-3xl p-5">
-            <Text className="text-base font-bold text-gray-800 mb-3">동네 선택</Text>
+          <View className="bg-white rounded-t-[28px] px-6 pt-7 pb-8">
+            <Text className="text-xl font-extrabold text-gray-900 mb-5">동네 선택</Text>
             {DISTRICTS.map((d) => (
               <Pressable
                 key={d}
@@ -45,9 +39,9 @@ export function LocationHeader({ city, district }: { city: string; district: str
                   setSelected(d);
                   setPickerOpen(false);
                 }}
-                className="py-3 flex-row items-center justify-between"
+                className="py-4 flex-row items-center justify-between"
               >
-                <Text className="text-base text-gray-800">
+                <Text className={`text-base ${selected === d ? 'font-bold text-gray-900' : 'text-gray-500'}`}>
                   {city} {d}
                 </Text>
                 {selected === d && <Feather name="check" size={18} color="#10b981" />}
@@ -59,13 +53,13 @@ export function LocationHeader({ city, district }: { city: string; district: str
 
       <Modal visible={bellOpen} transparent animationType="fade" onRequestClose={() => setBellOpen(false)}>
         <Pressable className="flex-1 bg-black/30 justify-end" onPress={() => setBellOpen(false)}>
-          <View className="bg-white rounded-t-3xl p-5 max-h-[70%]">
-            <Text className="text-base font-bold text-gray-800 mb-3">알림</Text>
+          <View className="bg-white rounded-t-[28px] px-6 pt-7 pb-8 max-h-[70%]">
+            <Text className="text-xl font-extrabold text-gray-900 mb-4">알림</Text>
             {NOTIFICATIONS.map((n) => (
-              <View key={n.id} className="py-3 border-b border-gray-100">
-                <Text className="text-sm font-semibold text-gray-800">{n.title}</Text>
-                <Text className="text-sm text-gray-500 mt-0.5">{n.body}</Text>
-                <Text className="text-xs text-gray-400 mt-1">{formatRelativeTime(n.createdAt)}</Text>
+              <View key={n.id} className="py-4 border-t border-gray-100">
+                <Text className="text-[15px] font-semibold text-gray-800">{n.title}</Text>
+                <Text className="text-sm text-gray-500 mt-1">{n.body}</Text>
+                <Text className="text-xs text-gray-400 mt-1.5">{formatRelativeTime(n.createdAt)}</Text>
               </View>
             ))}
           </View>

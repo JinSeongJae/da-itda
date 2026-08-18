@@ -67,7 +67,7 @@ export default function EditProfile() {
   return (
     <SafeAreaView className="flex-1 bg-white">
       <Header title="프로필 수정" showBack />
-      <ScrollView className="flex-1 px-5 pt-5" contentContainerStyle={{ paddingBottom: 24 }}>
+      <ScrollView className="flex-1 px-6 pt-5" contentContainerStyle={{ paddingBottom: 24 }}>
         <View className="items-center mb-6">
           <Pressable onPress={handlePickAvatar} className="relative">
             <Avatar uri={user.avatarUrl} size={88} />
@@ -125,7 +125,7 @@ export default function EditProfile() {
         </View>
       </ScrollView>
 
-      <View className="px-5 pt-3 pb-4 border-t border-gray-100 bg-white">
+      <View className="px-6 pt-3 pb-4 border-t border-gray-100 bg-white">
         <Button label="저장하기" onPress={() => updateProfile(currentUserId, { bio })} />
       </View>
     </SafeAreaView>

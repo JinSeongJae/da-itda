@@ -21,7 +21,7 @@ function YesNoRow({
   warning?: boolean;
 }) {
   return (
-    <View className={`rounded-2xl p-4 mb-3 ${warning ? 'bg-amber-50 border border-amber-200' : 'bg-gray-50'}`}>
+    <View className={`rounded-2xl p-4 mb-3 ${warning ? 'bg-amber-50' : 'bg-gray-50'}`}>
       <View className="flex-row items-start mb-3">
         {warning && <Feather name="alert-triangle" size={15} color="#b45309" style={{ marginTop: 2, marginRight: 6 }} />}
         <Text className={`text-sm font-semibold flex-1 ${warning ? 'text-amber-900' : 'text-gray-800'}`}>

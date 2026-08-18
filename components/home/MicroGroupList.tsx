@@ -12,33 +12,30 @@ interface Props {
 
 export function MicroGroupList({ groups, currentUserId, onToggleInterest }: Props) {
   return (
-    <View className="mt-4">
-      <View className="flex-row items-center mb-3">
-        <Feather name="users" size={18} color="#10b981" />
-        <Text className="ml-2 text-base font-bold text-gray-800">AI 추천 동네 소모임</Text>
-      </View>
+    <View className="mt-8">
+      <Text className="text-[13px] font-semibold text-gray-400 mb-1">AI 추천</Text>
+      <Text className="text-xl font-extrabold text-gray-900 mb-3">동네 소모임</Text>
       {groups.map((group) => {
         const isInterested = group.interestedUserIds.includes(currentUserId);
         return (
           <Card key={group.id} className="mb-3">
-            <Text className="text-sm font-semibold text-gray-800">{group.title}</Text>
+            <Text className="text-[15px] font-bold text-gray-900">{group.title}</Text>
             <View className="flex-row items-center mt-2">
               <Feather name="map-pin" size={13} color="#9ca3af" />
-              <Text className="text-xs text-gray-500 ml-1">{group.location}</Text>
-            </View>
-            <View className="flex-row items-center mt-1">
+              <Text className="text-[13px] text-gray-500 ml-1">{group.location}</Text>
+              <Text className="text-[13px] text-gray-300 mx-1.5">·</Text>
               <Feather name="calendar" size={13} color="#9ca3af" />
-              <Text className="text-xs text-gray-500 ml-1">{formatDate(group.date)}</Text>
+              <Text className="text-[13px] text-gray-500 ml-1">{formatDate(group.date)}</Text>
             </View>
             <View className="flex-row items-center justify-between mt-3">
-              <Text className="text-xs text-gray-400">
+              <Text className="text-[13px] text-gray-400">
                 관심 {group.interestedUserIds.length}/{group.maxParticipants}명
               </Text>
               <Pressable
                 onPress={() => onToggleInterest(group.id)}
-                className={`px-3 py-1.5 rounded-full ${isInterested ? 'bg-primary-500' : 'bg-gray-100'}`}
+                className={`px-3.5 py-2 rounded-full ${isInterested ? 'bg-primary-500' : 'bg-white'}`}
               >
-                <Text className={`text-xs font-semibold ${isInterested ? 'text-white' : 'text-gray-600'}`}>
+                <Text className={`text-[13px] font-bold ${isInterested ? 'text-white' : 'text-gray-700'}`}>
                   {isInterested ? '참여 신청됨' : '관심 있어요'}
                 </Text>
               </Pressable>

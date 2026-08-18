@@ -47,7 +47,7 @@ export default function MeetupQr() {
   return (
     <SafeAreaView className="flex-1 bg-white">
       <Header title="현장 인증" showBack />
-      <View className="flex-1 px-5 pt-6">
+      <View className="flex-1 px-6 pt-6">
         <Text className="text-gray-500 text-sm mb-5 text-center">
           Safe Zone에 도착했다면 QR을 스캔해서 출석을 인증해주세요.
         </Text>

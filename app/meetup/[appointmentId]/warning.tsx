@@ -20,7 +20,7 @@ export default function MeetupWarning() {
   return (
     <SafeAreaView className="flex-1 bg-white">
       <Header title="만남 전 안내사항" showBack />
-      <ScrollView className="flex-1 px-5 pt-5" contentContainerStyle={{ paddingBottom: 24 }}>
+      <ScrollView className="flex-1 px-6 pt-5" contentContainerStyle={{ paddingBottom: 24 }}>
         <View className="items-center mb-5">
           <View className="w-16 h-16 rounded-full bg-amber-100 items-center justify-center mb-3">
             <Feather name="alert-triangle" size={28} color="#b45309" />
