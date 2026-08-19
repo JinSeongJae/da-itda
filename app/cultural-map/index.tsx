@@ -1,6 +1,6 @@
 import { useEffect } from 'react';
 import { Feather } from '@expo/vector-icons';
-import { FlatList, Platform, Pressable, Text, View } from 'react-native';
+import { FlatList, Pressable, Text, View } from 'react-native';
 import { router } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Header } from '../../components/common/Header';
@@ -9,13 +9,10 @@ import { useCulturalMapStore } from '../../store/useCulturalMapStore';
 import type { CulturalPin } from '../../types';
 import { useTranslation } from '../../utils/i18n';
 
-// react-native-maps calls codegenNativeComponent at module load time, which
-// react-native-web doesn't implement and crashes on ("is not a function") — so this must
-// stay a runtime-guarded require(), never a static top-level import, or the web bundle
-// evaluates it regardless of the Platform.OS check below.
-const CulturalPinMapView: typeof import('../../components/culturalMap/CulturalPinMapView').CulturalPinMapView | null =
-  Platform.OS === 'web' ? null : require('../../components/culturalMap/CulturalPinMapView').CulturalPinMapView;
-
+// A real MapView (react-native-maps) needs a Google Maps API key configured for standalone
+// Android builds, which this app doesn't have set up — rendering it without one crashes on
+// device. Every other geo feature in this app (SafeZonePicker, etc.) is list-based for the
+// same reason, so this follows suit instead of taking on a Maps API key as a new dependency.
 function PinRow({ pin, onPress }: { pin: CulturalPin; onPress: () => void }) {
   const meta = CULTURAL_PIN_CATEGORY_META[pin.category];
   return (
@@ -53,17 +50,13 @@ export default function CulturalMapScreen() {
       <Header title={t('culturalMap.title')} showBack />
 
       <View className="flex-1">
-        {Platform.OS === 'web' ? (
-          <FlatList
-            data={pins}
-            keyExtractor={(pin) => pin.id}
-            contentContainerStyle={{ padding: 16, paddingBottom: 96 }}
-            renderItem={({ item }) => <PinRow pin={item} onPress={() => openPin(item)} />}
-            ListEmptyComponent={<Text className="text-sm text-gray-400 text-center mt-10">{t('culturalMap.empty')}</Text>}
-          />
-        ) : (
-          CulturalPinMapView && <CulturalPinMapView pins={pins} onSelectPin={openPin} />
-        )}
+        <FlatList
+          data={pins}
+          keyExtractor={(pin) => pin.id}
+          contentContainerStyle={{ padding: 16, paddingBottom: 96 }}
+          renderItem={({ item }) => <PinRow pin={item} onPress={() => openPin(item)} />}
+          ListEmptyComponent={<Text className="text-sm text-gray-400 text-center mt-10">{t('culturalMap.empty')}</Text>}
+        />
       </View>
 
       <Pressable

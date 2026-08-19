@@ -29,10 +29,6 @@ export function ProfileHeader({ user }: { user: User }) {
 
       <View className="flex-row mt-6 w-full justify-around">
         <View className="items-center">
-          <Text className="text-xl font-extrabold text-gray-900">{user.points}</Text>
-          <Text className="text-[13px] text-gray-400 mt-0.5">{t('mypage.pointsLabel')}</Text>
-        </View>
-        <View className="items-center">
           <Text className="text-xl font-extrabold text-gray-900">{user.volunteerMinutes}</Text>
           <Text className="text-[13px] text-gray-400 mt-0.5">{t('mypage.volunteerLabel')}</Text>
         </View>

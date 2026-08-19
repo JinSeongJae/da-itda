@@ -1,10 +1,12 @@
 import { Feather } from '@expo/vector-icons';
 import { Tabs } from 'expo-router';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { COLORS } from '../../constants/theme';
 import { useTranslation } from '../../utils/i18n';
 
 export default function TabsLayout() {
   const { t } = useTranslation();
+  const insets = useSafeAreaInsets();
   return (
     <Tabs
       screenOptions={{
@@ -13,9 +15,11 @@ export default function TabsLayout() {
         tabBarInactiveTintColor: '#9ca3af',
         tabBarLabelStyle: { fontSize: 11, fontWeight: '600' },
         tabBarStyle: {
-          height: 62,
+          // 기기의 하단 내비게이션 바(제스처/3버튼)만큼 안전영역을 더해야 탭바가 그 아래에
+          // 깔려 눌리지 않는 문제를 막을 수 있다 — Android edge-to-edge에서 특히 필요.
+          height: 62 + insets.bottom,
           paddingTop: 8,
-          paddingBottom: 10,
+          paddingBottom: 10 + insets.bottom,
           borderTopWidth: 0,
           elevation: 12,
           shadowColor: '#000',
