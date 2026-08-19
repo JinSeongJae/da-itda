@@ -28,6 +28,13 @@ export interface UserLocation {
   lng: number;
 }
 
+/** Foreground-tracked GPS fix, refreshed while the app is open — used for the smart-match push. */
+export interface LiveLocation {
+  lat: number;
+  lng: number;
+  updatedAt: string;
+}
+
 export interface User {
   id: string;
   name: string;
@@ -40,6 +47,8 @@ export interface User {
   gender?: Gender;
   talkStyle?: TalkStyle;
   location: UserLocation;
+  liveLocation?: LiveLocation;
+  pushToken?: string;
   languages: LanguageProficiency[];
   skillsOffered: Skill[];
   skillsWanted: Skill[];
