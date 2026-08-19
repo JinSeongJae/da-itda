@@ -22,6 +22,9 @@ export default function RootLayout() {
           <Stack.Screen name="meetup/[appointmentId]/qr" options={{ presentation: 'modal' }} />
           <Stack.Screen name="meetup/[appointmentId]/review" options={{ presentation: 'modal' }} />
           <Stack.Screen name="badge/[badgeId]" options={{ presentation: 'modal' }} />
+          <Stack.Screen name="cultural-map/index" />
+          <Stack.Screen name="cultural-map/new" options={{ presentation: 'modal' }} />
+          <Stack.Screen name="cultural-map/[pinId]" options={{ presentation: 'modal' }} />
         </Stack>
       </SafeAreaProvider>
     </GestureHandlerRootView>

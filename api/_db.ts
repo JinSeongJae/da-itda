@@ -110,6 +110,21 @@ async function createSchema(): Promise<void> {
     );
 
     CREATE INDEX IF NOT EXISTS appointments_thread_id_idx ON appointments(thread_id);
+
+    CREATE TABLE IF NOT EXISTS cultural_pins (
+      id TEXT PRIMARY KEY,
+      author_id TEXT NOT NULL,
+      title TEXT NOT NULL,
+      story TEXT NOT NULL,
+      category TEXT NOT NULL,
+      lat DOUBLE PRECISION NOT NULL,
+      lng DOUBLE PRECISION NOT NULL,
+      address TEXT,
+      created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+      verifications JSONB NOT NULL DEFAULT '[]'
+    );
+
+    CREATE INDEX IF NOT EXISTS cultural_pins_author_id_idx ON cultural_pins(author_id);
   `);
 }
 

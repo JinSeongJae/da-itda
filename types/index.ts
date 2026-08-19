@@ -8,3 +8,4 @@ export * from './chat';
 export * from './appointment';
 export * from './review';
 export * from './community';
+export * from './culturalPin';

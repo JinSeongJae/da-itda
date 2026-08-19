@@ -206,7 +206,45 @@ export type TranslationKey =
   | 'skillCategory.sports'
   | 'skillCategory.hobby-art'
   | 'skillCategory.tech'
-  | 'skillCategory.legal-admin';
+  | 'skillCategory.legal-admin'
+  | 'culturalMap.title'
+  | 'culturalMap.empty'
+  | 'culturalMap.entryCardTitle'
+  | 'culturalMap.entryCardSubtitle'
+  | 'culturalMap.newPinTitle'
+  | 'culturalMap.newPinSubtitle'
+  | 'culturalMap.titleLabel'
+  | 'culturalMap.titlePlaceholder'
+  | 'culturalMap.storyLabel'
+  | 'culturalMap.storyPlaceholder'
+  | 'culturalMap.categoryLabel'
+  | 'culturalMap.category.food'
+  | 'culturalMap.category.study'
+  | 'culturalMap.category.shopping'
+  | 'culturalMap.category.culture-spot'
+  | 'culturalMap.category.nature'
+  | 'culturalMap.category.other'
+  | 'culturalMap.addressLabel'
+  | 'culturalMap.addressPlaceholder'
+  | 'culturalMap.currentLocationHint'
+  | 'culturalMap.submitting'
+  | 'culturalMap.submitButton'
+  | 'culturalMap.locationPermissionDenied'
+  | 'culturalMap.locationFetchFailed'
+  | 'culturalMap.pinNotFoundTitle'
+  | 'culturalMap.pinDetailTitle'
+  | 'culturalMap.registeredBy'
+  | 'culturalMap.verifiedCount'
+  | 'culturalMap.isAuthorLabel'
+  | 'culturalMap.alreadyVerifiedLabel'
+  | 'culturalMap.verifying'
+  | 'culturalMap.verifyButton'
+  | 'culturalMap.verifySuccess'
+  | 'culturalMap.verifyErrorSelf'
+  | 'culturalMap.verifyErrorDuplicate'
+  | 'culturalMap.verifyErrorTooFar'
+  | 'culturalMap.verifyErrorNotFound'
+  | 'culturalMap.verifyErrorOffline';
 
 export const TRANSLATIONS: Record<Locale, Record<TranslationKey, string>> = {
   ko: {
@@ -407,6 +445,44 @@ export const TRANSLATIONS: Record<Locale, Record<TranslationKey, string>> = {
     'skillCategory.hobby-art': '취미/예술',
     'skillCategory.tech': 'IT/컴퓨터',
     'skillCategory.legal-admin': '법률/행정 상담',
+    'culturalMap.title': '컬처럴 맵',
+    'culturalMap.empty': '아직 등록된 핀이 없어요. 첫 스팟을 등록해보세요!',
+    'culturalMap.entryCardTitle': '🗺️ 컬처럴 맵 보기',
+    'culturalMap.entryCardSubtitle': '이웃이 발견한 동네 숨은 스팟을 지도에서 만나보세요',
+    'culturalMap.newPinTitle': '스팟 등록하기',
+    'culturalMap.newPinSubtitle': '내가 발견한 동네 스팟을 이웃들에게 소개해주세요',
+    'culturalMap.titleLabel': '스팟 이름',
+    'culturalMap.titlePlaceholder': '예: 향신료 파는 동네 슈퍼',
+    'culturalMap.storyLabel': '나만의 이야기',
+    'culturalMap.storyPlaceholder': '이 장소를 어떻게 알게 됐는지, 왜 추천하는지 들려주세요',
+    'culturalMap.categoryLabel': '카테고리',
+    'culturalMap.category.food': '음식/식료품',
+    'culturalMap.category.study': '공부/카페',
+    'culturalMap.category.shopping': '쇼핑',
+    'culturalMap.category.culture-spot': '문화체험',
+    'culturalMap.category.nature': '자연/산책',
+    'culturalMap.category.other': '기타',
+    'culturalMap.addressLabel': '주소 (선택)',
+    'culturalMap.addressPlaceholder': '예: 경상북도 경산시 중산로 32',
+    'culturalMap.currentLocationHint': '등록 버튼을 누르면 지금 서 있는 위치가 핀 좌표로 저장돼요',
+    'culturalMap.submitting': '등록 중...',
+    'culturalMap.submitButton': '현재 위치에 등록하기',
+    'culturalMap.locationPermissionDenied': '위치 권한이 필요해요.',
+    'culturalMap.locationFetchFailed': '위치를 가져오지 못했어요. 다시 시도해주세요.',
+    'culturalMap.pinNotFoundTitle': '핀을 찾을 수 없어요',
+    'culturalMap.pinDetailTitle': '스팟 정보',
+    'culturalMap.registeredBy': '{name}님이 등록했어요',
+    'culturalMap.verifiedCount': '인증 {count}회',
+    'culturalMap.isAuthorLabel': '내가 등록한 스팟이에요',
+    'culturalMap.alreadyVerifiedLabel': '이미 인증했어요',
+    'culturalMap.verifying': '인증 중...',
+    'culturalMap.verifyButton': '방문 인증하기',
+    'culturalMap.verifySuccess': '인증 완료! {name}님에게 교류 포인트가 적립됐어요',
+    'culturalMap.verifyErrorSelf': '본인이 등록한 핀은 인증할 수 없어요.',
+    'culturalMap.verifyErrorDuplicate': '이미 인증한 핀이에요.',
+    'culturalMap.verifyErrorTooFar': '핀 장소 근처에서만 인증할 수 있어요.',
+    'culturalMap.verifyErrorNotFound': '핀을 찾을 수 없어요.',
+    'culturalMap.verifyErrorOffline': '인증에 실패했어요. 네트워크를 확인해주세요.',
   },
   en: {
     'welcome.tagline': 'The safest hyperlocal community\nfor sharing talents with your neighbors',
@@ -610,6 +686,44 @@ export const TRANSLATIONS: Record<Locale, Record<TranslationKey, string>> = {
     'skillCategory.hobby-art': 'Hobbies & arts',
     'skillCategory.tech': 'Tech',
     'skillCategory.legal-admin': 'Legal & admin',
+    'culturalMap.title': 'Cultural Map',
+    'culturalMap.empty': 'No pins yet. Register the first spot!',
+    'culturalMap.entryCardTitle': '🗺️ View Cultural Map',
+    'culturalMap.entryCardSubtitle': 'Discover hidden neighborhood spots found by your neighbors',
+    'culturalMap.newPinTitle': 'Register a spot',
+    'culturalMap.newPinSubtitle': 'Introduce a neighborhood spot you discovered to your neighbors',
+    'culturalMap.titleLabel': 'Spot name',
+    'culturalMap.titlePlaceholder': 'e.g. The corner store that sells spices',
+    'culturalMap.storyLabel': 'Your story',
+    'culturalMap.storyPlaceholder': 'Tell us how you found this place and why you recommend it',
+    'culturalMap.categoryLabel': 'Category',
+    'culturalMap.category.food': 'Food & groceries',
+    'culturalMap.category.study': 'Study & cafes',
+    'culturalMap.category.shopping': 'Shopping',
+    'culturalMap.category.culture-spot': 'Culture spot',
+    'culturalMap.category.nature': 'Nature & walks',
+    'culturalMap.category.other': 'Other',
+    'culturalMap.addressLabel': 'Address (optional)',
+    'culturalMap.addressPlaceholder': 'e.g. 32 Jungsan-ro, Gyeongsan',
+    'culturalMap.currentLocationHint': 'Tapping submit saves the spot where you are standing right now as the pin location',
+    'culturalMap.submitting': 'Submitting...',
+    'culturalMap.submitButton': 'Register at my current location',
+    'culturalMap.locationPermissionDenied': 'Location permission is required.',
+    'culturalMap.locationFetchFailed': 'Could not get your location. Please try again.',
+    'culturalMap.pinNotFoundTitle': 'Pin not found',
+    'culturalMap.pinDetailTitle': 'Spot details',
+    'culturalMap.registeredBy': 'Registered by {name}',
+    'culturalMap.verifiedCount': 'Verified {count} times',
+    'culturalMap.isAuthorLabel': 'This is your spot',
+    'culturalMap.alreadyVerifiedLabel': 'Already verified',
+    'culturalMap.verifying': 'Verifying...',
+    'culturalMap.verifyButton': 'Verify my visit',
+    'culturalMap.verifySuccess': 'Verified! {name} earned exchange points',
+    'culturalMap.verifyErrorSelf': "You can't verify your own pin.",
+    'culturalMap.verifyErrorDuplicate': "You've already verified this pin.",
+    'culturalMap.verifyErrorTooFar': 'You can only verify near the pin location.',
+    'culturalMap.verifyErrorNotFound': 'Pin not found.',
+    'culturalMap.verifyErrorOffline': 'Verification failed. Please check your connection.',
   },
   tl: {
     'welcome.tagline': 'Ang pinakaligtas na hyperlocal na komunidad\npara sa pagbabahagi ng talento sa mga kapitbahay',
@@ -814,6 +928,44 @@ export const TRANSLATIONS: Record<Locale, Record<TranslationKey, string>> = {
     'skillCategory.hobby-art': 'Hobby at sining',
     'skillCategory.tech': 'Teknolohiya',
     'skillCategory.legal-admin': 'Legal at administratibo',
+    'culturalMap.title': 'Cultural Map',
+    'culturalMap.empty': 'Walang pin pa. Irehistro ang unang spot!',
+    'culturalMap.entryCardTitle': '🗺️ Tingnan ang Cultural Map',
+    'culturalMap.entryCardSubtitle': 'Tuklasin ang mga tagong spot sa kapitbahayan na natuklasan ng iyong mga kapitbahay',
+    'culturalMap.newPinTitle': 'Irehistro ang isang spot',
+    'culturalMap.newPinSubtitle': 'Ipakilala sa mga kapitbahay ang spot na natuklasan mo',
+    'culturalMap.titleLabel': 'Pangalan ng spot',
+    'culturalMap.titlePlaceholder': 'hal. Ang tindahang nagbebenta ng rekado',
+    'culturalMap.storyLabel': 'Iyong kwento',
+    'culturalMap.storyPlaceholder': 'Sabihin kung paano mo natuklasan ang lugar na ito at kung bakit mo ito irerekomenda',
+    'culturalMap.categoryLabel': 'Kategorya',
+    'culturalMap.category.food': 'Pagkain at groseri',
+    'culturalMap.category.study': 'Pag-aaral at cafe',
+    'culturalMap.category.shopping': 'Shopping',
+    'culturalMap.category.culture-spot': 'Kultural na spot',
+    'culturalMap.category.nature': 'Kalikasan at paglalakad',
+    'culturalMap.category.other': 'Iba pa',
+    'culturalMap.addressLabel': 'Address (opsyonal)',
+    'culturalMap.addressPlaceholder': 'hal. 32 Jungsan-ro, Gyeongsan',
+    'culturalMap.currentLocationHint': 'Kapag pinindot ang submit, ang kasalukuyang lokasyon mo ang mai-save bilang pin',
+    'culturalMap.submitting': 'Isinusumite...',
+    'culturalMap.submitButton': 'Irehistro sa kasalukuyang lokasyon',
+    'culturalMap.locationPermissionDenied': 'Kinakailangan ang location permission.',
+    'culturalMap.locationFetchFailed': 'Hindi nakuha ang lokasyon. Subukan ulit.',
+    'culturalMap.pinNotFoundTitle': 'Hindi nahanap ang pin',
+    'culturalMap.pinDetailTitle': 'Detalye ng spot',
+    'culturalMap.registeredBy': 'Nirehistro ni {name}',
+    'culturalMap.verifiedCount': 'Na-verify {count} na',
+    'culturalMap.isAuthorLabel': 'Ito ang iyong spot',
+    'culturalMap.alreadyVerifiedLabel': 'Na-verify na',
+    'culturalMap.verifying': 'Iniberipika...',
+    'culturalMap.verifyButton': 'I-verify ang pagbisita',
+    'culturalMap.verifySuccess': 'Na-verify! Nakakuha si {name} ng exchange points',
+    'culturalMap.verifyErrorSelf': 'Hindi mo maiveripika ang sariling pin.',
+    'culturalMap.verifyErrorDuplicate': 'Na-verify mo na ang pin na ito.',
+    'culturalMap.verifyErrorTooFar': 'Maiveripika lang malapit sa lokasyon ng pin.',
+    'culturalMap.verifyErrorNotFound': 'Hindi nahanap ang pin.',
+    'culturalMap.verifyErrorOffline': 'Nabigo ang pag-verify. Pakisuri ang koneksyon.',
   },
   vi: {
     'welcome.tagline': 'Cộng đồng siêu địa phương an toàn nhất\nđể chia sẻ tài năng với hàng xóm',
@@ -1017,5 +1169,43 @@ export const TRANSLATIONS: Record<Locale, Record<TranslationKey, string>> = {
     'skillCategory.hobby-art': 'Sở thích & nghệ thuật',
     'skillCategory.tech': 'Công nghệ',
     'skillCategory.legal-admin': 'Pháp lý & hành chính',
+    'culturalMap.title': 'Bản đồ văn hóa',
+    'culturalMap.empty': 'Chưa có điểm nào. Hãy đăng ký điểm đầu tiên!',
+    'culturalMap.entryCardTitle': '🗺️ Xem Bản đồ văn hóa',
+    'culturalMap.entryCardSubtitle': 'Khám phá những địa điểm ẩn trong khu phố do hàng xóm phát hiện',
+    'culturalMap.newPinTitle': 'Đăng ký địa điểm',
+    'culturalMap.newPinSubtitle': 'Giới thiệu địa điểm bạn đã phát hiện cho hàng xóm',
+    'culturalMap.titleLabel': 'Tên địa điểm',
+    'culturalMap.titlePlaceholder': 'VD: Cửa hàng bán gia vị đầu ngõ',
+    'culturalMap.storyLabel': 'Câu chuyện của bạn',
+    'culturalMap.storyPlaceholder': 'Hãy kể bạn biết đến nơi này thế nào và vì sao bạn giới thiệu',
+    'culturalMap.categoryLabel': 'Danh mục',
+    'culturalMap.category.food': 'Thực phẩm/đồ ăn',
+    'culturalMap.category.study': 'Học tập/cà phê',
+    'culturalMap.category.shopping': 'Mua sắm',
+    'culturalMap.category.culture-spot': 'Trải nghiệm văn hóa',
+    'culturalMap.category.nature': 'Thiên nhiên/đi bộ',
+    'culturalMap.category.other': 'Khác',
+    'culturalMap.addressLabel': 'Địa chỉ (không bắt buộc)',
+    'culturalMap.addressPlaceholder': 'VD: 32 Jungsan-ro, Gyeongsan',
+    'culturalMap.currentLocationHint': 'Khi bạn nhấn đăng ký, vị trí hiện tại của bạn sẽ được lưu làm tọa độ điểm',
+    'culturalMap.submitting': 'Đang đăng ký...',
+    'culturalMap.submitButton': 'Đăng ký tại vị trí hiện tại',
+    'culturalMap.locationPermissionDenied': 'Cần quyền truy cập vị trí.',
+    'culturalMap.locationFetchFailed': 'Không lấy được vị trí. Vui lòng thử lại.',
+    'culturalMap.pinNotFoundTitle': 'Không tìm thấy điểm',
+    'culturalMap.pinDetailTitle': 'Thông tin địa điểm',
+    'culturalMap.registeredBy': '{name} đã đăng ký',
+    'culturalMap.verifiedCount': 'Đã xác nhận {count} lần',
+    'culturalMap.isAuthorLabel': 'Đây là địa điểm của bạn',
+    'culturalMap.alreadyVerifiedLabel': 'Đã xác nhận rồi',
+    'culturalMap.verifying': 'Đang xác nhận...',
+    'culturalMap.verifyButton': 'Xác nhận đã đến',
+    'culturalMap.verifySuccess': 'Xác nhận thành công! {name} đã nhận được điểm giao lưu',
+    'culturalMap.verifyErrorSelf': 'Bạn không thể xác nhận điểm của chính mình.',
+    'culturalMap.verifyErrorDuplicate': 'Bạn đã xác nhận điểm này rồi.',
+    'culturalMap.verifyErrorTooFar': 'Bạn chỉ có thể xác nhận khi ở gần địa điểm này.',
+    'culturalMap.verifyErrorNotFound': 'Không tìm thấy điểm.',
+    'culturalMap.verifyErrorOffline': 'Xác nhận thất bại. Vui lòng kiểm tra kết nối.',
   },
 };
