@@ -15,6 +15,27 @@ import { query, testConnection } from '../_db';
 export default async function handler(req: VercelRequest, res: VercelResponse) {
   if (applyCors(req, res)) return;
 
+  if (typeof req.query.relatedTo === 'string') {
+    const id = req.query.relatedTo;
+    const [threads, messages, appointments, pins] = await Promise.all([
+      query<{ count: string }>(
+        'SELECT count(*) FROM threads WHERE user_a_id = $1 OR user_b_id = $1',
+        [id]
+      ),
+      query<{ count: string }>('SELECT count(*) FROM messages WHERE sender_id = $1', [id]),
+      query<{ count: string }>('SELECT count(*) FROM appointments WHERE created_by = $1', [id]),
+      query<{ count: string }>('SELECT count(*) FROM cultural_pins WHERE author_id = $1', [id]),
+    ]);
+    res.status(200).json({
+      id,
+      threads: Number(threads[0].count),
+      messages: Number(messages[0].count),
+      appointments: Number(appointments[0].count),
+      culturalPins: Number(pins[0].count),
+    });
+    return;
+  }
+
   if (req.query.list) {
     const rows = await query<{ id: string; kakao_id: string; name: string; created_at: string; profile: unknown }>(
       'SELECT id, kakao_id, name, created_at, profile FROM app_users ORDER BY created_at ASC'
