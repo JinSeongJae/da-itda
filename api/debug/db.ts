@@ -36,6 +36,17 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     return;
   }
 
+  if (req.method === 'DELETE' && typeof req.query.deleteUser === 'string') {
+    const id = req.query.deleteUser;
+    await query('DELETE FROM messages WHERE sender_id = $1', [id]);
+    await query('DELETE FROM threads WHERE user_a_id = $1 OR user_b_id = $1', [id]);
+    await query('DELETE FROM appointments WHERE created_by = $1', [id]);
+    await query('DELETE FROM cultural_pins WHERE author_id = $1', [id]);
+    const deleted = await query<{ id: string }>('DELETE FROM app_users WHERE id = $1 RETURNING id', [id]);
+    res.status(200).json({ deleted: deleted.length > 0, id });
+    return;
+  }
+
   if (req.query.list) {
     const rows = await query<{ id: string; kakao_id: string; name: string; created_at: string; profile: unknown }>(
       'SELECT id, kakao_id, name, created_at, profile FROM app_users ORDER BY created_at ASC'
