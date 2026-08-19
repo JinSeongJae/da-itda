@@ -4,11 +4,17 @@ import { FlatList, Platform, Pressable, Text, View } from 'react-native';
 import { router } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Header } from '../../components/common/Header';
-import { CulturalPinMapView } from '../../components/culturalMap/CulturalPinMapView';
 import { CULTURAL_PIN_CATEGORY_META } from '../../constants/theme';
 import { useCulturalMapStore } from '../../store/useCulturalMapStore';
 import type { CulturalPin } from '../../types';
 import { useTranslation } from '../../utils/i18n';
+
+// react-native-maps calls codegenNativeComponent at module load time, which
+// react-native-web doesn't implement and crashes on ("is not a function") — so this must
+// stay a runtime-guarded require(), never a static top-level import, or the web bundle
+// evaluates it regardless of the Platform.OS check below.
+const CulturalPinMapView: typeof import('../../components/culturalMap/CulturalPinMapView').CulturalPinMapView | null =
+  Platform.OS === 'web' ? null : require('../../components/culturalMap/CulturalPinMapView').CulturalPinMapView;
 
 function PinRow({ pin, onPress }: { pin: CulturalPin; onPress: () => void }) {
   const meta = CULTURAL_PIN_CATEGORY_META[pin.category];
@@ -56,7 +62,7 @@ export default function CulturalMapScreen() {
             ListEmptyComponent={<Text className="text-sm text-gray-400 text-center mt-10">{t('culturalMap.empty')}</Text>}
           />
         ) : (
-          <CulturalPinMapView pins={pins} onSelectPin={openPin} />
+          CulturalPinMapView && <CulturalPinMapView pins={pins} onSelectPin={openPin} />
         )}
       </View>
 
