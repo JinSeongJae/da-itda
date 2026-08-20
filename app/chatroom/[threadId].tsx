@@ -1,5 +1,5 @@
 import { useEffect, useRef } from 'react';
-import { FlatList, KeyboardAvoidingView, Platform, Pressable, Text, View } from 'react-native';
+import { Alert, FlatList, KeyboardAvoidingView, Platform, Pressable, Text, View } from 'react-native';
 import { router, useLocalSearchParams } from 'expo-router';
 import { Feather } from '@expo/vector-icons';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -22,6 +22,7 @@ export default function Chatroom() {
   const { threadId } = useLocalSearchParams<{ threadId: string }>();
   const currentUserId = useAuthStore((s) => s.currentUserId)!;
   const usersById = useUserStore((s) => s.usersById);
+  const currentUser = usersById[currentUserId];
 
   const thread = useChatStore((s) => s.threadsById[threadId]);
   const messages = useChatStore((s) => s.messagesByThread[threadId] ?? []);
@@ -71,6 +72,20 @@ export default function Chatroom() {
     requestAnimationFrame(() => listRef.current?.scrollToEnd({ animated: true }));
   };
 
+  const handleOpenAppointment = () => {
+    if (currentUser?.verification !== 'verified') {
+      Alert.alert(t('chatroom.verificationRequiredTitle'), t('chatroom.verificationRequiredBody'), [
+        { text: t('chatroom.verificationRequiredCancel'), style: 'cancel' },
+        {
+          text: t('chatroom.verificationRequiredConfirm'),
+          onPress: () => router.push('/(tabs)/mypage/verification'),
+        },
+      ]);
+      return;
+    }
+    router.push(`/appointment/${threadId}`);
+  };
+
   return (
     <SafeAreaView edges={['top', 'bottom']} className="flex-1 bg-white">
       <View className="flex-row items-center px-4 py-3">
@@ -82,12 +97,19 @@ export default function Chatroom() {
           {counterpart?.name ?? t('chatroom.defaultCounterpart')}
           {thread.isDirectChannel ? ` · ${t('chat.directChannelTag')}` : ''}
         </Text>
+        <Pressable
+          onPress={handleOpenAppointment}
+          hitSlop={10}
+          className="w-9 h-9 rounded-full bg-primary-50 items-center justify-center"
+        >
+          <Feather name="calendar" size={17} color="#059669" />
+        </Pressable>
       </View>
 
       {contextHeader && <AIContextHeader data={contextHeader} />}
 
       <KeyboardAvoidingView
-        behavior={Platform.OS === 'ios' ? 'padding' : undefined}
+        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
         className="flex-1"
         keyboardVerticalOffset={Platform.OS === 'ios' ? 60 : 0}
       >
@@ -102,7 +124,7 @@ export default function Chatroom() {
           )}
         />
         <SmartReplySuggestions suggestions={smartReplySuggestions} onSelect={handleSend} />
-        <ChatInputBar onSend={handleSend} onOpenAppointment={() => router.push(`/appointment/${threadId}`)} />
+        <ChatInputBar onSend={handleSend} />
       </KeyboardAvoidingView>
     </SafeAreaView>
   );

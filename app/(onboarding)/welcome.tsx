@@ -31,6 +31,7 @@ function extractQueryParam(url: string, key: string): string | null {
 
 export default function Welcome() {
   const loginWithKakao = useAuthStore((s) => s.loginWithKakao);
+  const completeOnboarding = useAuthStore((s) => s.completeOnboarding);
   const addUser = useUserStore((s) => s.addUser);
   const locale = useLocaleStore((s) => s.locale);
   const { t } = useTranslation();
@@ -80,8 +81,17 @@ export default function Welcome() {
         throw new Error(body.error ?? `${t('welcome.errorGeneric')} (${res.status})`);
       }
 
-      const { token, user } = await res.json();
+      const { token, user, onboarded, profile } = await res.json();
       loginWithKakao(token, user.id);
+
+      if (onboarded && profile) {
+        // 이미 관심사 설정을 마친 계정 — 서버에 저장된 프로필 그대로 복원하고 온보딩을 건너뛴다.
+        addUser(profile);
+        completeOnboarding(user.id);
+        router.replace('/(tabs)');
+        return;
+      }
+
       addUser({
         id: user.id,
         name: user.name,
@@ -134,7 +144,14 @@ export default function Welcome() {
       `&client_id=${encodeURIComponent(clientId)}` +
       `&redirect_uri=${encodeURIComponent(nativeBridgeRedirectUri)}`;
 
-    const result = await WebBrowser.openAuthSessionAsync(authUrl, NATIVE_RETURN_URL);
+    // 옵션 없이 열면 안드로이드 Custom Tab이 뜨기 전에 잠깐 검은 화면이 보이는 기기가 있다 —
+    // 툴바 색을 앱과 맞추고 타이틀/바 콜랩싱을 꺼서 전환이 매끄럽게 보이도록 한다.
+    const result = await WebBrowser.openAuthSessionAsync(authUrl, NATIVE_RETURN_URL, {
+      toolbarColor: '#ffffff',
+      secondaryToolbarColor: '#ffffff',
+      showTitle: false,
+      enableBarCollapsing: false,
+    });
     if (result.type !== 'success' || !result.url) {
       if (result.type !== 'cancel' && result.type !== 'dismiss') {
         setError(t('welcome.errorCancelled'));

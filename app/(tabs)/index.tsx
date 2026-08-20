@@ -62,8 +62,14 @@ export default function Home() {
           {t('home.greeting', { name: currentUser.name })}
         </Text>
 
-        {upcomingAppointment && upcomingCounterpart && (
+        {upcomingAppointment && upcomingCounterpart ? (
           <ConfirmedAppointmentBanner appointment={upcomingAppointment} counterpart={upcomingCounterpart} />
+        ) : (
+          <View className="bg-gray-50 px-6 py-5 rounded-3xl mt-3">
+            <Text className="text-gray-500 text-[14px] font-semibold text-center">
+              {t('home.noAppointmentPlaceholder')}
+            </Text>
+          </View>
         )}
 
         <View className="mt-10">

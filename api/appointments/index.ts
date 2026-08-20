@@ -95,7 +95,62 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       return;
     }
 
-    res.status(405).json({ error: 'GET 또는 POST 요청만 지원합니다.' });
+    if (req.method === 'PATCH') {
+      const { id, action } = req.body ?? {};
+      if (!id || (action !== 'accept' && action !== 'reject' && action !== 'checkin')) {
+        res.status(400).json({ error: "id와 action('accept'|'reject'|'checkin')이 필요합니다." });
+        return;
+      }
+
+      const rows = await query<AppointmentRow>(
+        `SELECT a.id, a.created_by, a.status, a.check_ins
+         FROM appointments a
+         JOIN threads t ON t.id = a.thread_id
+         WHERE a.id = $1 AND (t.user_a_id = $2 OR t.user_b_id = $2)`,
+        [id, userId]
+      );
+      const appointment = rows[0];
+      if (!appointment) {
+        res.status(403).json({ error: '이 약속에 접근할 권한이 없습니다.' });
+        return;
+      }
+
+      if (action === 'checkin') {
+        const alreadyCheckedIn = appointment.check_ins.some((c) => c.userId === userId);
+        const checkIns = alreadyCheckedIn
+          ? appointment.check_ins
+          : [...appointment.check_ins, { userId, checkedInAt: new Date().toISOString() }];
+
+        const updated = await query<AppointmentRow>(
+          `UPDATE appointments SET status = 'checked-in', check_ins = $2::jsonb WHERE id = $1
+           RETURNING id, thread_id, match_id, date, time, safe_zone_id, purpose, status, created_by, created_at, qr_token, check_ins`,
+          [id, JSON.stringify(checkIns)]
+        );
+        res.status(200).json({ appointment: toAppointmentJson(updated[0]) });
+        return;
+      }
+
+      // accept/reject: 약속을 제안한 본인은 스스로 응답할 수 없다 — 상대방만 응답할 수 있다.
+      if (appointment.created_by === userId) {
+        res.status(400).json({ error: '본인이 제안한 약속은 응답할 수 없습니다.' });
+        return;
+      }
+      if (appointment.status !== 'pending') {
+        res.status(409).json({ error: '이미 응답이 처리된 약속입니다.' });
+        return;
+      }
+
+      const newStatus = action === 'accept' ? 'confirmed' : 'cancelled';
+      const updated = await query<AppointmentRow>(
+        `UPDATE appointments SET status = $2 WHERE id = $1
+         RETURNING id, thread_id, match_id, date, time, safe_zone_id, purpose, status, created_by, created_at, qr_token, check_ins`,
+        [id, newStatus]
+      );
+      res.status(200).json({ appointment: toAppointmentJson(updated[0]) });
+      return;
+    }
+
+    res.status(405).json({ error: 'GET, POST 또는 PATCH 요청만 지원합니다.' });
   } catch (error) {
     const statusCode = (error as { statusCode?: number })?.statusCode ?? 500;
     res.status(statusCode).json({ error: error instanceof Error ? error.message : '알 수 없는 오류가 발생했습니다.' });

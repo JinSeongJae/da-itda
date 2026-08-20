@@ -4,13 +4,17 @@ import { AppointmentSummaryCard } from './AppointmentSummaryCard';
 import { CulturalGuideCard } from './CulturalGuideCard';
 import { TranslationToggle } from './TranslationToggle';
 import { useAppointmentStore } from '../../store/useAppointmentStore';
+import { useAuthStore } from '../../store/useAuthStore';
 import { useSafeZoneStore } from '../../store/useSafeZoneStore';
 import type { ChatMessage } from '../../types';
 import { formatTimeShort } from '../../utils/formatters';
 
 export function MessageBubble({ message, isOwnMessage }: { message: ChatMessage; isOwnMessage: boolean }) {
+  const currentUserId = useAuthStore((s) => s.currentUserId);
   const getAppointmentById = useAppointmentStore((s) => s.getAppointmentById);
   const getSafeZoneById = useSafeZoneStore((s) => s.getSafeZoneById);
+  const acceptAppointment = useAppointmentStore((s) => s.acceptAppointment);
+  const rejectAppointment = useAppointmentStore((s) => s.rejectAppointment);
 
   if (message.type === 'system') {
     return (
@@ -30,7 +34,10 @@ export function MessageBubble({ message, isOwnMessage }: { message: ChatMessage;
       <AppointmentSummaryCard
         appointment={appointment}
         safeZone={safeZone}
+        isCreator={appointment.createdBy === currentUserId}
         onCheckIn={() => router.push(`/meetup/${appointment.id}/warning`)}
+        onAccept={() => acceptAppointment(appointment.id)}
+        onReject={() => rejectAppointment(appointment.id)}
       />
     );
   }

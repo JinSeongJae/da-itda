@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Feather } from '@expo/vector-icons';
 import { Text, View } from 'react-native';
 import { router, useLocalSearchParams } from 'expo-router';
@@ -12,6 +12,8 @@ import { useMatchStore } from '../../../store/useMatchStore';
 import { useReviewStore } from '../../../store/useReviewStore';
 import { useTranslation } from '../../../utils/i18n';
 
+const POLL_INTERVAL_MS = 4000;
+
 export default function MeetupReview() {
   const { t } = useTranslation();
   const { appointmentId } = useLocalSearchParams<{ appointmentId: string }>();
@@ -22,15 +24,38 @@ export default function MeetupReview() {
   const isPositiveReview = useReviewStore((s) => s.isPositiveReview);
   const isEligibleForBadge = useReviewStore((s) => s.isEligibleForBadge);
   const evaluateAndAwardBadge = useReviewStore((s) => s.evaluateAndAwardBadge);
-  const getReviewsForAppointment = useReviewStore((s) => s.getReviewsForAppointment);
+  const fetchReviewsForAppointment = useReviewStore((s) => s.fetchReviewsForAppointment);
+  // 상대방이 실제로 리뷰를 제출했는지는 서버에서 가져와야 알 수 있다 — 이 값을 구독해서
+  // fetch가 갱신할 때마다 아래 effect가 다시 평가되도록 한다.
+  const reviewsForAppointment = useReviewStore((s) => s.checklistsByAppointment[appointmentId]) ?? [];
 
   const [submitted, setSubmitted] = useState(false);
   const [ownWasPositive, setOwnWasPositive] = useState(false);
+  const [badgeAwarded, setBadgeAwarded] = useState(false);
 
   const match = appointment ? getMatchById(appointment.matchId) : undefined;
   const counterpartId = match && (match.userAId === currentUserId ? match.userBId : match.userAId);
   const counterpartAlreadyReviewed =
-    !!counterpartId && getReviewsForAppointment(appointmentId).some((r) => r.reviewerId === counterpartId);
+    !!counterpartId && reviewsForAppointment.some((r) => r.reviewerId === counterpartId);
+
+  // 제출 후에는 상대방의 실제 리뷰가 도착했는지 주기적으로 확인한다.
+  useEffect(() => {
+    if (!submitted) return;
+    fetchReviewsForAppointment(appointmentId);
+    const interval = setInterval(() => fetchReviewsForAppointment(appointmentId), POLL_INTERVAL_MS);
+    return () => clearInterval(interval);
+  }, [submitted, appointmentId, fetchReviewsForAppointment]);
+
+  useEffect(() => {
+    if (!submitted || !ownWasPositive || badgeAwarded) return;
+    if (!isEligibleForBadge(appointmentId)) return;
+    const awarded = evaluateAndAwardBadge(appointmentId);
+    if (awarded) {
+      setBadgeAwarded(true);
+      router.replace('/badge/best-friend-neighbor');
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [submitted, ownWasPositive, badgeAwarded, reviewsForAppointment, appointmentId]);
 
   if (!appointment || !match || !counterpartId) {
     return (
@@ -41,11 +66,6 @@ export default function MeetupReview() {
     );
   }
 
-  const goToBadge = () => {
-    const awarded = evaluateAndAwardBadge(appointmentId);
-    if (awarded) router.replace(`/badge/best-friend-neighbor`);
-  };
-
   const handleSubmit = (answers: {
     metAtSafeZone: boolean;
     exchangeWentWell: boolean;
@@ -54,21 +74,6 @@ export default function MeetupReview() {
     const review = submitReview(appointmentId, currentUserId, answers);
     setOwnWasPositive(isPositiveReview(review));
     setSubmitted(true);
-
-    if (isEligibleForBadge(appointmentId)) {
-      goToBadge();
-    }
-  };
-
-  const handleSimulateCounterpart = () => {
-    submitReview(appointmentId, counterpartId, {
-      metAtSafeZone: true,
-      exchangeWentWell: true,
-      hadUncomfortableIncident: false,
-    });
-    if (isEligibleForBadge(appointmentId)) {
-      goToBadge();
-    }
   };
 
   return (
@@ -82,23 +87,13 @@ export default function MeetupReview() {
             <Feather name="check-circle" size={40} color="#10b981" />
             <Text className="text-lg font-bold text-gray-800 mt-4">{t('review.submitted')}</Text>
             {ownWasPositive ? (
-              <>
-                <Text className="text-gray-500 text-sm text-center mt-2 px-4">
-                  {t('review.badgeInfo')}
-                  {'\n'}
-                  {counterpartAlreadyReviewed
-                    ? t('review.checkingCounterpart')
-                    : t('review.waitingCounterpart')}
-                </Text>
-                {!counterpartAlreadyReviewed && (
-                  <Button
-                    label={t('review.simulateButton')}
-                    variant="outline"
-                    className="mt-6"
-                    onPress={handleSimulateCounterpart}
-                  />
-                )}
-              </>
+              <Text className="text-gray-500 text-sm text-center mt-2 px-4">
+                {t('review.badgeInfo')}
+                {'\n'}
+                {counterpartAlreadyReviewed
+                  ? t('review.checkingCounterpart')
+                  : t('review.waitingCounterpart')}
+              </Text>
             ) : (
               <Text className="text-gray-500 text-sm text-center mt-2 px-4">{t('review.negativeThanks')}</Text>
             )}

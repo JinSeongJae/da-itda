@@ -38,6 +38,7 @@ interface UserState {
   removeSkillWanted: (userId: string, skillId: string) => void;
   setAvailability: (userId: string, availability: TimeSlot[]) => void;
   awardBadge: (userId: string, badgeId: BadgeId) => void;
+  addBestFriendNeighbor: (userId: string, counterpartId: string) => void;
   setVerificationStatus: (userId: string, status: VerificationStatus) => void;
   addPoints: (userId: string, amount: number) => void;
   addVolunteerMinutes: (userId: string, minutes: number) => void;
@@ -146,6 +147,23 @@ export const useUserStore = create<UserState>()(
             usersById: {
               ...state.usersById,
               [userId]: { ...user, badges: [...user.badges, badgeId] },
+            },
+          };
+        });
+        syncSelfProfile(get().usersById[userId]);
+      },
+
+      addBestFriendNeighbor: (userId, counterpartId) => {
+        set((state) => {
+          const user = state.usersById[userId];
+          if (!user || user.bestFriendNeighborIds?.includes(counterpartId)) return state;
+          return {
+            usersById: {
+              ...state.usersById,
+              [userId]: {
+                ...user,
+                bestFriendNeighborIds: [...(user.bestFriendNeighborIds ?? []), counterpartId],
+              },
             },
           };
         });

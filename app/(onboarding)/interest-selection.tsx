@@ -13,8 +13,6 @@ import type { Gender, Skill, TalkStyle } from '../../types';
 import { useTranslation } from '../../utils/i18n';
 import type { TranslationKey } from '../../constants/i18n';
 
-const SKILLS_BY_CATEGORY = groupSkillsByCategory(ALL_SKILLS);
-
 const GENDER_OPTIONS: { value: Gender; key: TranslationKey }[] = [
   { value: 'female', key: 'profileFields.genderFemale' },
   { value: 'male', key: 'profileFields.genderMale' },
@@ -66,17 +64,20 @@ function SkillChip({
 }
 
 function GroupedSkillChips({
+  skills: skillPool,
   selectedIds,
   onToggle,
 }: {
+  skills: Skill[];
   selectedIds: string[];
   onToggle: (id: string) => void;
 }) {
   const { t } = useTranslation();
+  const grouped = groupSkillsByCategory(skillPool);
   return (
     <>
       {SKILL_CATEGORY_ORDER.map((category) => {
-        const skills = SKILLS_BY_CATEGORY[category];
+        const skills = grouped[category];
         if (!skills || skills.length === 0) return null;
         return (
           <View key={category} className="mb-1">
@@ -101,9 +102,8 @@ function GroupedSkillChips({
 }
 
 export default function InterestSelection() {
-  const { t } = useTranslation();
+  const { t, skillLabel } = useTranslation();
   const currentUserId = useAuthStore((s) => s.currentUserId);
-  const completeOnboarding = useAuthStore((s) => s.completeOnboarding);
   const updateProfile = useUserStore((s) => s.updateProfile);
   const existingUser = useUserStore((s) => (currentUserId ? s.usersById[currentUserId] : undefined));
 
@@ -112,6 +112,11 @@ export default function InterestSelection() {
   const [wantedIds, setWantedIds] = useState<string[]>([]);
   const [gender, setGender] = useState<Gender>(existingUser?.gender ?? 'unspecified');
   const [talkStyle, setTalkStyle] = useState<TalkStyle>(existingUser?.talkStyle ?? 'no-preference');
+  const [skillSearch, setSkillSearch] = useState('');
+
+  const filteredSkills = skillSearch.trim()
+    ? ALL_SKILLS.filter((s) => skillLabel(s).toLowerCase().includes(skillSearch.trim().toLowerCase()))
+    : ALL_SKILLS;
 
   const toggle = (setFn: typeof setOfferedIds, id: string) =>
     setFn((prev) => (prev.includes(id) ? prev.filter((s) => s !== id) : [...prev, id]));
@@ -135,8 +140,7 @@ export default function InterestSelection() {
         { day: '토', start: '10:00', end: '13:00' },
       ],
     });
-    completeOnboarding(currentUserId);
-    router.replace('/(tabs)');
+    router.replace('/(onboarding)/location-setup');
   };
 
   return (
@@ -157,6 +161,17 @@ export default function InterestSelection() {
           />
         </View>
 
+        <View className="flex-row items-center border border-gray-200 rounded-2xl px-4 mb-4">
+          <Feather name="search" size={15} color="#9ca3af" />
+          <TextInput
+            value={skillSearch}
+            onChangeText={setSkillSearch}
+            placeholder={t('skillSearch.placeholder')}
+            placeholderTextColor="#9ca3af"
+            className="flex-1 py-3 ml-2 text-sm text-gray-800"
+          />
+        </View>
+
         <View className="flex-row items-center justify-between mb-2">
           <Text className="text-sm font-semibold text-gray-700">{t('interestSelection.offeredLabel')}</Text>
           <Text className="text-xs text-gray-400">
@@ -165,7 +180,11 @@ export default function InterestSelection() {
         </View>
         <Text className="text-xs text-gray-400 mb-3">{t('interestSelection.offeredHint')}</Text>
         <View className="mb-4">
-          <GroupedSkillChips selectedIds={offeredIds} onToggle={(id) => toggle(setOfferedIds, id)} />
+          <GroupedSkillChips
+            skills={filteredSkills}
+            selectedIds={offeredIds}
+            onToggle={(id) => toggle(setOfferedIds, id)}
+          />
         </View>
 
         <View className="flex-row items-center justify-between mb-2">
@@ -176,7 +195,11 @@ export default function InterestSelection() {
         </View>
         <Text className="text-xs text-gray-400 mb-3">{t('interestSelection.wantedHint')}</Text>
         <View className="mb-1">
-          <GroupedSkillChips selectedIds={wantedIds} onToggle={(id) => toggle(setWantedIds, id)} />
+          <GroupedSkillChips
+            skills={filteredSkills}
+            selectedIds={wantedIds}
+            onToggle={(id) => toggle(setWantedIds, id)}
+          />
         </View>
 
         <Text className="text-sm font-semibold text-gray-700 mb-2 mt-4">{t('profileFields.genderLabel')}</Text>

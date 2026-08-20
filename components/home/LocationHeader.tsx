@@ -1,11 +1,12 @@
 import { useState } from 'react';
 import { Feather } from '@expo/vector-icons';
 import { Modal, Pressable, Text, View } from 'react-native';
+import { GYEONGSAN_DISTRICTS } from '../../constants/location';
 import { NOTIFICATIONS } from '../../mocks/notifications';
 import { formatRelativeTime } from '../../utils/formatters';
 import { useTranslation } from '../../utils/i18n';
 
-const DISTRICTS = ['중산동', '진량읍'];
+const DISTRICTS = GYEONGSAN_DISTRICTS;
 
 export function LocationHeader({ city, district }: { city: string; district: string }) {
   const { t } = useTranslation();

@@ -16,6 +16,7 @@ export default function ChatList() {
   const fetchThreads = useChatStore((s) => s.fetchThreads);
   const usersById = useUserStore((s) => s.usersById);
   const fetchAllUsers = useUserStore((s) => s.fetchAllUsers);
+  const currentUser = usersById[currentUserId];
 
   useEffect(() => {
     fetchThreads();
@@ -44,6 +45,7 @@ export default function ChatList() {
             <ChatListItem
               thread={item}
               counterpart={counterpart}
+              isBestFriendNeighbor={currentUser?.bestFriendNeighborIds?.includes(counterpart.id)}
               onPress={() => router.push(`/chatroom/${item.id}`)}
             />
           );

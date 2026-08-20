@@ -55,6 +55,8 @@ export interface User {
   availability: TimeSlot[];
   verification: VerificationStatus;
   badges: BadgeId[];
+  /** User ids this person has become "단짝 이웃" (best-friend-neighbor) with — powers the chat list tag. */
+  bestFriendNeighborIds?: string[];
   points: number;
   volunteerMinutes: number;
   createdAt: string;

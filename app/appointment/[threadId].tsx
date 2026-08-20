@@ -85,6 +85,22 @@ export default function AppointmentFormScreen() {
     );
   }
 
+  if (currentUser && currentUser.verification !== 'verified') {
+    return (
+      <SafeAreaView className="flex-1 bg-white">
+        <Header title={t('appointmentForm.title')} showBack />
+        <View className="flex-1 items-center justify-center px-8">
+          <Text className="text-center text-gray-500 leading-6">{t('chatroom.verificationRequiredBody')}</Text>
+          <Button
+            label={t('chatroom.verificationRequiredConfirm')}
+            className="mt-5"
+            onPress={() => router.replace('/(tabs)/mypage/verification')}
+          />
+        </View>
+      </SafeAreaView>
+    );
+  }
+
   const selectedZone = zones.find((z) => z.id === (safeZoneId ?? zones[0]?.id));
   const dateStr = format(date, 'yyyy-MM-dd');
   const timeStr = format(time, 'HH:mm');

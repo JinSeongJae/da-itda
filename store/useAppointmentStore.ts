@@ -52,15 +52,16 @@ function syncAppointmentToServer(appointment: Appointment): void {
   }).catch(() => {});
 }
 
-function syncCheckInToServer(appointmentId: string): void {
+/** Every appointment state transition (accept/reject/check-in) goes through this one PATCH action. */
+function syncAppointmentActionToServer(appointmentId: string, action: 'accept' | 'reject' | 'checkin'): void {
   const backendUrl = process.env.EXPO_PUBLIC_BACKEND_URL;
   const token = useAuthStore.getState().sessionToken;
   if (!backendUrl || !token) return;
 
-  fetch(`${backendUrl}/api/appointments/checkin`, {
-    method: 'POST',
+  fetch(`${backendUrl}/api/appointments`, {
+    method: 'PATCH',
     headers: { 'content-type': 'application/json', authorization: `Bearer ${token}` },
-    body: JSON.stringify({ appointmentId }),
+    body: JSON.stringify({ id: appointmentId, action }),
   }).catch(() => {});
 }
 
@@ -77,6 +78,10 @@ interface CreateAppointmentInput {
 interface AppointmentState {
   appointmentsById: Record<string, Appointment>;
   createAppointment: (input: CreateAppointmentInput) => Appointment;
+  /** The other participant accepts a proposed (pending) appointment, confirming it. */
+  acceptAppointment: (appointmentId: string) => void;
+  /** The other participant declines a proposed (pending) appointment. */
+  rejectAppointment: (appointmentId: string) => void;
   checkIn: (appointmentId: string, userId: string) => Appointment | undefined;
   completeAppointment: (appointmentId: string) => void;
   recommendSafeZones: (
@@ -116,7 +121,7 @@ export const useAppointmentStore = create<AppointmentState>()(
           time: input.time,
           safeZoneId: input.safeZoneId,
           purpose: input.purpose,
-          status: 'confirmed',
+          status: 'pending',
           createdBy: input.createdBy,
           createdAt: new Date().toISOString(),
           qrToken: generateQrToken(),
@@ -127,6 +132,34 @@ export const useAppointmentStore = create<AppointmentState>()(
         }));
         syncAppointmentToServer(appointment);
         return appointment;
+      },
+
+      acceptAppointment: (appointmentId) => {
+        set((state) => {
+          const appointment = state.appointmentsById[appointmentId];
+          if (!appointment || appointment.status !== 'pending') return state;
+          return {
+            appointmentsById: {
+              ...state.appointmentsById,
+              [appointmentId]: { ...appointment, status: 'confirmed' },
+            },
+          };
+        });
+        syncAppointmentActionToServer(appointmentId, 'accept');
+      },
+
+      rejectAppointment: (appointmentId) => {
+        set((state) => {
+          const appointment = state.appointmentsById[appointmentId];
+          if (!appointment || appointment.status !== 'pending') return state;
+          return {
+            appointmentsById: {
+              ...state.appointmentsById,
+              [appointmentId]: { ...appointment, status: 'cancelled' },
+            },
+          };
+        });
+        syncAppointmentActionToServer(appointmentId, 'reject');
       },
 
       checkIn: (appointmentId, userId) => {
@@ -142,7 +175,7 @@ export const useAppointmentStore = create<AppointmentState>()(
         set((state) => ({
           appointmentsById: { ...state.appointmentsById, [appointmentId]: updated },
         }));
-        syncCheckInToServer(appointmentId);
+        syncAppointmentActionToServer(appointmentId, 'checkin');
         return updated;
       },
 

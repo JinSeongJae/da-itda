@@ -8,10 +8,12 @@ import { useTranslation } from '../../utils/i18n';
 export function ChatListItem({
   thread,
   counterpart,
+  isBestFriendNeighbor,
   onPress,
 }: {
   thread: ChatThread;
   counterpart: User;
+  isBestFriendNeighbor?: boolean;
   onPress: () => void;
 }) {
   const { t } = useTranslation();
@@ -21,7 +23,11 @@ export function ChatListItem({
       <View className="ml-3.5 flex-1">
         <View className="flex-row items-center">
           <Text className="text-[16px] font-bold text-gray-900">{counterpart.name}</Text>
-          {thread.isDirectChannel && <Tag label={t('chat.directChannelTag')} tone="primary" />}
+          {/* isDirectChannel은 기기 로컬 값이라 재설치 시 사라질 수 있어, 프로필에 동기화되는
+              bestFriendNeighborIds도 함께 확인해 더 안정적으로 태그를 보여준다. */}
+          {(thread.isDirectChannel || isBestFriendNeighbor) && (
+            <Tag label={t('chat.directChannelTag')} tone="primary" />
+          )}
         </View>
         <Text className="text-gray-400 text-[13px] mt-0.5" numberOfLines={1}>
           {thread.lastMessagePreview ?? t('chat.startConversation')}

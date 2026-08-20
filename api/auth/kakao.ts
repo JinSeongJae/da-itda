@@ -103,16 +103,16 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     // DB(예: Supabase)가 일시적으로 연결되지 않아도 로그인 자체는 막지 않는다 — 이 세션은
     // app_users에 저장되지 않으므로 메시지 동기화 등 DB 의존 기능만 제한될 뿐, 로그인은
     // 계속 진행된다(임시 세션). 원인은 로그로 구체적으로 남긴다.
-    let user = { id: fallbackUserId, name, avatar_url: avatarUrl as string | null };
+    let user = { id: fallbackUserId, name, avatar_url: avatarUrl as string | null, profile: null as unknown };
     let dbSynced = true;
 
     try {
-      const rows = await query<{ id: string; name: string; avatar_url: string | null }>(
+      const rows = await query<{ id: string; name: string; avatar_url: string | null; profile: unknown }>(
         `INSERT INTO app_users (id, kakao_id, name, avatar_url)
          VALUES ($1, $2, $3, $4)
          ON CONFLICT (kakao_id)
          DO UPDATE SET name = EXCLUDED.name, avatar_url = EXCLUDED.avatar_url
-         RETURNING id, name, avatar_url`,
+         RETURNING id, name, avatar_url, profile`,
         [fallbackUserId, kakaoId, name, avatarUrl]
       );
       user = rows[0];
@@ -127,9 +127,13 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 
     const token = signSessionToken(user.id);
 
+    // profile이 이미 채워져 있으면 관심사 설정을 이미 마친 계정 — 클라이언트가 온보딩을
+    // 건너뛸 수 있도록 그 프로필 전체를 함께 내려준다(이름도 프로필 쪽이 최신/커스텀 값).
     res.status(200).json({
       token,
       user: { id: user.id, name: user.name, avatarUrl: user.avatar_url ?? undefined },
+      onboarded: user.profile != null,
+      profile: user.profile ?? undefined,
       dbSynced,
     });
   } catch (error) {

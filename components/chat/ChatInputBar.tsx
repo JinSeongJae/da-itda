@@ -3,13 +3,7 @@ import { Feather } from '@expo/vector-icons';
 import { Pressable, TextInput, View } from 'react-native';
 import { useTranslation } from '../../utils/i18n';
 
-export function ChatInputBar({
-  onSend,
-  onOpenAppointment,
-}: {
-  onSend: (text: string) => void;
-  onOpenAppointment: () => void;
-}) {
+export function ChatInputBar({ onSend }: { onSend: (text: string) => void }) {
   const { t } = useTranslation();
   const [text, setText] = useState('');
 
@@ -22,9 +16,6 @@ export function ChatInputBar({
 
   return (
     <View className="flex-row items-center px-3 py-2 border-t border-gray-100 bg-white">
-      <Pressable onPress={onOpenAppointment} hitSlop={8} className="mr-2 w-9 h-9 rounded-full bg-gray-100 items-center justify-center">
-        <Feather name="plus" size={20} color="#374151" />
-      </Pressable>
       <TextInput
         value={text}
         onChangeText={setText}

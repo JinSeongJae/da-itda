@@ -79,10 +79,10 @@ export const useCulturalMapStore = create<CulturalMapState>()(
         if (!backendUrl || !headers) return { ok: false, reason: 'offline' };
 
         try {
-          const res = await fetch(`${backendUrl}/api/cultural-map/pins/${pinId}/verify`, {
-            method: 'POST',
+          const res = await fetch(`${backendUrl}/api/cultural-map/pins`, {
+            method: 'PATCH',
             headers: { 'content-type': 'application/json', ...headers },
-            body: JSON.stringify(location),
+            body: JSON.stringify({ pinId, ...location }),
           });
 
           if (!res.ok) {

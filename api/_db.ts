@@ -102,14 +102,30 @@ async function createSchema(): Promise<void> {
       time TEXT NOT NULL,
       safe_zone_id TEXT NOT NULL,
       purpose TEXT,
-      status TEXT NOT NULL DEFAULT 'confirmed',
+      status TEXT NOT NULL DEFAULT 'pending',
       created_by TEXT NOT NULL,
       created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
       qr_token TEXT,
       check_ins JSONB NOT NULL DEFAULT '[]'
     );
 
+    -- 상호 수락 플로우 도입 전에는 기본값이 'confirmed'였다 — 기존 테이블에도 반영되도록 명시적으로 변경.
+    ALTER TABLE appointments ALTER COLUMN status SET DEFAULT 'pending';
+
     CREATE INDEX IF NOT EXISTS appointments_thread_id_idx ON appointments(thread_id);
+
+    CREATE TABLE IF NOT EXISTS reviews (
+      id TEXT PRIMARY KEY,
+      appointment_id TEXT NOT NULL,
+      reviewer_id TEXT NOT NULL,
+      met_at_safe_zone BOOLEAN NOT NULL,
+      exchange_went_well BOOLEAN NOT NULL,
+      had_uncomfortable_incident BOOLEAN NOT NULL,
+      submitted_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+      UNIQUE (appointment_id, reviewer_id)
+    );
+
+    CREATE INDEX IF NOT EXISTS reviews_appointment_id_idx ON reviews(appointment_id);
 
     CREATE TABLE IF NOT EXISTS cultural_pins (
       id TEXT PRIMARY KEY,

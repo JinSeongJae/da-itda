@@ -49,6 +49,7 @@ export type TranslationKey =
   | 'home.successFeedLabel'
   | 'home.appointmentWith'
   | 'home.appointmentDefaultPurpose'
+  | 'home.noAppointmentPlaceholder'
   | 'neighborCard.top'
   | 'neighborCard.offers'
   | 'neighborCard.matchButton'
@@ -83,6 +84,11 @@ export type TranslationKey =
   | 'appointmentCard.confirmed'
   | 'appointmentCard.defaultZone'
   | 'appointmentCard.checkinButton'
+  | 'appointmentCard.pendingLabel'
+  | 'appointmentCard.cancelledLabel'
+  | 'appointmentCard.waitingForAccept'
+  | 'appointmentCard.acceptButton'
+  | 'appointmentCard.rejectButton'
   | 'appointmentForm.title'
   | 'appointmentForm.subtitle'
   | 'appointmentForm.aiSuggestButton'
@@ -108,6 +114,7 @@ export type TranslationKey =
   | 'mypage.noItems'
   | 'mypage.offeredLabel'
   | 'mypage.wantedLabel'
+  | 'mypage.showLess'
   | 'edit.title'
   | 'edit.changePhoto'
   | 'edit.bioLabel'
@@ -148,6 +155,11 @@ export type TranslationKey =
   | 'meetupQr.reward'
   | 'meetupQr.reviewButton'
   | 'meetupQr.notFound'
+  | 'meetupQr.myQrLabel'
+  | 'meetupQr.cameraPermissionNeeded'
+  | 'meetupQr.grantPermission'
+  | 'meetupQr.invalidQr'
+  | 'meetupQr.wrongQr'
   | 'qrScan.button'
   | 'qrScan.scanning'
   | 'review.title'
@@ -197,6 +209,40 @@ export type TranslationKey =
   | 'skill.skill_immigration_office_accompany'
   | 'skill.skill_labor_rights_info'
   | 'skill.skill_admin_document_help'
+  | 'skill.skill_multilingual_interpretation'
+  | 'skill.skill_pronunciation_study'
+  | 'skill.skill_holiday_culture_exchange'
+  | 'skill.skill_world_festival_intro'
+  | 'skill.skill_baking_dessert'
+  | 'skill.skill_vegan_cooking'
+  | 'skill.skill_bus_route_help'
+  | 'skill.skill_housing_info_share'
+  | 'skill.skill_playground_meetup'
+  | 'skill.skill_baby_product_info_share'
+  | 'skill.skill_basic_literacy_education'
+  | 'skill.skill_topik_study_group'
+  | 'skill.skill_table_tennis_partner'
+  | 'skill.skill_cycling_group'
+  | 'skill.skill_board_game_meetup'
+  | 'skill.skill_gardening'
+  | 'skill.skill_smart_device_help'
+  | 'skill.skill_sns_youtube_help'
+  | 'skill.skill_lease_contract_info_share'
+  | 'skill.skill_tax_year_end_info_share'
+  | 'skillSearch.placeholder'
+  | 'locationSetup.title'
+  | 'locationSetup.subtitle'
+  | 'locationSetup.checkingLocation'
+  | 'locationSetup.outsideBoundsTitle'
+  | 'locationSetup.outsideBoundsBody'
+  | 'locationSetup.retryButton'
+  | 'locationSetup.insideConfirmed'
+  | 'locationSetup.pickDistrictLabel'
+  | 'locationSetup.confirmButton'
+  | 'chatroom.verificationRequiredTitle'
+  | 'chatroom.verificationRequiredBody'
+  | 'chatroom.verificationRequiredConfirm'
+  | 'chatroom.verificationRequiredCancel'
   | 'skillCategory.language'
   | 'skillCategory.culture'
   | 'skillCategory.cooking'
@@ -287,6 +333,7 @@ export const TRANSLATIONS: Record<Locale, Record<TranslationKey, string>> = {
     'home.successFeedLabel': '실시간 매칭 성공 소식',
     'home.appointmentWith': '{name} 이웃과의 약속',
     'home.appointmentDefaultPurpose': '이웃 교류',
+    'home.noAppointmentPlaceholder': '주변 이웃과 필요한 재능을 나눠보세요~!',
     'neighborCard.top': 'TOP',
     'neighborCard.offers': '{skill} 나눠줄 수 있어요',
     'neighborCard.matchButton': '매칭하기',
@@ -321,6 +368,11 @@ export const TRANSLATIONS: Record<Locale, Record<TranslationKey, string>> = {
     'appointmentCard.confirmed': '약속이 확정되었어요',
     'appointmentCard.defaultZone': '안심존',
     'appointmentCard.checkinButton': '현장 체크인 하러 가기',
+    'appointmentCard.pendingLabel': '약속 제안이 왔어요',
+    'appointmentCard.cancelledLabel': '거절된 약속이에요',
+    'appointmentCard.waitingForAccept': '상대방의 수락을 기다리는 중이에요',
+    'appointmentCard.acceptButton': '수락하기',
+    'appointmentCard.rejectButton': '거절하기',
     'appointmentForm.title': '약속 잡기 (원터치)',
     'appointmentForm.subtitle': '{name}님과의 만남을 날짜·시간·장소까지 한번에 정해보세요.',
     'appointmentForm.aiSuggestButton': 'AI 약속 추천받기',
@@ -346,6 +398,7 @@ export const TRANSLATIONS: Record<Locale, Record<TranslationKey, string>> = {
     'mypage.noItems': '아직 등록된 항목이 없어요.',
     'mypage.offeredLabel': '줄 수 있어요',
     'mypage.wantedLabel': '받고 싶어요',
+    'mypage.showLess': '접기',
     'edit.title': '프로필 수정',
     'edit.changePhoto': '탭해서 프로필 사진 변경',
     'edit.bioLabel': '소개',
@@ -386,6 +439,11 @@ export const TRANSLATIONS: Record<Locale, Record<TranslationKey, string>> = {
     'meetupQr.reward': '+{points} 포인트 · +{minutes}분 봉사시간 적립',
     'meetupQr.reviewButton': '3초 후기 남기러 가기',
     'meetupQr.notFound': '약속 정보를 찾을 수 없어요.',
+    'meetupQr.myQrLabel': '내 QR코드 — 상대방에게 보여주세요',
+    'meetupQr.cameraPermissionNeeded': '상대방 QR을 스캔하려면 카메라 권한이 필요해요.',
+    'meetupQr.grantPermission': '카메라 권한 허용하기',
+    'meetupQr.invalidQr': '인식할 수 없는 QR코드예요.',
+    'meetupQr.wrongQr': '이 약속의 상대방 QR코드가 아니에요.',
     'qrScan.button': 'QR 스캔하여 체크인',
     'qrScan.scanning': '스캔 중...',
     'review.title': '3초 후기',
@@ -435,6 +493,40 @@ export const TRANSLATIONS: Record<Locale, Record<TranslationKey, string>> = {
     'skill.skill_immigration_office_accompany': '출입국관리사무소 동행',
     'skill.skill_labor_rights_info': '근로·임금 기초 정보 공유',
     'skill.skill_admin_document_help': '행정 서류 작성 도움',
+    'skill.skill_multilingual_interpretation': '다국어 통역 도움',
+    'skill.skill_pronunciation_study': '발음 교정 스터디',
+    'skill.skill_holiday_culture_exchange': '명절 문화 체험 나눔',
+    'skill.skill_world_festival_intro': '세계 축제 소개',
+    'skill.skill_baking_dessert': '베이킹/디저트 만들기',
+    'skill.skill_vegan_cooking': '채식 요리 나눔',
+    'skill.skill_bus_route_help': '대중교통·버스 노선 안내',
+    'skill.skill_housing_info_share': '부동산/전월세 정보 공유',
+    'skill.skill_playground_meetup': '놀이터 동행 육아 품앗이',
+    'skill.skill_baby_product_info_share': '이유식·아기용품 정보 공유',
+    'skill.skill_basic_literacy_education': '성인 문해교육(한글 기초)',
+    'skill.skill_topik_study_group': 'TOPIK 스터디 그룹',
+    'skill.skill_table_tennis_partner': '탁구 파트너',
+    'skill.skill_cycling_group': '자전거 라이딩 모임',
+    'skill.skill_board_game_meetup': '보드게임 모임',
+    'skill.skill_gardening': '원예/식물 가꾸기',
+    'skill.skill_smart_device_help': '스마트워치·가전제품 사용법',
+    'skill.skill_sns_youtube_help': 'SNS/유튜브 활용법',
+    'skill.skill_lease_contract_info_share': '임대차 계약 기초 정보 공유',
+    'skill.skill_tax_year_end_info_share': '세금·연말정산 기초 안내',
+    'skillSearch.placeholder': '재능/관심사 검색하기',
+    'locationSetup.title': '지역 설정',
+    'locationSetup.subtitle': '경산시 내 위치인지 확인하고, 동네를 선택해주세요',
+    'locationSetup.checkingLocation': '위치 확인 중...',
+    'locationSetup.outsideBoundsTitle': '경산시 밖에 있는 것 같아요',
+    'locationSetup.outsideBoundsBody': '다잇다는 경산시 주민을 위한 서비스라 경산시 내에서만 가입할 수 있어요. 경산시로 이동한 뒤 다시 시도해주세요.',
+    'locationSetup.retryButton': '위치 다시 확인하기',
+    'locationSetup.insideConfirmed': '경산시 내에 있는 것을 확인했어요',
+    'locationSetup.pickDistrictLabel': '동네를 선택해주세요',
+    'locationSetup.confirmButton': '완료하고 시작하기',
+    'chatroom.verificationRequiredTitle': '안심인증이 필요해요',
+    'chatroom.verificationRequiredBody': '약속을 잡으려면 먼저 신분증 인증(안심인증)을 완료해주세요.',
+    'chatroom.verificationRequiredConfirm': '인증하러 가기',
+    'chatroom.verificationRequiredCancel': '취소',
     'skillCategory.language': '언어',
     'skillCategory.culture': '문화 교류',
     'skillCategory.cooking': '요리',
@@ -524,6 +616,7 @@ export const TRANSLATIONS: Record<Locale, Record<TranslationKey, string>> = {
     'home.successFeedLabel': 'Live match success stories',
     'home.appointmentWith': 'Meetup with {name}',
     'home.appointmentDefaultPurpose': 'Neighbor exchange',
+    'home.noAppointmentPlaceholder': 'Share the skills you have with neighbors nearby~!',
     'neighborCard.top': 'TOP',
     'neighborCard.offers': 'Can share {skill}',
     'neighborCard.matchButton': 'Match',
@@ -558,6 +651,11 @@ export const TRANSLATIONS: Record<Locale, Record<TranslationKey, string>> = {
     'appointmentCard.confirmed': 'Appointment confirmed',
     'appointmentCard.defaultZone': 'Safe zone',
     'appointmentCard.checkinButton': 'Go check in on site',
+    'appointmentCard.pendingLabel': 'New appointment request',
+    'appointmentCard.cancelledLabel': 'This appointment was declined',
+    'appointmentCard.waitingForAccept': "Waiting for the other person's response",
+    'appointmentCard.acceptButton': 'Accept',
+    'appointmentCard.rejectButton': 'Decline',
     'appointmentForm.title': 'Schedule a meetup',
     'appointmentForm.subtitle': 'Set the date, time, and place for your meetup with {name} all at once.',
     'appointmentForm.aiSuggestButton': 'Get an AI suggestion',
@@ -583,6 +681,7 @@ export const TRANSLATIONS: Record<Locale, Record<TranslationKey, string>> = {
     'mypage.noItems': 'Nothing added yet.',
     'mypage.offeredLabel': 'I can offer',
     'mypage.wantedLabel': 'I want to learn',
+    'mypage.showLess': 'Show less',
     'edit.title': 'Edit profile',
     'edit.changePhoto': 'Tap to change your photo',
     'edit.bioLabel': 'Bio',
@@ -626,6 +725,11 @@ export const TRANSLATIONS: Record<Locale, Record<TranslationKey, string>> = {
     'meetupQr.reward': '+{points} pts · +{minutes} min volunteer time earned',
     'meetupQr.reviewButton': 'Leave a 3-second review',
     'meetupQr.notFound': "Couldn't find this appointment.",
+    'meetupQr.myQrLabel': 'My QR code — show this to the other person',
+    'meetupQr.cameraPermissionNeeded': 'Camera access is needed to scan the other person’s QR code.',
+    'meetupQr.grantPermission': 'Allow camera access',
+    'meetupQr.invalidQr': "That QR code couldn't be recognized.",
+    'meetupQr.wrongQr': "That's not this appointment's counterpart QR code.",
     'qrScan.button': 'Scan QR to check in',
     'qrScan.scanning': 'Scanning...',
     'review.title': '3-second review',
@@ -676,6 +780,41 @@ export const TRANSLATIONS: Record<Locale, Record<TranslationKey, string>> = {
     'skill.skill_immigration_office_accompany': 'Immigration office accompaniment',
     'skill.skill_labor_rights_info': 'Basic labor/wage info sharing',
     'skill.skill_admin_document_help': 'Help with admin paperwork',
+    'skill.skill_multilingual_interpretation': 'Multilingual interpretation help',
+    'skill.skill_pronunciation_study': 'Pronunciation practice study group',
+    'skill.skill_holiday_culture_exchange': 'Holiday culture exchange',
+    'skill.skill_world_festival_intro': 'World festival introductions',
+    'skill.skill_baking_dessert': 'Baking & desserts',
+    'skill.skill_vegan_cooking': 'Vegan/vegetarian cooking',
+    'skill.skill_bus_route_help': 'Bus route & transit help',
+    'skill.skill_housing_info_share': 'Housing/rental info sharing',
+    'skill.skill_playground_meetup': 'Playground playdate co-op',
+    'skill.skill_baby_product_info_share': 'Baby food & gear info sharing',
+    'skill.skill_basic_literacy_education': 'Adult basic literacy (Korean)',
+    'skill.skill_topik_study_group': 'TOPIK study group',
+    'skill.skill_table_tennis_partner': 'Table tennis partner',
+    'skill.skill_cycling_group': 'Cycling group',
+    'skill.skill_board_game_meetup': 'Board game meetup',
+    'skill.skill_gardening': 'Gardening',
+    'skill.skill_smart_device_help': 'Smartwatch/appliance help',
+    'skill.skill_sns_youtube_help': 'Social media/YouTube help',
+    'skill.skill_lease_contract_info_share': 'Lease contract basics sharing',
+    'skill.skill_tax_year_end_info_share': 'Tax/year-end settlement basics',
+    'skillSearch.placeholder': 'Search skills/interests',
+    'locationSetup.title': 'Set your location',
+    'locationSetup.subtitle': "We'll check you're within Gyeongsan, then pick your neighborhood",
+    'locationSetup.checkingLocation': 'Checking your location...',
+    'locationSetup.outsideBoundsTitle': "Looks like you're outside Gyeongsan",
+    'locationSetup.outsideBoundsBody':
+      'Da-itda is a service for Gyeongsan residents, so you can only sign up while inside Gyeongsan. Please move inside the city and try again.',
+    'locationSetup.retryButton': 'Check location again',
+    'locationSetup.insideConfirmed': "Confirmed you're inside Gyeongsan",
+    'locationSetup.pickDistrictLabel': 'Pick your neighborhood',
+    'locationSetup.confirmButton': 'Finish and get started',
+    'chatroom.verificationRequiredTitle': 'Verification required',
+    'chatroom.verificationRequiredBody': 'Please complete ID verification before scheduling a meetup.',
+    'chatroom.verificationRequiredConfirm': 'Go verify',
+    'chatroom.verificationRequiredCancel': 'Cancel',
     'skillCategory.language': 'Language',
     'skillCategory.culture': 'Culture exchange',
     'skillCategory.cooking': 'Cooking',
@@ -766,6 +905,7 @@ export const TRANSLATIONS: Record<Locale, Record<TranslationKey, string>> = {
     'home.successFeedLabel': 'Live na kwento ng matagumpay na tugma',
     'home.appointmentWith': 'Pagkikita kasama si {name}',
     'home.appointmentDefaultPurpose': 'Palitan ng kapitbahay',
+    'home.noAppointmentPlaceholder': 'Ibahagi ang kasanayan mo sa mga kapitbahay malapit sa iyo~!',
     'neighborCard.top': 'TOP',
     'neighborCard.offers': 'Maibabahagi ang {skill}',
     'neighborCard.matchButton': 'Itugma',
@@ -800,6 +940,11 @@ export const TRANSLATIONS: Record<Locale, Record<TranslationKey, string>> = {
     'appointmentCard.confirmed': 'Nakumpirma ang appointment',
     'appointmentCard.defaultZone': 'Ligtas na zone',
     'appointmentCard.checkinButton': 'Pumunta para mag-check-in',
+    'appointmentCard.pendingLabel': 'Bagong panukalang appointment',
+    'appointmentCard.cancelledLabel': 'Tinanggihan ang appointment na ito',
+    'appointmentCard.waitingForAccept': 'Hinihintay ang sagot ng kabilang panig',
+    'appointmentCard.acceptButton': 'Tanggapin',
+    'appointmentCard.rejectButton': 'Tanggihan',
     'appointmentForm.title': 'Mag-iskedyul ng pagkikita',
     'appointmentForm.subtitle': 'Itakda ang petsa, oras, at lugar ng pagkikita mo kasama si {name}.',
     'appointmentForm.aiSuggestButton': 'Kumuha ng suhestyon ng AI',
@@ -825,6 +970,7 @@ export const TRANSLATIONS: Record<Locale, Record<TranslationKey, string>> = {
     'mypage.noItems': 'Walang naidagdag pa.',
     'mypage.offeredLabel': 'Kaya kong ibigay',
     'mypage.wantedLabel': 'Gusto kong matutunan',
+    'mypage.showLess': 'Ipakita ang mas kaunti',
     'edit.title': 'I-edit ang profile',
     'edit.changePhoto': 'I-tap para baguhin ang larawan',
     'edit.bioLabel': 'Tungkol sa akin',
@@ -868,6 +1014,11 @@ export const TRANSLATIONS: Record<Locale, Record<TranslationKey, string>> = {
     'meetupQr.reward': '+{points} puntos · +{minutes} minutong boluntaryo',
     'meetupQr.reviewButton': 'Mag-leave ng 3-segundong review',
     'meetupQr.notFound': 'Hindi mahanap ang appointment.',
+    'meetupQr.myQrLabel': 'Aking QR code — ipakita ito sa kabilang tao',
+    'meetupQr.cameraPermissionNeeded': 'Kailangan ng access sa camera para i-scan ang QR code ng kausap mo.',
+    'meetupQr.grantPermission': 'Payagan ang camera',
+    'meetupQr.invalidQr': 'Hindi nakilala ang QR code na iyon.',
+    'meetupQr.wrongQr': 'Hindi iyan ang QR code ng kapareha sa appointment na ito.',
     'qrScan.button': 'I-scan ang QR para mag-check-in',
     'qrScan.scanning': 'Sini-scan...',
     'review.title': '3-segundong review',
@@ -918,6 +1069,41 @@ export const TRANSLATIONS: Record<Locale, Record<TranslationKey, string>> = {
     'skill.skill_immigration_office_accompany': 'Samahan sa immigration office',
     'skill.skill_labor_rights_info': 'Batayang impormasyon sa paggawa/sahod',
     'skill.skill_admin_document_help': 'Tulong sa administratibong papeles',
+    'skill.skill_multilingual_interpretation': 'Tulong sa multilingguwal na interpretasyon',
+    'skill.skill_pronunciation_study': 'Pag-aaral ng tamang bigkas',
+    'skill.skill_holiday_culture_exchange': 'Palitan ng kultura ng kapistahan',
+    'skill.skill_world_festival_intro': 'Pagpapakilala ng mga pandaigdigang pista',
+    'skill.skill_baking_dessert': 'Baking at dessert',
+    'skill.skill_vegan_cooking': 'Vegan/vegetarian na pagluluto',
+    'skill.skill_bus_route_help': 'Tulong sa bus route at transportasyon',
+    'skill.skill_housing_info_share': 'Pagbahagi ng impormasyon sa bahay/renta',
+    'skill.skill_playground_meetup': 'Playdate sa playground',
+    'skill.skill_baby_product_info_share': 'Impormasyon sa pagkain at gamit ng sanggol',
+    'skill.skill_basic_literacy_education': 'Batayang literacy ng nasa hustong gulang (Koreano)',
+    'skill.skill_topik_study_group': 'Grupo ng pag-aaral ng TOPIK',
+    'skill.skill_table_tennis_partner': 'Kasosyo sa table tennis',
+    'skill.skill_cycling_group': 'Grupo ng pagbibisikleta',
+    'skill.skill_board_game_meetup': 'Meetup ng board game',
+    'skill.skill_gardening': 'Paghahalaman',
+    'skill.skill_smart_device_help': 'Tulong sa smartwatch/appliance',
+    'skill.skill_sns_youtube_help': 'Tulong sa social media/YouTube',
+    'skill.skill_lease_contract_info_share': 'Pagbahagi ng batayang impormasyon sa kontrata ng upa',
+    'skill.skill_tax_year_end_info_share': 'Batayang impormasyon sa buwis/year-end',
+    'skillSearch.placeholder': 'Maghanap ng kasanayan/interes',
+    'locationSetup.title': 'I-set ang lokasyon',
+    'locationSetup.subtitle': 'Titingnan namin kung nasa Gyeongsan ka, tapos piliin ang iyong kapitbahayan',
+    'locationSetup.checkingLocation': 'Sinusuri ang lokasyon mo...',
+    'locationSetup.outsideBoundsTitle': 'Mukhang nasa labas ka ng Gyeongsan',
+    'locationSetup.outsideBoundsBody':
+      'Ang Da-itda ay para sa mga residente ng Gyeongsan, kaya maaari ka lang mag-sign up kapag nasa loob ng Gyeongsan. Pumunta sa loob ng lungsod at subukan muli.',
+    'locationSetup.retryButton': 'Suriin ulit ang lokasyon',
+    'locationSetup.insideConfirmed': 'Nakumpirma na nasa loob ka ng Gyeongsan',
+    'locationSetup.pickDistrictLabel': 'Piliin ang iyong kapitbahayan',
+    'locationSetup.confirmButton': 'Tapusin at magsimula',
+    'chatroom.verificationRequiredTitle': 'Kailangan ng beripikasyon',
+    'chatroom.verificationRequiredBody': 'Pakikumpleto muna ang beripikasyon ng ID bago mag-iskedyul ng pagkikita.',
+    'chatroom.verificationRequiredConfirm': 'Pumunta sa beripikasyon',
+    'chatroom.verificationRequiredCancel': 'Kanselahin',
     'skillCategory.language': 'Wika',
     'skillCategory.culture': 'Palitan ng kultura',
     'skillCategory.cooking': 'Pagluluto',
@@ -1008,6 +1194,7 @@ export const TRANSLATIONS: Record<Locale, Record<TranslationKey, string>> = {
     'home.successFeedLabel': 'Câu chuyện ghép đôi thành công',
     'home.appointmentWith': 'Lịch hẹn với {name}',
     'home.appointmentDefaultPurpose': 'Giao lưu hàng xóm',
+    'home.noAppointmentPlaceholder': 'Hãy chia sẻ tài năng bạn có với hàng xóm xung quanh~!',
     'neighborCard.top': 'TOP',
     'neighborCard.offers': 'Có thể chia sẻ {skill}',
     'neighborCard.matchButton': 'Kết nối',
@@ -1042,6 +1229,11 @@ export const TRANSLATIONS: Record<Locale, Record<TranslationKey, string>> = {
     'appointmentCard.confirmed': 'Đã xác nhận lịch hẹn',
     'appointmentCard.defaultZone': 'Khu vực an toàn',
     'appointmentCard.checkinButton': 'Đến check-in tại nơi hẹn',
+    'appointmentCard.pendingLabel': 'Có đề xuất lịch hẹn mới',
+    'appointmentCard.cancelledLabel': 'Lịch hẹn này đã bị từ chối',
+    'appointmentCard.waitingForAccept': 'Đang chờ phản hồi từ đối phương',
+    'appointmentCard.acceptButton': 'Đồng ý',
+    'appointmentCard.rejectButton': 'Từ chối',
     'appointmentForm.title': 'Đặt lịch gặp mặt',
     'appointmentForm.subtitle': 'Đặt ngày, giờ và địa điểm gặp {name} cùng một lúc.',
     'appointmentForm.aiSuggestButton': 'Nhận gợi ý từ AI',
@@ -1067,6 +1259,7 @@ export const TRANSLATIONS: Record<Locale, Record<TranslationKey, string>> = {
     'mypage.noItems': 'Chưa có mục nào.',
     'mypage.offeredLabel': 'Tôi có thể chia sẻ',
     'mypage.wantedLabel': 'Tôi muốn học',
+    'mypage.showLess': 'Thu gọn',
     'edit.title': 'Chỉnh sửa hồ sơ',
     'edit.changePhoto': 'Nhấn để đổi ảnh đại diện',
     'edit.bioLabel': 'Giới thiệu',
@@ -1109,6 +1302,11 @@ export const TRANSLATIONS: Record<Locale, Record<TranslationKey, string>> = {
     'meetupQr.reward': '+{points} điểm · +{minutes} phút tình nguyện',
     'meetupQr.reviewButton': 'Đánh giá 3 giây',
     'meetupQr.notFound': 'Không tìm thấy lịch hẹn.',
+    'meetupQr.myQrLabel': 'Mã QR của tôi — hãy cho đối phương xem',
+    'meetupQr.cameraPermissionNeeded': 'Cần quyền truy cập camera để quét mã QR của đối phương.',
+    'meetupQr.grantPermission': 'Cho phép truy cập camera',
+    'meetupQr.invalidQr': 'Không nhận dạng được mã QR đó.',
+    'meetupQr.wrongQr': 'Đây không phải mã QR của đối phương trong lịch hẹn này.',
     'qrScan.button': 'Quét QR để check-in',
     'qrScan.scanning': 'Đang quét...',
     'review.title': 'Đánh giá 3 giây',
@@ -1159,6 +1357,41 @@ export const TRANSLATIONS: Record<Locale, Record<TranslationKey, string>> = {
     'skill.skill_immigration_office_accompany': 'Đi cùng đến văn phòng xuất nhập cảnh',
     'skill.skill_labor_rights_info': 'Chia sẻ thông tin cơ bản về lao động/lương',
     'skill.skill_admin_document_help': 'Hỗ trợ giấy tờ hành chính',
+    'skill.skill_multilingual_interpretation': 'Hỗ trợ phiên dịch đa ngôn ngữ',
+    'skill.skill_pronunciation_study': 'Nhóm luyện phát âm',
+    'skill.skill_holiday_culture_exchange': 'Giao lưu văn hóa ngày lễ',
+    'skill.skill_world_festival_intro': 'Giới thiệu lễ hội các nước',
+    'skill.skill_baking_dessert': 'Làm bánh/tráng miệng',
+    'skill.skill_vegan_cooking': 'Nấu ăn chay',
+    'skill.skill_bus_route_help': 'Hướng dẫn tuyến xe buýt/di chuyển',
+    'skill.skill_housing_info_share': 'Chia sẻ thông tin nhà ở/thuê nhà',
+    'skill.skill_playground_meetup': 'Cùng đưa con đi công viên/sân chơi',
+    'skill.skill_baby_product_info_share': 'Chia sẻ thông tin đồ ăn dặm/đồ trẻ em',
+    'skill.skill_basic_literacy_education': 'Giáo dục xóa mù chữ cho người lớn (tiếng Hàn)',
+    'skill.skill_topik_study_group': 'Nhóm học TOPIK',
+    'skill.skill_table_tennis_partner': 'Bạn chơi bóng bàn',
+    'skill.skill_cycling_group': 'Nhóm đạp xe',
+    'skill.skill_board_game_meetup': 'Buổi gặp chơi board game',
+    'skill.skill_gardening': 'Làm vườn',
+    'skill.skill_smart_device_help': 'Hỗ trợ đồng hồ thông minh/thiết bị gia dụng',
+    'skill.skill_sns_youtube_help': 'Hỗ trợ mạng xã hội/YouTube',
+    'skill.skill_lease_contract_info_share': 'Chia sẻ thông tin cơ bản về hợp đồng thuê nhà',
+    'skill.skill_tax_year_end_info_share': 'Thông tin cơ bản về thuế/quyết toán cuối năm',
+    'skillSearch.placeholder': 'Tìm kỹ năng/sở thích',
+    'locationSetup.title': 'Cài đặt vị trí',
+    'locationSetup.subtitle': 'Chúng tôi sẽ kiểm tra bạn có ở Gyeongsan không, sau đó chọn khu vực của bạn',
+    'locationSetup.checkingLocation': 'Đang kiểm tra vị trí...',
+    'locationSetup.outsideBoundsTitle': 'Có vẻ bạn đang ở ngoài Gyeongsan',
+    'locationSetup.outsideBoundsBody':
+      'Da-itda là dịch vụ dành cho cư dân Gyeongsan, nên bạn chỉ có thể đăng ký khi ở trong Gyeongsan. Vui lòng di chuyển vào thành phố và thử lại.',
+    'locationSetup.retryButton': 'Kiểm tra lại vị trí',
+    'locationSetup.insideConfirmed': 'Đã xác nhận bạn đang ở trong Gyeongsan',
+    'locationSetup.pickDistrictLabel': 'Chọn khu vực của bạn',
+    'locationSetup.confirmButton': 'Hoàn tất và bắt đầu',
+    'chatroom.verificationRequiredTitle': 'Cần xác minh',
+    'chatroom.verificationRequiredBody': 'Vui lòng hoàn tất xác minh giấy tờ trước khi đặt lịch hẹn.',
+    'chatroom.verificationRequiredConfirm': 'Đi xác minh',
+    'chatroom.verificationRequiredCancel': 'Hủy',
     'skillCategory.language': 'Ngôn ngữ',
     'skillCategory.culture': 'Giao lưu văn hóa',
     'skillCategory.cooking': 'Nấu ăn',

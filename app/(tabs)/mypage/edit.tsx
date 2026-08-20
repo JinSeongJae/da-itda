@@ -11,6 +11,7 @@ import { useAuthStore } from '../../../store/useAuthStore';
 import { useUserStore } from '../../../store/useUserStore';
 import type { Gender, Skill, TalkStyle } from '../../../types';
 import { useTranslation } from '../../../utils/i18n';
+import { uploadImage } from '../../../utils/upload';
 import type { TranslationKey } from '../../../constants/i18n';
 
 const GENDER_OPTIONS: { value: Gender; key: TranslationKey }[] = [
@@ -86,7 +87,7 @@ function GroupedAddableChips({ skills, onAdd }: { skills: Skill[]; onAdd: (skill
 }
 
 export default function EditProfile() {
-  const { t } = useTranslation();
+  const { t, skillLabel } = useTranslation();
   const currentUserId = useAuthStore((s) => s.currentUserId)!;
   const user = useUserStore((s) => s.usersById[currentUserId]);
   const updateProfile = useUserStore((s) => s.updateProfile);
@@ -95,9 +96,11 @@ export default function EditProfile() {
   const addSkillWanted = useUserStore((s) => s.addSkillWanted);
   const removeSkillWanted = useUserStore((s) => s.removeSkillWanted);
 
+  const [name, setName] = useState(user?.name ?? '');
   const [bio, setBio] = useState(user?.bio ?? '');
   const [gender, setGender] = useState<Gender>(user?.gender ?? 'unspecified');
   const [talkStyle, setTalkStyle] = useState<TalkStyle>(user?.talkStyle ?? 'no-preference');
+  const [skillSearch, setSkillSearch] = useState('');
 
   const handlePickAvatar = async () => {
     const permission = await ImagePicker.requestMediaLibraryPermissionsAsync();
@@ -108,9 +111,17 @@ export default function EditProfile() {
       quality: 0.7,
       allowsEditing: true,
       aspect: [1, 1],
+      base64: true,
     });
-    if (!result.canceled && result.assets[0]) {
-      updateProfile(currentUserId, { avatarUrl: result.assets[0].uri });
+    if (result.canceled || !result.assets[0]) return;
+
+    const asset = result.assets[0];
+    // 즉시 로컬 미리보기로 반영하고, 업로드가 끝나면 실제 서버 URL로 교체한다 —
+    // 그래야 다른 유저 기기에서도 새 프로필 사진이 보인다(로컬 file:// URI는 나만 볼 수 있음).
+    updateProfile(currentUserId, { avatarUrl: asset.uri });
+    if (asset.base64) {
+      const url = await uploadImage(asset.base64, asset.mimeType ?? 'image/jpeg');
+      if (url) updateProfile(currentUserId, { avatarUrl: url });
     }
   };
 
@@ -118,8 +129,10 @@ export default function EditProfile() {
 
   const offeredIds = new Set(user.skillsOffered.map((s) => s.id));
   const wantedIds = new Set(user.skillsWanted.map((s) => s.id));
-  const availableToOffer = ALL_SKILLS.filter((s) => !offeredIds.has(s.id));
-  const availableToWant = ALL_SKILLS.filter((s) => !wantedIds.has(s.id));
+  const searchQuery = skillSearch.trim().toLowerCase();
+  const matchesSearch = (s: Skill) => !searchQuery || skillLabel(s).toLowerCase().includes(searchQuery);
+  const availableToOffer = ALL_SKILLS.filter((s) => !offeredIds.has(s.id) && matchesSearch(s));
+  const availableToWant = ALL_SKILLS.filter((s) => !wantedIds.has(s.id) && matchesSearch(s));
 
   return (
     <SafeAreaView className="flex-1 bg-white">
@@ -135,6 +148,15 @@ export default function EditProfile() {
           <Text className="text-xs text-gray-500 mt-2">{t('edit.changePhoto')}</Text>
         </View>
 
+        <Text className="text-sm font-bold text-gray-700 mb-2">{t('interestSelection.nameLabel')}</Text>
+        <TextInput
+          value={name}
+          onChangeText={setName}
+          placeholder={t('interestSelection.namePlaceholder')}
+          placeholderTextColor="#9ca3af"
+          className="border border-gray-300 rounded-2xl px-4 py-3 text-sm text-gray-800 mb-6"
+        />
+
         <Text className="text-sm font-bold text-gray-700 mb-2">{t('edit.bioLabel')}</Text>
         <TextInput
           value={bio}
@@ -146,6 +168,17 @@ export default function EditProfile() {
           className="border border-gray-300 rounded-2xl px-4 py-3 text-sm text-gray-800 mb-6"
           textAlignVertical="top"
         />
+
+        <View className="flex-row items-center border border-gray-200 rounded-2xl px-4 mb-4">
+          <Feather name="search" size={15} color="#9ca3af" />
+          <TextInput
+            value={skillSearch}
+            onChangeText={setSkillSearch}
+            placeholder={t('skillSearch.placeholder')}
+            placeholderTextColor="#9ca3af"
+            className="flex-1 py-3 ml-2 text-sm text-gray-800"
+          />
+        </View>
 
         <Text className="text-sm font-bold text-gray-700 mb-1">{t('mypage.offeredLabel')}</Text>
         <Text className="text-xs text-gray-400 mb-2.5">{t('edit.tagHint')}</Text>
@@ -204,7 +237,11 @@ export default function EditProfile() {
       </ScrollView>
 
       <View className="px-6 pt-3 pb-4 border-t border-gray-100 bg-white">
-        <Button label={t('edit.save')} onPress={() => updateProfile(currentUserId, { bio, gender, talkStyle })} />
+        <Button
+          label={t('edit.save')}
+          disabled={name.trim().length === 0}
+          onPress={() => updateProfile(currentUserId, { name: name.trim(), bio, gender, talkStyle })}
+        />
       </View>
     </SafeAreaView>
   );

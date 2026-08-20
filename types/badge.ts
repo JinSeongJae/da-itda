@@ -1,4 +1,4 @@
-export type BadgeId = 'safe-verified' | 'best-friend-neighbor' | 'first-exchange' | 'local-guide';
+export type BadgeId = 'safe-verified' | 'best-friend-neighbor';
 
 export interface Badge {
   id: BadgeId;
