@@ -72,7 +72,7 @@ export default function Chatroom() {
   };
 
   return (
-    <SafeAreaView edges={['top']} className="flex-1 bg-white">
+    <SafeAreaView edges={['top', 'bottom']} className="flex-1 bg-white">
       <View className="flex-row items-center px-4 py-3">
         <Pressable onPress={() => router.back()} hitSlop={12} className="mr-2 -ml-1">
           <Feather name="chevron-left" size={26} color="#111827" />

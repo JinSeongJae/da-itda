@@ -207,16 +207,24 @@ export const useUserStore = create<UserState>()(
           const selfId = useAuthStore.getState().currentUserId;
           let selfChanged = false;
           set((state) => {
-            const merged = { ...state.usersById };
+            // 서버 응답을 그대로 정답으로 삼아 통째로 교체한다(merge가 아님) — 예전 로컬
+            // 테스트 중 addUser로 남아있던 목업 유저(Jasmin, 이지은 등)가 실제 유저 목록에서
+            // 절대 사라지지 않던 문제의 원인이었다.
+            const fresh: Record<string, User> = {};
             for (const user of users) {
               if (!user?.id) continue;
               const normalized = normalizeUser(user);
               if (user.id === selfId && JSON.stringify(normalized) !== JSON.stringify(user)) {
                 selfChanged = true;
               }
-              merged[user.id] = normalized;
+              fresh[user.id] = normalized;
             }
-            return { usersById: merged };
+            // 온보딩 직후처럼 자기 프로필의 서버 동기화가 아직 안 끝났을 때도 자기 자신은
+            // 화면에서 사라지면 안 되므로, 그 경우에만 로컬 값을 유지한다.
+            if (selfId && !fresh[selfId] && state.usersById[selfId]) {
+              fresh[selfId] = state.usersById[selfId];
+            }
+            return { usersById: fresh };
           });
 
           if (selfChanged && selfId) syncSelfProfile(get().usersById[selfId]);
