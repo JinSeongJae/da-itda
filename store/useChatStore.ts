@@ -225,10 +225,14 @@ export const useChatStore = create<ChatState>()(
           };
 
           set((state) => {
-            const merged = { ...state.threadsById };
+            // GET /api/threads is exhaustive for the current user, so replace rather than merge —
+            // otherwise a thread deleted server-side (or a stale local-only demo thread from long
+            // before the backend existed, e.g. with a mock counterpart like Jasmin/이지은) lingers
+            // forever and can be tapped into with no real counterpart/thread data behind it.
+            const fresh: typeof state.threadsById = {};
             for (const t of threads) {
-              const existing = merged[t.id];
-              merged[t.id] = {
+              const existing = state.threadsById[t.id];
+              fresh[t.id] = {
                 id: t.id,
                 // 서버는 matchId를 모른다 — 이미 로컬에 있으면 유지하고, 처음 보는 스레드면 빈 문자열로 둔다
                 // (컨텍스트 헤더는 해당 매칭 기록이 없으면 자연히 표시되지 않을 뿐 기능은 그대로 동작).
@@ -240,7 +244,7 @@ export const useChatStore = create<ChatState>()(
                 lastMessageAt: existing?.lastMessageAt,
               };
             }
-            return { threadsById: merged };
+            return { threadsById: fresh };
           });
         } catch {
           // 오프라인이거나 백엔드 미배포 — 로컬 상태 그대로 유지
