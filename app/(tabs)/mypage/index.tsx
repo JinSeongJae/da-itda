@@ -50,6 +50,15 @@ export default function MyPage() {
         <Text className="text-xl font-extrabold text-gray-900 px-6 mb-3 mt-4">{t('mypage.earnedBadges')}</Text>
         <BadgeGrid earnedBadgeIds={user.badges} />
 
+        <Pressable
+          onPress={() => router.push('/(onboarding)/tutorial')}
+          className="flex-row items-center bg-gray-50 rounded-2xl px-4 py-3.5 mx-6 mt-6"
+        >
+          <Feather name="help-circle" size={16} color="#374151" />
+          <Text className="text-sm font-semibold text-gray-700 ml-2 flex-1">{t('mypage.viewTutorial')}</Text>
+          <Feather name="chevron-right" size={16} color="#9ca3af" />
+        </Pressable>
+
         {isAdminUser(currentUserId) && (
           <Pressable
             onPress={() => router.push('/admin')}

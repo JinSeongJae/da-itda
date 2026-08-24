@@ -116,6 +116,7 @@ export type TranslationKey =
   | 'mypage.offeredLabel'
   | 'mypage.wantedLabel'
   | 'mypage.showLess'
+  | 'mypage.viewTutorial'
   | 'edit.title'
   | 'edit.changePhoto'
   | 'edit.bioLabel'
@@ -486,6 +487,7 @@ export const TRANSLATIONS: Record<Locale, Record<TranslationKey, string>> = {
     'mypage.offeredLabel': '줄 수 있어요',
     'mypage.wantedLabel': '받고 싶어요',
     'mypage.showLess': '접기',
+    'mypage.viewTutorial': '앱 사용법 다시 보기',
     'edit.title': '프로필 수정',
     'edit.changePhoto': '탭해서 프로필 사진 변경',
     'edit.bioLabel': '소개',
@@ -865,6 +867,7 @@ export const TRANSLATIONS: Record<Locale, Record<TranslationKey, string>> = {
     'mypage.offeredLabel': 'I can offer',
     'mypage.wantedLabel': 'I want to learn',
     'mypage.showLess': 'Show less',
+    'mypage.viewTutorial': 'View app tutorial again',
     'edit.title': 'Edit profile',
     'edit.changePhoto': 'Tap to change your photo',
     'edit.bioLabel': 'Bio',
@@ -1251,6 +1254,7 @@ export const TRANSLATIONS: Record<Locale, Record<TranslationKey, string>> = {
     'mypage.offeredLabel': 'Kaya kong ibigay',
     'mypage.wantedLabel': 'Gusto kong matutunan',
     'mypage.showLess': 'Ipakita ang mas kaunti',
+    'mypage.viewTutorial': 'Tingnan ulit ang tutorial ng app',
     'edit.title': 'I-edit ang profile',
     'edit.changePhoto': 'I-tap para baguhin ang larawan',
     'edit.bioLabel': 'Tungkol sa akin',
@@ -1637,6 +1641,7 @@ export const TRANSLATIONS: Record<Locale, Record<TranslationKey, string>> = {
     'mypage.offeredLabel': 'Tôi có thể chia sẻ',
     'mypage.wantedLabel': 'Tôi muốn học',
     'mypage.showLess': 'Thu gọn',
+    'mypage.viewTutorial': 'Xem lại hướng dẫn sử dụng ứng dụng',
     'edit.title': 'Chỉnh sửa hồ sơ',
     'edit.changePhoto': 'Nhấn để đổi ảnh đại diện',
     'edit.bioLabel': 'Giới thiệu',
