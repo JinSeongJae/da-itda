@@ -22,17 +22,24 @@ const SECTION_KEYS: { title: TranslationKey; body: TranslationKey }[] = [
 export default function Terms() {
   const { t } = useTranslation();
   const currentUserId = useAuthStore((s) => s.currentUserId)!;
+  const isOnboarded = useAuthStore((s) => s.isOnboarded);
   const updateProfile = useUserStore((s) => s.updateProfile);
   const [checked, setChecked] = useState(false);
 
+  // 이미 가입된 계정이 마이페이지에서 "다시 보기"로 들어온 경우 — 재동의를 요구하지 않고
+  // 그냥 보여주기만 한다. 신규 가입 흐름에서만 체크박스 동의가 필요하다.
   const handleContinue = () => {
+    if (isOnboarded) {
+      router.back();
+      return;
+    }
     updateProfile(currentUserId, { termsAcceptedAt: new Date().toISOString() });
     router.replace('/(onboarding)/interest-selection');
   };
 
   return (
     <SafeAreaView className="flex-1 bg-white">
-      <Header title={t('terms.title')} />
+      <Header title={t('terms.title')} showBack={isOnboarded} />
       <ScrollView className="flex-1 px-6 pt-4" contentContainerStyle={{ paddingBottom: 24 }}>
         <Text className="text-gray-500 mb-5 leading-5">{t('terms.intro')}</Text>
 
@@ -43,22 +50,30 @@ export default function Terms() {
           </View>
         ))}
 
-        <Pressable
-          onPress={() => setChecked((c) => !c)}
-          className="flex-row items-center mt-2 mb-2 bg-gray-50 rounded-2xl p-4"
-        >
-          <View
-            className={`w-5 h-5 rounded-md border-2 items-center justify-center mr-3 ${checked ? 'bg-primary-500 border-primary-500' : 'border-gray-300'}`}
+        {!isOnboarded && (
+          <Pressable
+            onPress={() => setChecked((c) => !c)}
+            className="flex-row items-center mt-2 mb-2 bg-gray-50 rounded-2xl p-4"
           >
-            {checked && <Feather name="check" size={13} color="#fff" />}
-          </View>
-          <Text className="text-sm text-gray-700 flex-1">{t('terms.checkboxLabel')}</Text>
-        </Pressable>
+            <View
+              className={`w-5 h-5 rounded-md border-2 items-center justify-center mr-3 ${checked ? 'bg-primary-500 border-primary-500' : 'border-gray-300'}`}
+            >
+              {checked && <Feather name="check" size={13} color="#fff" />}
+            </View>
+            <Text className="text-sm text-gray-700 flex-1">{t('terms.checkboxLabel')}</Text>
+          </Pressable>
+        )}
       </ScrollView>
 
       <View className="px-6 pt-3 pb-4 border-t border-gray-100 bg-white">
-        {!checked && <Text className="text-xs text-gray-400 text-center mb-2">{t('terms.mustAgreeHint')}</Text>}
-        <Button label={t('terms.continueButton')} onPress={handleContinue} disabled={!checked} />
+        {!isOnboarded && !checked && (
+          <Text className="text-xs text-gray-400 text-center mb-2">{t('terms.mustAgreeHint')}</Text>
+        )}
+        <Button
+          label={isOnboarded ? t('terms.closeButton') : t('terms.continueButton')}
+          onPress={handleContinue}
+          disabled={!isOnboarded && !checked}
+        />
       </View>
     </SafeAreaView>
   );

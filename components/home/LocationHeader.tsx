@@ -58,13 +58,17 @@ export function LocationHeader({ city, district }: { city: string; district: str
         <Pressable className="flex-1 bg-black/30 justify-end" onPress={() => setBellOpen(false)}>
           <View className="bg-white rounded-t-[28px] px-6 pt-7 pb-8 max-h-[70%]">
             <Text className="text-xl font-extrabold text-gray-900 mb-4">{t('locationHeader.notifTitle')}</Text>
-            {NOTIFICATIONS.map((n) => (
-              <View key={n.id} className="py-4 border-t border-gray-100">
-                <Text className="text-[15px] font-semibold text-gray-800">{n.title}</Text>
-                <Text className="text-sm text-gray-500 mt-1">{n.body}</Text>
-                <Text className="text-xs text-gray-400 mt-1.5">{formatRelativeTime(n.createdAt)}</Text>
-              </View>
-            ))}
+            {NOTIFICATIONS.length === 0 ? (
+              <Text className="text-sm text-gray-400 text-center py-6">{t('locationHeader.noNotifications')}</Text>
+            ) : (
+              NOTIFICATIONS.map((n) => (
+                <View key={n.id} className="py-4 border-t border-gray-100">
+                  <Text className="text-[15px] font-semibold text-gray-800">{n.title}</Text>
+                  <Text className="text-sm text-gray-500 mt-1">{n.body}</Text>
+                  <Text className="text-xs text-gray-400 mt-1.5">{formatRelativeTime(n.createdAt)}</Text>
+                </View>
+              ))
+            )}
           </View>
         </Pressable>
       </Modal>

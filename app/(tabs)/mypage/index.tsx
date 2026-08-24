@@ -59,6 +59,15 @@ export default function MyPage() {
           <Feather name="chevron-right" size={16} color="#9ca3af" />
         </Pressable>
 
+        <Pressable
+          onPress={() => router.push('/(onboarding)/terms')}
+          className="flex-row items-center bg-gray-50 rounded-2xl px-4 py-3.5 mx-6 mt-3"
+        >
+          <Feather name="file-text" size={16} color="#374151" />
+          <Text className="text-sm font-semibold text-gray-700 ml-2 flex-1">{t('mypage.viewTerms')}</Text>
+          <Feather name="chevron-right" size={16} color="#9ca3af" />
+        </Pressable>
+
         {isAdminUser(currentUserId) && (
           <Pressable
             onPress={() => router.push('/admin')}

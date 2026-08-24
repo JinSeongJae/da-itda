@@ -41,13 +41,9 @@ export const useCommunityPostStore = create<CommunityPostState>()(
           const res = await fetch(`${backendUrl}/api/cultural-map/pins?resource=post`, { headers });
           if (!res.ok) return;
           const { posts } = (await res.json()) as { posts: CommunityPost[] };
-          set((state) => {
-            const merged = { ...state.postsById };
-            for (const post of posts) {
-              if (post?.id) merged[post.id] = post;
-            }
-            return { postsById: merged };
-          });
+          // 서버 응답을 그대로 정답으로 삼아 통째로 교체한다(merge가 아님) — 그래야 시드/삭제된
+          // 글이 로컬에 유령처럼 남지 않는다 (fetchAllUsers에서 이미 겪은 문제와 동일한 패턴).
+          set({ postsById: Object.fromEntries(posts.filter((p) => p?.id).map((p) => [p.id, p])) });
         } catch {
           // 오프라인이거나 백엔드 미배포 — 로컬(시드) 상태 그대로 유지
         }

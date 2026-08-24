@@ -120,13 +120,9 @@ export const useCulturalMapStore = create<CulturalMapState>()(
           if (!res.ok) return;
 
           const { pins } = (await res.json()) as { pins: CulturalPin[] };
-          set((state) => {
-            const merged = { ...state.pinsById };
-            for (const pin of pins) {
-              if (pin?.id) merged[pin.id] = pin;
-            }
-            return { pinsById: merged };
-          });
+          // 서버 응답을 그대로 정답으로 삼아 통째로 교체한다(merge가 아님) — 그래야 시드/삭제된
+          // 핀이 로컬에 유령처럼 남지 않는다.
+          set({ pinsById: Object.fromEntries(pins.filter((p) => p?.id).map((p) => [p.id, p])) });
         } catch {
           // 오프라인이거나 백엔드 미배포 — 로컬(시드) 상태 그대로 유지
         }

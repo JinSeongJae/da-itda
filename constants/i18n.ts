@@ -55,6 +55,7 @@ export type TranslationKey =
   | 'neighborCard.matchButton'
   | 'locationHeader.pickTitle'
   | 'locationHeader.notifTitle'
+  | 'locationHeader.noNotifications'
   | 'microGroup.aiLabel'
   | 'microGroup.title'
   | 'microGroup.interestCount'
@@ -117,6 +118,7 @@ export type TranslationKey =
   | 'mypage.wantedLabel'
   | 'mypage.showLess'
   | 'mypage.viewTutorial'
+  | 'mypage.viewTerms'
   | 'edit.title'
   | 'edit.changePhoto'
   | 'edit.bioLabel'
@@ -327,6 +329,7 @@ export type TranslationKey =
   | 'terms.section6Body'
   | 'terms.checkboxLabel'
   | 'terms.continueButton'
+  | 'terms.closeButton'
   | 'terms.mustAgreeHint'
   | 'report.title'
   | 'report.subtitle'
@@ -426,6 +429,7 @@ export const TRANSLATIONS: Record<Locale, Record<TranslationKey, string>> = {
     'neighborCard.matchButton': '매칭하기',
     'locationHeader.pickTitle': '동네 선택',
     'locationHeader.notifTitle': '알림',
+    'locationHeader.noNotifications': '아직 알림이 없어요.',
     'microGroup.aiLabel': 'AI 추천',
     'microGroup.title': '동네 소모임',
     'microGroup.interestCount': '관심 {count}/{max}명',
@@ -488,6 +492,7 @@ export const TRANSLATIONS: Record<Locale, Record<TranslationKey, string>> = {
     'mypage.wantedLabel': '받고 싶어요',
     'mypage.showLess': '접기',
     'mypage.viewTutorial': '앱 사용법 다시 보기',
+    'mypage.viewTerms': '이용약관 보기',
     'edit.title': '프로필 수정',
     'edit.changePhoto': '탭해서 프로필 사진 변경',
     'edit.bioLabel': '소개',
@@ -704,6 +709,7 @@ export const TRANSLATIONS: Record<Locale, Record<TranslationKey, string>> = {
       '본 약관 또는 관계 법령을 위반한 이용자는 사전 통보 없이 서비스 이용이 제한되거나 계정이 정지될 수 있습니다.',
     'terms.checkboxLabel': '저는 만 19세 이상이며, 위 약관 내용에 모두 동의합니다.',
     'terms.continueButton': '동의하고 계속하기',
+    'terms.closeButton': '닫기',
     'terms.mustAgreeHint': '약관에 동의해야 다음 단계로 진행할 수 있어요.',
     'report.title': '신고하기',
     'report.subtitle': '신고 내용은 운영자만 확인하며, 신고자 정보는 상대방에게 공개되지 않아요.',
@@ -806,6 +812,7 @@ export const TRANSLATIONS: Record<Locale, Record<TranslationKey, string>> = {
     'neighborCard.matchButton': 'Match',
     'locationHeader.pickTitle': 'Choose neighborhood',
     'locationHeader.notifTitle': 'Notifications',
+    'locationHeader.noNotifications': 'No notifications yet.',
     'microGroup.aiLabel': 'AI pick',
     'microGroup.title': 'Neighborhood meetups',
     'microGroup.interestCount': '{count}/{max} interested',
@@ -868,6 +875,7 @@ export const TRANSLATIONS: Record<Locale, Record<TranslationKey, string>> = {
     'mypage.wantedLabel': 'I want to learn',
     'mypage.showLess': 'Show less',
     'mypage.viewTutorial': 'View app tutorial again',
+    'mypage.viewTerms': 'View Terms of Service',
     'edit.title': 'Edit profile',
     'edit.changePhoto': 'Tap to change your photo',
     'edit.bioLabel': 'Bio',
@@ -1090,6 +1098,7 @@ export const TRANSLATIONS: Record<Locale, Record<TranslationKey, string>> = {
       'Users who violate these terms or applicable law may have their access restricted or their account suspended without prior notice.',
     'terms.checkboxLabel': 'I am 19 or older and I agree to all of the above terms.',
     'terms.continueButton': 'Agree and continue',
+    'terms.closeButton': 'Close',
     'terms.mustAgreeHint': 'You must agree to the terms to continue.',
     'report.title': 'Report',
     'report.subtitle': 'Only our operators see report details, and your identity is never shared with the reported user.',
@@ -1193,6 +1202,7 @@ export const TRANSLATIONS: Record<Locale, Record<TranslationKey, string>> = {
     'neighborCard.matchButton': 'Itugma',
     'locationHeader.pickTitle': 'Pumili ng lugar',
     'locationHeader.notifTitle': 'Mga Abiso',
+    'locationHeader.noNotifications': 'Wala pang abiso.',
     'microGroup.aiLabel': 'Rekomendasyon ng AI',
     'microGroup.title': 'Mga pagtitipon sa kapitbahayan',
     'microGroup.interestCount': '{count}/{max} interesado',
@@ -1255,6 +1265,7 @@ export const TRANSLATIONS: Record<Locale, Record<TranslationKey, string>> = {
     'mypage.wantedLabel': 'Gusto kong matutunan',
     'mypage.showLess': 'Ipakita ang mas kaunti',
     'mypage.viewTutorial': 'Tingnan ulit ang tutorial ng app',
+    'mypage.viewTerms': 'Tingnan ang Mga Tuntunin ng Serbisyo',
     'edit.title': 'I-edit ang profile',
     'edit.changePhoto': 'I-tap para baguhin ang larawan',
     'edit.bioLabel': 'Tungkol sa akin',
@@ -1477,6 +1488,7 @@ export const TRANSLATIONS: Record<Locale, Record<TranslationKey, string>> = {
       'Ang mga user na lumalabag sa mga tuntuning ito o sa naaangkop na batas ay maaaring paghigpitan ang access o suspindihin ang account nang walang paunang abiso.',
     'terms.checkboxLabel': '19 taong gulang pataas ako at sumasang-ayon ako sa lahat ng tuntunin sa itaas.',
     'terms.continueButton': 'Sumang-ayon at magpatuloy',
+    'terms.closeButton': 'Isara',
     'terms.mustAgreeHint': 'Dapat sumang-ayon sa mga tuntunin para magpatuloy.',
     'report.title': 'I-report',
     'report.subtitle': 'Tanging ang mga operator namin ang makakakita ng detalye ng report, at hindi ipinapakita ang iyong pagkakakilanlan sa na-report na user.',
@@ -1580,6 +1592,7 @@ export const TRANSLATIONS: Record<Locale, Record<TranslationKey, string>> = {
     'neighborCard.matchButton': 'Kết nối',
     'locationHeader.pickTitle': 'Chọn khu vực',
     'locationHeader.notifTitle': 'Thông báo',
+    'locationHeader.noNotifications': 'Chưa có thông báo nào.',
     'microGroup.aiLabel': 'Gợi ý AI',
     'microGroup.title': 'Nhóm gặp mặt hàng xóm',
     'microGroup.interestCount': '{count}/{max} quan tâm',
@@ -1642,6 +1655,7 @@ export const TRANSLATIONS: Record<Locale, Record<TranslationKey, string>> = {
     'mypage.wantedLabel': 'Tôi muốn học',
     'mypage.showLess': 'Thu gọn',
     'mypage.viewTutorial': 'Xem lại hướng dẫn sử dụng ứng dụng',
+    'mypage.viewTerms': 'Xem điều khoản dịch vụ',
     'edit.title': 'Chỉnh sửa hồ sơ',
     'edit.changePhoto': 'Nhấn để đổi ảnh đại diện',
     'edit.bioLabel': 'Giới thiệu',
@@ -1862,6 +1876,7 @@ export const TRANSLATIONS: Record<Locale, Record<TranslationKey, string>> = {
       'Người dùng vi phạm các điều khoản này hoặc pháp luật liên quan có thể bị hạn chế quyền truy cập hoặc khóa tài khoản mà không cần thông báo trước.',
     'terms.checkboxLabel': 'Tôi từ 19 tuổi trở lên và đồng ý với tất cả điều khoản trên.',
     'terms.continueButton': 'Đồng ý và tiếp tục',
+    'terms.closeButton': 'Đóng',
     'terms.mustAgreeHint': 'Bạn cần đồng ý với điều khoản để tiếp tục.',
     'report.title': 'Báo cáo',
     'report.subtitle': 'Chỉ quản trị viên của chúng tôi xem được nội dung báo cáo, danh tính của bạn không được chia sẻ với người bị báo cáo.',

@@ -1,5 +1,4 @@
 export * from './skills';
-export * from './users';
 export * from './safeZones';
 export * from './activityCourses';
 export * from './microGroups';

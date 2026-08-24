@@ -118,8 +118,10 @@ export default function Chatroom() {
 
       {contextHeader && <AIContextHeader data={contextHeader} />}
 
+      {/* 안드로이드는 windowSoftInputMode가 기본 "resize"라 OS가 이미 화면을 줄여준다 — 여기서
+          또 'height'로 수동으로 줄이면 이중으로 줄어들어 입력 칸이 화면 밖으로 밀려난다. */}
       <KeyboardAvoidingView
-        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+        behavior={Platform.OS === 'ios' ? 'padding' : undefined}
         className="flex-1"
         keyboardVerticalOffset={Platform.OS === 'ios' ? 60 : 0}
       >

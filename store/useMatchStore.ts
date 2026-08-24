@@ -123,13 +123,9 @@ export const useMatchStore = create<MatchState>()(
           const res = await fetch(`${backendUrl}/api/cultural-map/pins?resource=micro-group`, { headers });
           if (!res.ok) return;
           const { microGroups } = (await res.json()) as { microGroups: MicroGroupSuggestion[] };
-          set((state) => {
-            const merged = { ...Object.fromEntries(state.microGroups.map((g) => [g.id, g])) };
-            for (const group of microGroups) {
-              if (group?.id) merged[group.id] = group;
-            }
-            return { microGroups: Object.values(merged) };
-          });
+          // 서버 응답을 그대로 정답으로 삼아 통째로 교체한다(merge가 아님) — 그래야 시드/삭제된
+          // 소모임이 로컬에 유령처럼 남지 않는다.
+          set({ microGroups: microGroups.filter((g) => g?.id) });
         } catch {
           // 오프라인이거나 백엔드 미배포 — 로컬(시드) 상태 그대로 유지
         }
