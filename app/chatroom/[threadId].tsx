@@ -100,10 +100,11 @@ export default function Chatroom() {
         {counterpart && (
           <Pressable
             onPress={() => router.push({ pathname: '/report/[targetUserId]', params: { targetUserId: counterpartId, threadId } })}
-            hitSlop={10}
-            className="w-9 h-9 rounded-full bg-gray-50 items-center justify-center mr-1.5"
+            hitSlop={8}
+            className="flex-row items-center bg-red-50 rounded-full px-2.5 py-1.5 mr-1.5"
           >
-            <Feather name="flag" size={16} color="#6b7280" />
+            <Feather name="alert-triangle" size={13} color="#ef4444" />
+            <Text className="text-[11px] font-bold text-red-500 ml-1">{t('chatroom.reportButton')}</Text>
           </Pressable>
         )}
         <Pressable

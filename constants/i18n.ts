@@ -78,6 +78,7 @@ export type TranslationKey =
   | 'chatroom.aiContextLabel'
   | 'chatroom.culturalGuideTitle'
   | 'chatroom.notFound'
+  | 'chatroom.reportButton'
   | 'chatroom.replyLoading'
   | 'chatroom.viewOriginal'
   | 'chatroom.viewTranslation'
@@ -447,6 +448,7 @@ export const TRANSLATIONS: Record<Locale, Record<TranslationKey, string>> = {
     'chatroom.aiContextLabel': 'AI 매칭 목적 · 호환 지수 {score}%',
     'chatroom.culturalGuideTitle': 'AI 문화 맥락 가이드',
     'chatroom.notFound': '대화방을 찾을 수 없어요.',
+    'chatroom.reportButton': '신고',
     'chatroom.replyLoading': '답장을 작성 중이에요...',
     'chatroom.viewOriginal': '원문 보기',
     'chatroom.viewTranslation': '번역 보기',
@@ -825,6 +827,7 @@ export const TRANSLATIONS: Record<Locale, Record<TranslationKey, string>> = {
     'chatroom.aiContextLabel': 'AI match purpose · {score}% compatible',
     'chatroom.culturalGuideTitle': 'AI cultural context guide',
     'chatroom.notFound': "Couldn't find this conversation.",
+    'chatroom.reportButton': 'Report',
     'chatroom.replyLoading': 'Writing a reply...',
     'chatroom.viewOriginal': 'View original',
     'chatroom.viewTranslation': 'View translation',
@@ -1210,6 +1213,7 @@ export const TRANSLATIONS: Record<Locale, Record<TranslationKey, string>> = {
     'chatroom.aiContextLabel': 'Layunin ng AI match · {score}% tugma',
     'chatroom.culturalGuideTitle': 'Gabay sa kultura ng AI',
     'chatroom.notFound': 'Hindi mahanap ang chat room na ito.',
+    'chatroom.reportButton': 'I-report',
     'chatroom.replyLoading': 'Sumusulat ng sagot...',
     'chatroom.viewOriginal': 'Tingnan ang orihinal',
     'chatroom.viewTranslation': 'Tingnan ang salin',
@@ -1595,6 +1599,7 @@ export const TRANSLATIONS: Record<Locale, Record<TranslationKey, string>> = {
     'chatroom.aiContextLabel': 'Mục đích ghép đôi AI · {score}% phù hợp',
     'chatroom.culturalGuideTitle': 'Hướng dẫn văn hóa AI',
     'chatroom.notFound': 'Không tìm thấy cuộc trò chuyện này.',
+    'chatroom.reportButton': 'Báo cáo',
     'chatroom.replyLoading': 'Đang soạn câu trả lời...',
     'chatroom.viewOriginal': 'Xem bản gốc',
     'chatroom.viewTranslation': 'Xem bản dịch',

@@ -31,6 +31,7 @@ export default function RootLayout() {
           <Stack.Screen name="report/[targetUserId]" options={{ presentation: 'modal' }} />
           <Stack.Screen name="community/new-post" options={{ presentation: 'modal' }} />
           <Stack.Screen name="community/new-group" options={{ presentation: 'modal' }} />
+          <Stack.Screen name="oauth/kakao" />
         </Stack>
       </SafeAreaProvider>
     </GestureHandlerRootView>
