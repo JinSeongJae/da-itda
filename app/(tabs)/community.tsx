@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { useEffect, useMemo } from 'react';
 import { Feather } from '@expo/vector-icons';
 import { Pressable, ScrollView, Text, View } from 'react-native';
 import { router } from 'expo-router';
@@ -18,8 +18,14 @@ export default function CommunityScreen() {
   const microGroups = useMatchStore((s) => s.microGroups);
   const toggleMicroGroupInterest = useMatchStore((s) => s.toggleMicroGroupInterest);
   const fetchMicroGroups = useMatchStore((s) => s.fetchMicroGroups);
-  const posts = useCommunityPostStore((s) => s.getAllPosts());
+  const postsById = useCommunityPostStore((s) => s.postsById);
   const fetchPosts = useCommunityPostStore((s) => s.fetchPosts);
+  // getAllPosts() sorts into a brand-new array every call — selecting it directly would hand
+  // React 18's useSyncExternalStore a different reference on every render and infinite-loop.
+  const posts = useMemo(
+    () => Object.values(postsById).sort((a, b) => b.createdAt.localeCompare(a.createdAt)),
+    [postsById]
+  );
 
   useEffect(() => {
     fetchMicroGroups();
