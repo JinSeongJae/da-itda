@@ -22,6 +22,7 @@ export default function Home() {
   const currentUser = usersById[currentUserId];
   const fetchAllUsers = useUserStore((s) => s.fetchAllUsers);
 
+  const matches = useMatchStore((s) => s.matches);
   const getMatchById = useMatchStore((s) => s.getMatchById);
   const createOrFetchThreadWithUser = useChatStore((s) => s.createOrFetchThreadWithUser);
   const getUpcomingAppointmentForUser = useAppointmentStore((s) => s.getUpcomingAppointmentForUser);
@@ -35,7 +36,15 @@ export default function Home() {
 
   if (!currentUser) return null;
 
-  const candidates = Object.values(usersById).filter((u) => u.id !== currentUserId);
+  // 이미 매칭한(=매칭하기를 눌러 채팅이 시작된) 이웃은 추천에서 다시 뜨지 않게 제외한다.
+  const alreadyMatchedIds = new Set(
+    matches
+      .filter((m) => m.userAId === currentUserId || m.userBId === currentUserId)
+      .map((m) => (m.userAId === currentUserId ? m.userBId : m.userAId))
+  );
+  const candidates = Object.values(usersById).filter(
+    (u) => u.id !== currentUserId && !alreadyMatchedIds.has(u.id)
+  );
   const topRecommendations = rankCandidates(currentUser, candidates).slice(0, 3);
 
   const upcomingAppointment = getUpcomingAppointmentForUser(currentUserId);
