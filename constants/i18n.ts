@@ -140,6 +140,24 @@ export type TranslationKey =
   | 'verification.devTools'
   | 'verification.approve'
   | 'verification.reject'
+  | 'verification.maskingNotice'
+  | 'verification.errorMinor'
+  | 'verification.errorNotFound'
+  | 'verification.errorGeneric'
+  | 'verification.submitting'
+  | 'admin.title'
+  | 'admin.noAccess'
+  | 'admin.verificationSectionTitle'
+  | 'admin.verificationSectionSubtitle'
+  | 'admin.noVerifications'
+  | 'admin.birthDateLabel'
+  | 'admin.reportSectionTitle'
+  | 'admin.reportSectionSubtitle'
+  | 'admin.noReports'
+  | 'admin.viewThread'
+  | 'admin.dismissReport'
+  | 'admin.resolveReport'
+  | 'admin.entryLabel'
   | 'uploader.placeholder'
   | 'meetupWarning.title'
   | 'meetupWarning.headline'
@@ -290,7 +308,74 @@ export type TranslationKey =
   | 'culturalMap.verifyErrorDuplicate'
   | 'culturalMap.verifyErrorTooFar'
   | 'culturalMap.verifyErrorNotFound'
-  | 'culturalMap.verifyErrorOffline';
+  | 'culturalMap.verifyErrorOffline'
+  | 'terms.title'
+  | 'terms.intro'
+  | 'terms.section1Title'
+  | 'terms.section1Body'
+  | 'terms.section2Title'
+  | 'terms.section2Body'
+  | 'terms.section3Title'
+  | 'terms.section3Body'
+  | 'terms.section4Title'
+  | 'terms.section4Body'
+  | 'terms.section5Title'
+  | 'terms.section5Body'
+  | 'terms.section6Title'
+  | 'terms.section6Body'
+  | 'terms.checkboxLabel'
+  | 'terms.continueButton'
+  | 'terms.mustAgreeHint'
+  | 'report.title'
+  | 'report.subtitle'
+  | 'report.reasonLabel'
+  | 'report.reason.inappropriate'
+  | 'report.reason.no-show'
+  | 'report.reason.harassment'
+  | 'report.reason.scam'
+  | 'report.reason.other'
+  | 'report.detailLabel'
+  | 'report.detailPlaceholder'
+  | 'report.submitButton'
+  | 'report.submitting'
+  | 'report.successTitle'
+  | 'report.successBody'
+  | 'report.errorMessage'
+  | 'report.validationHint'
+  | 'tutorial.skip'
+  | 'tutorial.next'
+  | 'tutorial.start'
+  | 'tutorial.slide1Title'
+  | 'tutorial.slide1Body'
+  | 'tutorial.slide2Title'
+  | 'tutorial.slide2Body'
+  | 'tutorial.slide3Title'
+  | 'tutorial.slide3Body'
+  | 'tutorial.slide4Title'
+  | 'tutorial.slide4Body'
+  | 'community.writeButton'
+  | 'community.newGroupButton'
+  | 'newPost.title'
+  | 'newPost.categoryLabel'
+  | 'newPost.titleLabel'
+  | 'newPost.titlePlaceholder'
+  | 'newPost.bodyLabel'
+  | 'newPost.bodyPlaceholder'
+  | 'newPost.submitButton'
+  | 'newPost.validationHint'
+  | 'newGroup.title'
+  | 'newGroup.titleLabel'
+  | 'newGroup.titlePlaceholder'
+  | 'newGroup.locationLabel'
+  | 'newGroup.locationPlaceholder'
+  | 'newGroup.dateLabel'
+  | 'newGroup.timeLabel'
+  | 'newGroup.categoryLabel'
+  | 'newGroup.categoryPlaceholder'
+  | 'newGroup.maxParticipantsLabel'
+  | 'newGroup.maxParticipantsPlaceholder'
+  | 'newGroup.submitButton'
+  | 'newGroup.validationHint';
 
 export const TRANSLATIONS: Record<Locale, Record<TranslationKey, string>> = {
   ko: {
@@ -407,7 +492,7 @@ export const TRANSLATIONS: Record<Locale, Record<TranslationKey, string>> = {
     'edit.save': '저장하기',
     'verification.title': '수동 안심인증',
     'verification.cardSubtitle': '신분증·외국인등록증 수동 안심인증',
-    'verification.subtitle': '제출하신 서류는 OCR 자동 인식 없이, 운영팀이 직접 육안으로 확인 후 승인해드려요.',
+    'verification.subtitle': 'AI가 주민등록번호·외국인등록번호를 자동으로 가린 뒤, 운영팀이 마스킹된 사진만 확인하고 승인해요.',
     'verification.stepSubmit': '제출',
     'verification.stepReview': '검토 중',
     'verification.stepDone': '인증 완료',
@@ -422,8 +507,26 @@ export const TRANSLATIONS: Record<Locale, Record<TranslationKey, string>> = {
     'verification.submit': '제출하기',
     'verification.resubmit': '재제출하기',
     'verification.devTools': 'DEV TOOLS · 관리자 검토 시뮬레이션',
-    'verification.approve': '승인 처리',
-    'verification.reject': '반려 처리',
+    'verification.approve': '승인',
+    'verification.reject': '반려',
+    'verification.maskingNotice': 'AI가 사진에서 번호를 자동으로 가린 뒤에만 저장돼요 — 운영팀도 가려진 사진만 볼 수 있어요.',
+    'verification.errorMinor': '만 19세 미만은 다잇다에 가입할 수 없어요.',
+    'verification.errorNotFound': '신분증에서 번호를 찾지 못했어요. 번호가 잘 보이도록 다시 촬영해주세요.',
+    'verification.errorGeneric': '제출 중 문제가 생겼어요. 다시 시도해주세요.',
+    'verification.submitting': '제출 중...',
+    'admin.title': '운영자 검토',
+    'admin.noAccess': '운영자만 접근할 수 있는 화면이에요.',
+    'admin.verificationSectionTitle': '안심인증 검토',
+    'admin.verificationSectionSubtitle': 'AI가 번호를 가린 사진만 표시돼요',
+    'admin.noVerifications': '검토할 인증 요청이 없어요.',
+    'admin.birthDateLabel': '생년월일 {date}',
+    'admin.reportSectionTitle': '신고 내역',
+    'admin.reportSectionSubtitle': '접수된 신고를 확인하고 처리해주세요',
+    'admin.noReports': '접수된 신고가 없어요.',
+    'admin.viewThread': '채팅방 보기 →',
+    'admin.dismissReport': '무시',
+    'admin.resolveReport': '처리 완료',
+    'admin.entryLabel': '운영자 검토',
     'uploader.placeholder': '신분증 · 외국인등록증 사진 업로드',
     'meetupWarning.title': '만남 전 안내사항',
     'meetupWarning.headline': '안전한 만남을 위해 꼭 확인해주세요',
@@ -575,6 +678,83 @@ export const TRANSLATIONS: Record<Locale, Record<TranslationKey, string>> = {
     'culturalMap.verifyErrorTooFar': '핀 장소 근처에서만 인증할 수 있어요.',
     'culturalMap.verifyErrorNotFound': '핀을 찾을 수 없어요.',
     'culturalMap.verifyErrorOffline': '인증에 실패했어요. 네트워크를 확인해주세요.',
+    'terms.title': '이용약관',
+    'terms.intro': '다잇다를 이용하기 전에 아래 약관을 꼭 읽어주세요. 계속하시면 아래 내용에 동의하는 것으로 간주됩니다.',
+    'terms.section1Title': '1. 서비스의 성격',
+    'terms.section1Body':
+      '다잇다는 경산시 이웃 간의 재능 교류를 돕는 매칭 플랫폼입니다. 회사는 만남의 장소만 제공할 뿐, 실제 만남과 교류는 이용자 개인 간의 자율적인 약속과 책임 하에 이루어집니다.',
+    'terms.section2Title': '2. 책임의 한계',
+    'terms.section2Body':
+      '회사는 이용자 간 매칭 이후 발생하는 만남, 거래, 대화 등에서 발생하는 사고, 분쟁, 범죄(폭행, 사기, 성범죄 등을 포함하되 이에 한정되지 않음)에 대해 어떠한 법적 책임도 지지 않습니다. 이용자는 낯선 사람과의 만남에 따르는 위험을 스스로 인지하고, 공개된 장소에서의 만남 등 안전 수칙을 준수해야 합니다.',
+    'terms.section3Title': '3. 이용 자격',
+    'terms.section3Body':
+      '본 서비스는 만 19세 이상만 이용할 수 있습니다. 미성년자의 가입 및 이용은 제한되며, 허위로 연령 정보를 제공하여 가입한 경우 회사는 사전 통보 없이 이용을 제한할 수 있습니다.',
+    'terms.section4Title': '4. 이용자의 의무',
+    'terms.section4Body':
+      '이용자는 타인에게 위협, 성희롱, 사기, 차별적 언행 등을 해서는 안 됩니다. 이러한 행위를 목격하거나 겪은 경우 앱 내 신고 기능을 통해 즉시 신고해주세요. 신고된 내용은 운영자가 검토 후 조치합니다.',
+    'terms.section5Title': '5. 신원인증 정보 처리',
+    'terms.section5Body':
+      '안심인증을 위해 제출한 신분증 사진은 AI가 주민등록번호 뒷자리 등 민감정보를 자동으로 가린 뒤에만 저장되며, 마스킹 전 원본 이미지는 서버에 저장되지 않습니다. 인증 승인/반려는 운영자 권한이 있는 담당자만 처리할 수 있습니다.',
+    'terms.section6Title': '6. 이용 제한',
+    'terms.section6Body':
+      '본 약관 또는 관계 법령을 위반한 이용자는 사전 통보 없이 서비스 이용이 제한되거나 계정이 정지될 수 있습니다.',
+    'terms.checkboxLabel': '저는 만 19세 이상이며, 위 약관 내용에 모두 동의합니다.',
+    'terms.continueButton': '동의하고 계속하기',
+    'terms.mustAgreeHint': '약관에 동의해야 다음 단계로 진행할 수 있어요.',
+    'report.title': '신고하기',
+    'report.subtitle': '신고 내용은 운영자만 확인하며, 신고자 정보는 상대방에게 공개되지 않아요.',
+    'report.reasonLabel': '신고 이유',
+    'report.reason.inappropriate': '부적절한 행동',
+    'report.reason.no-show': '약속 불참',
+    'report.reason.harassment': '괴롭힘/불쾌한 언행',
+    'report.reason.scam': '사기/금전 요구',
+    'report.reason.other': '기타',
+    'report.detailLabel': '상세 내용 (선택)',
+    'report.detailPlaceholder': '무슨 일이 있었는지 알려주세요.',
+    'report.submitButton': '신고 제출하기',
+    'report.submitting': '제출 중...',
+    'report.successTitle': '신고가 접수됐어요',
+    'report.successBody': '운영자가 확인 후 조치할게요. 안전하게 지켜드릴게요.',
+    'report.errorMessage': '신고 제출에 실패했어요. 다시 시도해주세요.',
+    'report.validationHint': '신고 이유를 선택해주세요.',
+    'tutorial.skip': '건너뛰기',
+    'tutorial.next': '다음',
+    'tutorial.start': '시작하기',
+    'tutorial.slide1Title': '이웃과 재능을 나눠요',
+    'tutorial.slide1Body':
+      '경산시에 사는 이웃들과 서로 가진 재능을 나누고 배워보세요. 언어, 요리, 육아 정보까지 다양하게 교류할 수 있어요.',
+    'tutorial.slide2Title': '채팅으로 약속을 잡아요',
+    'tutorial.slide2Body':
+      '관심 있는 이웃과 채팅을 나누고, 만날 시간과 장소를 함께 정해보세요. 약속은 상대방이 수락해야 확정돼요.',
+    'tutorial.slide3Title': '안심하고 만나요',
+    'tutorial.slide3Body':
+      '안심인증을 마치면 약속을 잡을 수 있어요. 만날 때는 서로 QR을 찍어 현장 인증을 하고, 불편한 상황이 있으면 언제든 신고할 수 있어요.',
+    'tutorial.slide4Title': '동네를 더 깊이 알아가요',
+    'tutorial.slide4Body':
+      '컬처럴 맵에 나만 아는 동네 스팟을 등록하고, 소모임과 게시판에서 이웃들과 더 폭넓게 교류해보세요.',
+    'community.writeButton': '글쓰기',
+    'community.newGroupButton': '소모임 만들기',
+    'newPost.title': '글쓰기',
+    'newPost.categoryLabel': '카테고리',
+    'newPost.titleLabel': '제목',
+    'newPost.titlePlaceholder': '제목을 입력해주세요',
+    'newPost.bodyLabel': '내용',
+    'newPost.bodyPlaceholder': '이웃들에게 나누고 싶은 이야기를 적어주세요',
+    'newPost.submitButton': '게시하기',
+    'newPost.validationHint': '제목과 내용을 모두 입력해주세요.',
+    'newGroup.title': '소모임 만들기',
+    'newGroup.titleLabel': '모임 이름',
+    'newGroup.titlePlaceholder': '예: 토요일 다문화 쿠킹 클래스',
+    'newGroup.locationLabel': '장소',
+    'newGroup.locationPlaceholder': '예: 경산시 공유주방',
+    'newGroup.dateLabel': '날짜',
+    'newGroup.timeLabel': '시간',
+    'newGroup.categoryLabel': '카테고리',
+    'newGroup.categoryPlaceholder': '예: 요리, 운동, 교육',
+    'newGroup.maxParticipantsLabel': '모집 인원',
+    'newGroup.maxParticipantsPlaceholder': '예: 6',
+    'newGroup.submitButton': '만들기',
+    'newGroup.validationHint': '모든 항목을 입력해주세요.',
   },
   en: {
     'welcome.tagline': 'The safest hyperlocal community\nfor sharing talents with your neighbors',
@@ -691,7 +871,7 @@ export const TRANSLATIONS: Record<Locale, Record<TranslationKey, string>> = {
     'verification.title': 'Manual safety verification',
     'verification.cardSubtitle': 'Manual safety verification via ID / Foreign Resident Card',
     'verification.subtitle':
-      'Your documents are reviewed by our team in person, with no automatic OCR scanning, before approval.',
+      'AI automatically masks your ID/registration number, then our team reviews only the masked photo before approving.',
     'verification.stepSubmit': 'Submit',
     'verification.stepReview': 'Reviewing',
     'verification.stepDone': 'Verified',
@@ -708,6 +888,25 @@ export const TRANSLATIONS: Record<Locale, Record<TranslationKey, string>> = {
     'verification.devTools': 'DEV TOOLS · admin review simulation',
     'verification.approve': 'Approve',
     'verification.reject': 'Reject',
+    'verification.maskingNotice':
+      'The photo is only saved after AI automatically masks the ID number — the review team only ever sees the masked version.',
+    'verification.errorMinor': 'You must be 19 or older to join da-itda.',
+    'verification.errorNotFound': "We couldn't find the ID number in that photo. Please retake it with the number clearly visible.",
+    'verification.errorGeneric': 'Something went wrong submitting this. Please try again.',
+    'verification.submitting': 'Submitting...',
+    'admin.title': 'Admin review',
+    'admin.noAccess': 'This screen is admin-only.',
+    'admin.verificationSectionTitle': 'ID verification review',
+    'admin.verificationSectionSubtitle': 'Only the AI-masked photo is ever shown',
+    'admin.noVerifications': 'No verification requests to review.',
+    'admin.birthDateLabel': 'Born {date}',
+    'admin.reportSectionTitle': 'Reports',
+    'admin.reportSectionSubtitle': 'Review and act on submitted reports',
+    'admin.noReports': 'No open reports.',
+    'admin.viewThread': 'View chat →',
+    'admin.dismissReport': 'Dismiss',
+    'admin.resolveReport': 'Resolve',
+    'admin.entryLabel': 'Admin review',
     'uploader.placeholder': 'Upload a photo of your ID',
     'meetupWarning.title': 'Before you meet',
     'meetupWarning.headline': 'Please review these for a safe meetup',
@@ -863,6 +1062,83 @@ export const TRANSLATIONS: Record<Locale, Record<TranslationKey, string>> = {
     'culturalMap.verifyErrorTooFar': 'You can only verify near the pin location.',
     'culturalMap.verifyErrorNotFound': 'Pin not found.',
     'culturalMap.verifyErrorOffline': 'Verification failed. Please check your connection.',
+    'terms.title': 'Terms of Service',
+    'terms.intro': 'Please read the terms below before using da-itda. By continuing, you agree to the following.',
+    'terms.section1Title': '1. Nature of the Service',
+    'terms.section1Body':
+      'da-itda is a matching platform that helps neighbors in Gyeongsan exchange skills. The company only provides the platform — actual meetups and exchanges happen at users\' own discretion and responsibility.',
+    'terms.section2Title': '2. Limitation of Liability',
+    'terms.section2Body':
+      'The company bears no legal liability for any accidents, disputes, or crimes (including but not limited to assault, fraud, or sexual offenses) arising from meetups, transactions, or conversations between matched users. Users acknowledge the risks of meeting strangers and must follow safety practices such as meeting in public places.',
+    'terms.section3Title': '3. Eligibility',
+    'terms.section3Body':
+      'This service is available only to users aged 19 and over. Minors may not sign up or use the service. If a user is found to have provided false age information, the company may restrict their access without prior notice.',
+    'terms.section4Title': '4. User Obligations',
+    'terms.section4Body':
+      'Users must not threaten, harass, defraud, or discriminate against others. If you witness or experience such behavior, please report it immediately using the in-app report feature. Reports are reviewed and acted upon by our operators.',
+    'terms.section5Title': '5. Handling of Verification Data',
+    'terms.section5Body':
+      'ID photos submitted for verification are stored only after AI automatically masks sensitive information such as the last digits of the resident registration number. The unmasked original image is never stored on our servers. Only authorized administrators can approve or reject verification requests.',
+    'terms.section6Title': '6. Restriction of Use',
+    'terms.section6Body':
+      'Users who violate these terms or applicable law may have their access restricted or their account suspended without prior notice.',
+    'terms.checkboxLabel': 'I am 19 or older and I agree to all of the above terms.',
+    'terms.continueButton': 'Agree and continue',
+    'terms.mustAgreeHint': 'You must agree to the terms to continue.',
+    'report.title': 'Report',
+    'report.subtitle': 'Only our operators see report details, and your identity is never shared with the reported user.',
+    'report.reasonLabel': 'Reason',
+    'report.reason.inappropriate': 'Inappropriate behavior',
+    'report.reason.no-show': 'Did not show up',
+    'report.reason.harassment': 'Harassment or abuse',
+    'report.reason.scam': 'Scam or money request',
+    'report.reason.other': 'Other',
+    'report.detailLabel': 'Details (optional)',
+    'report.detailPlaceholder': 'Tell us what happened.',
+    'report.submitButton': 'Submit report',
+    'report.submitting': 'Submitting...',
+    'report.successTitle': 'Report submitted',
+    'report.successBody': "We'll review it and take action. We're here to keep you safe.",
+    'report.errorMessage': 'Failed to submit the report. Please try again.',
+    'report.validationHint': 'Please choose a reason.',
+    'tutorial.skip': 'Skip',
+    'tutorial.next': 'Next',
+    'tutorial.start': 'Get started',
+    'tutorial.slide1Title': 'Share skills with neighbors',
+    'tutorial.slide1Body':
+      'Exchange and learn skills with neighbors living in Gyeongsan — languages, cooking, parenting tips, and more.',
+    'tutorial.slide2Title': 'Set up a meetup by chat',
+    'tutorial.slide2Body':
+      'Chat with a neighbor you\'re interested in and agree on a time and place. A meetup is confirmed only after the other person accepts.',
+    'tutorial.slide3Title': 'Meet safely',
+    'tutorial.slide3Body':
+      'Complete verification before you can set up a meetup. When you meet, scan each other\'s QR codes to check in, and report anything uncomfortable anytime.',
+    'tutorial.slide4Title': 'Get to know your neighborhood',
+    'tutorial.slide4Body':
+      'Add spots only you know about to the Cultural Map, and connect more broadly through micro-groups and the community board.',
+    'community.writeButton': 'Write a post',
+    'community.newGroupButton': 'Create a micro-group',
+    'newPost.title': 'Write a post',
+    'newPost.categoryLabel': 'Category',
+    'newPost.titleLabel': 'Title',
+    'newPost.titlePlaceholder': 'Enter a title',
+    'newPost.bodyLabel': 'Content',
+    'newPost.bodyPlaceholder': 'Share something with your neighbors',
+    'newPost.submitButton': 'Post',
+    'newPost.validationHint': 'Please fill in both the title and content.',
+    'newGroup.title': 'Create a micro-group',
+    'newGroup.titleLabel': 'Group name',
+    'newGroup.titlePlaceholder': 'e.g. Saturday multicultural cooking class',
+    'newGroup.locationLabel': 'Location',
+    'newGroup.locationPlaceholder': 'e.g. Gyeongsan shared kitchen',
+    'newGroup.dateLabel': 'Date',
+    'newGroup.timeLabel': 'Time',
+    'newGroup.categoryLabel': 'Category',
+    'newGroup.categoryPlaceholder': 'e.g. cooking, sports, education',
+    'newGroup.maxParticipantsLabel': 'Max participants',
+    'newGroup.maxParticipantsPlaceholder': 'e.g. 6',
+    'newGroup.submitButton': 'Create',
+    'newGroup.validationHint': 'Please fill in every field.',
   },
   tl: {
     'welcome.tagline': 'Ang pinakaligtas na hyperlocal na komunidad\npara sa pagbabahagi ng talento sa mga kapitbahay',
@@ -980,7 +1256,7 @@ export const TRANSLATIONS: Record<Locale, Record<TranslationKey, string>> = {
     'verification.title': 'Manual na beripikasyon ng kaligtasan',
     'verification.cardSubtitle': 'Manual na safety verification gamit ang ID / Foreign Resident Card',
     'verification.subtitle':
-      'Ang mga dokumentong isinumite mo ay direktang susuriin ng aming team, walang automatic OCR scanning.',
+      'Awtomatikong itatago ng AI ang numero ng ID/rehistrasyon mo, tapos susuriin lang ng aming team ang naitagong larawan bago aprubahan.',
     'verification.stepSubmit': 'Isumite',
     'verification.stepReview': 'Sinusuri',
     'verification.stepDone': 'Naberipika',
@@ -997,6 +1273,25 @@ export const TRANSLATIONS: Record<Locale, Record<TranslationKey, string>> = {
     'verification.devTools': 'DEV TOOLS · simulation ng admin review',
     'verification.approve': 'Aprubahan',
     'verification.reject': 'Tanggihan',
+    'verification.maskingNotice':
+      'Ang larawan ay ma-save lang matapos itago ng AI ang numero ng ID — makikita lang ng review team ang naitagong bersyon.',
+    'verification.errorMinor': 'Dapat 19 taong gulang pataas para sumali sa da-itda.',
+    'verification.errorNotFound': 'Hindi mahanap ang numero ng ID sa larawan. Kunan ulit nang malinaw ang numero.',
+    'verification.errorGeneric': 'Nagkaproblema sa pagsumite. Subukan ulit.',
+    'verification.submitting': 'Isinusumite...',
+    'admin.title': 'Pagsusuri ng admin',
+    'admin.noAccess': 'Admin lang ang may access sa screen na ito.',
+    'admin.verificationSectionTitle': 'Pagsusuri ng ID verification',
+    'admin.verificationSectionSubtitle': 'Ang naitagong larawan lang ang ipinapakita',
+    'admin.noVerifications': 'Walang verification request na susuriin.',
+    'admin.birthDateLabel': 'Ipinanganak {date}',
+    'admin.reportSectionTitle': 'Mga Report',
+    'admin.reportSectionSubtitle': 'Suriin at ayusin ang mga isinumiteng report',
+    'admin.noReports': 'Walang bukas na report.',
+    'admin.viewThread': 'Tingnan ang chat →',
+    'admin.dismissReport': 'I-dismiss',
+    'admin.resolveReport': 'Ayusin',
+    'admin.entryLabel': 'Pagsusuri ng admin',
     'uploader.placeholder': 'I-upload ang larawan ng ID',
     'meetupWarning.title': 'Bago magkita',
     'meetupWarning.headline': 'Paki-review ang mga ito para sa ligtas na pagkikita',
@@ -1152,6 +1447,83 @@ export const TRANSLATIONS: Record<Locale, Record<TranslationKey, string>> = {
     'culturalMap.verifyErrorTooFar': 'Maiveripika lang malapit sa lokasyon ng pin.',
     'culturalMap.verifyErrorNotFound': 'Hindi nahanap ang pin.',
     'culturalMap.verifyErrorOffline': 'Nabigo ang pag-verify. Pakisuri ang koneksyon.',
+    'terms.title': 'Mga Tuntunin ng Serbisyo',
+    'terms.intro': 'Pakibasa ang mga tuntunin sa ibaba bago gamitin ang da-itda. Sa pagpapatuloy, sumasang-ayon ka sa mga sumusunod.',
+    'terms.section1Title': '1. Katangian ng Serbisyo',
+    'terms.section1Body':
+      'Ang da-itda ay isang matching platform na tumutulong sa mga kapitbahay sa Gyeongsan na magpalitan ng kakayahan. Ang kompanya ay nagbibigay lamang ng plataporma — ang aktwal na pagkikita at pagpapalitan ay nasa sariling pasya at responsibilidad ng mga user.',
+    'terms.section2Title': '2. Limitasyon ng Pananagutan',
+    'terms.section2Body':
+      'Ang kompanya ay walang legal na pananagutan sa anumang aksidente, hidwaan, o krimen (kabilang ang, ngunit hindi limitado sa, pananakit, panloloko, o krimen sekswal) na nagmumula sa pagkikita, transaksyon, o pag-uusap sa pagitan ng mga na-match na user. Kinikilala ng mga user ang panganib ng pagkikita sa mga estranghero at dapat sundin ang mga tuntunin sa kaligtasan tulad ng pagkikita sa mga pampublikong lugar.',
+    'terms.section3Title': '3. Kwalipikasyon',
+    'terms.section3Body':
+      'Ang serbisyong ito ay para lamang sa mga user na 19 taong gulang pataas. Hindi maaaring mag-sign up o gumamit ang mga menor de edad. Kung natuklasan na nagbigay ang isang user ng maling impormasyon ng edad, maaaring paghigpitan ng kompanya ang access nila nang walang paunang abiso.',
+    'terms.section4Title': '4. Obligasyon ng User',
+    'terms.section4Body':
+      'Hindi dapat manakot, manggipit, manloko, o mag-diskriminasyon ang mga user sa iba. Kung nasaksihan o naranasan mo ang ganitong gawi, mangyaring iulat ito kaagad gamit ang report feature sa app. Ang mga ulat ay sinusuri at kikilusan ng aming mga operator.',
+    'terms.section5Title': '5. Paghawak sa Verification Data',
+    'terms.section5Body':
+      'Ang mga larawan ng ID na isinumite para sa verification ay ise-save lamang matapos itago ng AI ang sensitibong impormasyon tulad ng huling mga digit ng resident registration number. Hindi kailanman naiimbak ang orihinal na larawan na walang mask. Tanging mga awtorisadong admin lang ang makakapag-approve o mag-reject ng mga hiling ng verification.',
+    'terms.section6Title': '6. Paghihigpit sa Paggamit',
+    'terms.section6Body':
+      'Ang mga user na lumalabag sa mga tuntuning ito o sa naaangkop na batas ay maaaring paghigpitan ang access o suspindihin ang account nang walang paunang abiso.',
+    'terms.checkboxLabel': '19 taong gulang pataas ako at sumasang-ayon ako sa lahat ng tuntunin sa itaas.',
+    'terms.continueButton': 'Sumang-ayon at magpatuloy',
+    'terms.mustAgreeHint': 'Dapat sumang-ayon sa mga tuntunin para magpatuloy.',
+    'report.title': 'I-report',
+    'report.subtitle': 'Tanging ang mga operator namin ang makakakita ng detalye ng report, at hindi ipinapakita ang iyong pagkakakilanlan sa na-report na user.',
+    'report.reasonLabel': 'Dahilan',
+    'report.reason.inappropriate': 'Hindi angkop na pag-uugali',
+    'report.reason.no-show': 'Hindi dumating sa tipanan',
+    'report.reason.harassment': 'Pang-aabuso o panggigipit',
+    'report.reason.scam': 'Panloloko o paghingi ng pera',
+    'report.reason.other': 'Iba pa',
+    'report.detailLabel': 'Detalye (opsyonal)',
+    'report.detailPlaceholder': 'Sabihin sa amin ang nangyari.',
+    'report.submitButton': 'Isumite ang report',
+    'report.submitting': 'Isinusumite...',
+    'report.successTitle': 'Naisumite ang report',
+    'report.successBody': 'Susuriin namin ito at kikilos. Nandito kami para protektahan ka.',
+    'report.errorMessage': 'Nabigo ang pagsumite ng report. Subukan ulit.',
+    'report.validationHint': 'Pumili ng dahilan.',
+    'tutorial.skip': 'Laktawan',
+    'tutorial.next': 'Susunod',
+    'tutorial.start': 'Magsimula',
+    'tutorial.slide1Title': 'Magbahagi ng kakayahan sa mga kapitbahay',
+    'tutorial.slide1Body':
+      'Magpalitan at matuto ng kakayahan mula sa mga kapitbahay sa Gyeongsan — mga wika, pagluluto, tips sa pag-aalaga ng anak, at higit pa.',
+    'tutorial.slide2Title': 'Mag-set up ng tipanan sa chat',
+    'tutorial.slide2Body':
+      'Mag-chat sa kapitbahay na interesado ka at magkasundo sa oras at lugar. Ma-kukumpirma lamang ang tipanan kapag tinanggap ito ng kabilang tao.',
+    'tutorial.slide3Title': 'Magkita nang ligtas',
+    'tutorial.slide3Body':
+      'Kumpletuhin ang verification bago maka-set up ng tipanan. Kapag nagkita kayo, i-scan ang QR code ng isa\'t isa para mag-check in, at mag-report anumang oras kung may hindi komportableng nararamdaman.',
+    'tutorial.slide4Title': 'Higit pang kilalanin ang inyong lugar',
+    'tutorial.slide4Body':
+      'Idagdag sa Cultural Map ang mga spot na tanging ikaw lang ang nakakaalam, at mas lumawak ang pagkonekta sa mga micro-group at community board.',
+    'community.writeButton': 'Sumulat ng post',
+    'community.newGroupButton': 'Gumawa ng micro-group',
+    'newPost.title': 'Sumulat ng post',
+    'newPost.categoryLabel': 'Kategorya',
+    'newPost.titleLabel': 'Pamagat',
+    'newPost.titlePlaceholder': 'Ilagay ang pamagat',
+    'newPost.bodyLabel': 'Nilalaman',
+    'newPost.bodyPlaceholder': 'Ibahagi ang isang bagay sa iyong mga kapitbahay',
+    'newPost.submitButton': 'I-post',
+    'newPost.validationHint': 'Pakipuno ang pamagat at nilalaman.',
+    'newGroup.title': 'Gumawa ng micro-group',
+    'newGroup.titleLabel': 'Pangalan ng grupo',
+    'newGroup.titlePlaceholder': 'hal. Sabado multicultural cooking class',
+    'newGroup.locationLabel': 'Lokasyon',
+    'newGroup.locationPlaceholder': 'hal. Gyeongsan shared kitchen',
+    'newGroup.dateLabel': 'Petsa',
+    'newGroup.timeLabel': 'Oras',
+    'newGroup.categoryLabel': 'Kategorya',
+    'newGroup.categoryPlaceholder': 'hal. pagluluto, sports, edukasyon',
+    'newGroup.maxParticipantsLabel': 'Pinakamaraming kalahok',
+    'newGroup.maxParticipantsPlaceholder': 'hal. 6',
+    'newGroup.submitButton': 'Gawin',
+    'newGroup.validationHint': 'Pakipuno ang lahat ng field.',
   },
   vi: {
     'welcome.tagline': 'Cộng đồng siêu địa phương an toàn nhất\nđể chia sẻ tài năng với hàng xóm',
@@ -1268,7 +1640,7 @@ export const TRANSLATIONS: Record<Locale, Record<TranslationKey, string>> = {
     'edit.save': 'Lưu',
     'verification.title': 'Xác minh an toàn thủ công',
     'verification.cardSubtitle': 'Xác minh an toàn thủ công bằng CMND/CCCD hoặc Thẻ người nước ngoài',
-    'verification.subtitle': 'Giấy tờ bạn gửi sẽ được đội ngũ vận hành xem xét trực tiếp, không quét OCR tự động.',
+    'verification.subtitle': 'AI sẽ tự động che số CMND/số đăng ký, sau đó đội ngũ vận hành chỉ xem ảnh đã che trước khi duyệt.',
     'verification.stepSubmit': 'Gửi',
     'verification.stepReview': 'Đang xem xét',
     'verification.stepDone': 'Đã xác minh',
@@ -1285,6 +1657,24 @@ export const TRANSLATIONS: Record<Locale, Record<TranslationKey, string>> = {
     'verification.devTools': 'DEV TOOLS · giả lập xét duyệt của quản trị viên',
     'verification.approve': 'Phê duyệt',
     'verification.reject': 'Từ chối',
+    'verification.maskingNotice': 'Ảnh chỉ được lưu sau khi AI tự động che số ID — đội ngũ duyệt chỉ thấy bản đã che.',
+    'verification.errorMinor': 'Bạn phải từ 19 tuổi trở lên để tham gia da-itda.',
+    'verification.errorNotFound': 'Không tìm thấy số ID trong ảnh. Vui lòng chụp lại rõ số.',
+    'verification.errorGeneric': 'Có lỗi khi gửi. Vui lòng thử lại.',
+    'verification.submitting': 'Đang gửi...',
+    'admin.title': 'Xét duyệt của quản trị viên',
+    'admin.noAccess': 'Chỉ quản trị viên mới truy cập được màn hình này.',
+    'admin.verificationSectionTitle': 'Xét duyệt xác minh danh tính',
+    'admin.verificationSectionSubtitle': 'Chỉ hiển thị ảnh đã được AI che số',
+    'admin.noVerifications': 'Không có yêu cầu xác minh nào cần xét duyệt.',
+    'admin.birthDateLabel': 'Sinh {date}',
+    'admin.reportSectionTitle': 'Báo cáo',
+    'admin.reportSectionSubtitle': 'Xem xét và xử lý các báo cáo đã gửi',
+    'admin.noReports': 'Không có báo cáo nào.',
+    'admin.viewThread': 'Xem đoạn chat →',
+    'admin.dismissReport': 'Bỏ qua',
+    'admin.resolveReport': 'Đã xử lý',
+    'admin.entryLabel': 'Xét duyệt của quản trị viên',
     'uploader.placeholder': 'Tải lên ảnh giấy tờ',
     'meetupWarning.title': 'Trước khi gặp mặt',
     'meetupWarning.headline': 'Vui lòng xem để có buổi gặp mặt an toàn',
@@ -1440,5 +1830,82 @@ export const TRANSLATIONS: Record<Locale, Record<TranslationKey, string>> = {
     'culturalMap.verifyErrorTooFar': 'Bạn chỉ có thể xác nhận khi ở gần địa điểm này.',
     'culturalMap.verifyErrorNotFound': 'Không tìm thấy điểm.',
     'culturalMap.verifyErrorOffline': 'Xác nhận thất bại. Vui lòng kiểm tra kết nối.',
+    'terms.title': 'Điều khoản dịch vụ',
+    'terms.intro': 'Vui lòng đọc các điều khoản dưới đây trước khi sử dụng da-itda. Khi tiếp tục, bạn đồng ý với những nội dung sau.',
+    'terms.section1Title': '1. Tính chất của dịch vụ',
+    'terms.section1Body':
+      'da-itda là nền tảng kết nối giúp hàng xóm tại Gyeongsan trao đổi kỹ năng. Công ty chỉ cung cấp nền tảng — việc gặp mặt và trao đổi thực tế diễn ra theo quyết định và trách nhiệm riêng của người dùng.',
+    'terms.section2Title': '2. Giới hạn trách nhiệm',
+    'terms.section2Body':
+      'Công ty không chịu trách nhiệm pháp lý đối với bất kỳ tai nạn, tranh chấp hay tội phạm nào (bao gồm nhưng không giới hạn ở hành hung, lừa đảo, hoặc tội phạm tình dục) phát sinh từ các buổi gặp mặt, giao dịch hoặc trò chuyện giữa người dùng đã được ghép cặp. Người dùng tự nhận thức rủi ro khi gặp người lạ và phải tuân theo các quy tắc an toàn như gặp mặt ở nơi công cộng.',
+    'terms.section3Title': '3. Điều kiện sử dụng',
+    'terms.section3Body':
+      'Dịch vụ này chỉ dành cho người dùng từ 19 tuổi trở lên. Người chưa đủ tuổi không được đăng ký hoặc sử dụng dịch vụ. Nếu phát hiện người dùng cung cấp thông tin tuổi sai sự thật, công ty có thể hạn chế quyền truy cập mà không cần thông báo trước.',
+    'terms.section4Title': '4. Nghĩa vụ của người dùng',
+    'terms.section4Body':
+      'Người dùng không được đe dọa, quấy rối, lừa đảo hoặc phân biệt đối xử với người khác. Nếu bạn chứng kiến hoặc gặp phải hành vi như vậy, vui lòng báo cáo ngay qua chức năng báo cáo trong ứng dụng. Các báo cáo sẽ được quản trị viên xem xét và xử lý.',
+    'terms.section5Title': '5. Xử lý dữ liệu xác minh',
+    'terms.section5Body':
+      'Ảnh giấy tờ tùy thân được nộp để xác minh chỉ được lưu trữ sau khi AI tự động che các thông tin nhạy cảm như các số cuối của số đăng ký cư trú. Ảnh gốc chưa che không bao giờ được lưu trên máy chủ. Chỉ quản trị viên được ủy quyền mới có thể phê duyệt hoặc từ chối yêu cầu xác minh.',
+    'terms.section6Title': '6. Hạn chế sử dụng',
+    'terms.section6Body':
+      'Người dùng vi phạm các điều khoản này hoặc pháp luật liên quan có thể bị hạn chế quyền truy cập hoặc khóa tài khoản mà không cần thông báo trước.',
+    'terms.checkboxLabel': 'Tôi từ 19 tuổi trở lên và đồng ý với tất cả điều khoản trên.',
+    'terms.continueButton': 'Đồng ý và tiếp tục',
+    'terms.mustAgreeHint': 'Bạn cần đồng ý với điều khoản để tiếp tục.',
+    'report.title': 'Báo cáo',
+    'report.subtitle': 'Chỉ quản trị viên của chúng tôi xem được nội dung báo cáo, danh tính của bạn không được chia sẻ với người bị báo cáo.',
+    'report.reasonLabel': 'Lý do',
+    'report.reason.inappropriate': 'Hành vi không phù hợp',
+    'report.reason.no-show': 'Không đến điểm hẹn',
+    'report.reason.harassment': 'Quấy rối/hành vi khó chịu',
+    'report.reason.scam': 'Lừa đảo/yêu cầu tiền',
+    'report.reason.other': 'Khác',
+    'report.detailLabel': 'Chi tiết (không bắt buộc)',
+    'report.detailPlaceholder': 'Hãy cho chúng tôi biết điều gì đã xảy ra.',
+    'report.submitButton': 'Gửi báo cáo',
+    'report.submitting': 'Đang gửi...',
+    'report.successTitle': 'Đã gửi báo cáo',
+    'report.successBody': 'Chúng tôi sẽ xem xét và xử lý. Chúng tôi luôn bảo vệ sự an toàn của bạn.',
+    'report.errorMessage': 'Gửi báo cáo không thành công. Vui lòng thử lại.',
+    'report.validationHint': 'Vui lòng chọn lý do.',
+    'tutorial.skip': 'Bỏ qua',
+    'tutorial.next': 'Tiếp theo',
+    'tutorial.start': 'Bắt đầu',
+    'tutorial.slide1Title': 'Chia sẻ kỹ năng với hàng xóm',
+    'tutorial.slide1Body':
+      'Trao đổi và học kỹ năng với hàng xóm sống tại Gyeongsan — ngôn ngữ, nấu ăn, kinh nghiệm nuôi dạy con và nhiều hơn nữa.',
+    'tutorial.slide2Title': 'Hẹn gặp qua trò chuyện',
+    'tutorial.slide2Body':
+      'Trò chuyện với người hàng xóm bạn quan tâm và cùng thống nhất thời gian, địa điểm. Cuộc hẹn chỉ được xác nhận khi đối phương đồng ý.',
+    'tutorial.slide3Title': 'Gặp mặt an toàn',
+    'tutorial.slide3Body':
+      'Hoàn tất xác minh trước khi có thể đặt hẹn. Khi gặp nhau, hãy quét mã QR của nhau để check-in, và báo cáo bất cứ khi nào cảm thấy không thoải mái.',
+    'tutorial.slide4Title': 'Hiểu thêm về khu phố của bạn',
+    'tutorial.slide4Body':
+      'Đăng những địa điểm chỉ riêng bạn biết lên Cultural Map, và kết nối rộng hơn qua các nhóm nhỏ và bảng tin cộng đồng.',
+    'community.writeButton': 'Viết bài',
+    'community.newGroupButton': 'Tạo nhóm nhỏ',
+    'newPost.title': 'Viết bài',
+    'newPost.categoryLabel': 'Danh mục',
+    'newPost.titleLabel': 'Tiêu đề',
+    'newPost.titlePlaceholder': 'Nhập tiêu đề',
+    'newPost.bodyLabel': 'Nội dung',
+    'newPost.bodyPlaceholder': 'Chia sẻ điều gì đó với hàng xóm của bạn',
+    'newPost.submitButton': 'Đăng bài',
+    'newPost.validationHint': 'Vui lòng nhập cả tiêu đề và nội dung.',
+    'newGroup.title': 'Tạo nhóm nhỏ',
+    'newGroup.titleLabel': 'Tên nhóm',
+    'newGroup.titlePlaceholder': 'VD: Lớp học nấu ăn đa văn hóa thứ Bảy',
+    'newGroup.locationLabel': 'Địa điểm',
+    'newGroup.locationPlaceholder': 'VD: Nhà bếp chung Gyeongsan',
+    'newGroup.dateLabel': 'Ngày',
+    'newGroup.timeLabel': 'Giờ',
+    'newGroup.categoryLabel': 'Danh mục',
+    'newGroup.categoryPlaceholder': 'VD: nấu ăn, thể thao, giáo dục',
+    'newGroup.maxParticipantsLabel': 'Số người tối đa',
+    'newGroup.maxParticipantsPlaceholder': 'VD: 6',
+    'newGroup.submitButton': 'Tạo',
+    'newGroup.validationHint': 'Vui lòng điền đầy đủ các trường.',
   },
 };

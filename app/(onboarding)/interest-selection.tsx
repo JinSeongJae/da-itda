@@ -6,7 +6,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { Button } from '../../components/common/Button';
 import { Header } from '../../components/common/Header';
 import { LanguagePicker } from '../../components/common/LanguagePicker';
-import { ALL_SKILLS, groupSkillsByCategory, SKILL_CATEGORY_ORDER } from '../../mocks/skills';
+import { ALL_SKILLS, groupSkillsByCategory, SKILL_CATEGORY_EMOJI, SKILL_CATEGORY_ORDER } from '../../mocks/skills';
 import { useAuthStore } from '../../store/useAuthStore';
 import { useUserStore } from '../../store/useUserStore';
 import type { Gender, Skill, TalkStyle } from '../../types';
@@ -57,7 +57,7 @@ function SkillChip({
     >
       {selected && <Feather name="check" size={12} color="#fff" style={{ marginRight: 4 }} />}
       <Text className={`text-xs font-semibold ${selected ? 'text-white' : 'text-gray-700'}`}>
-        {skillLabel(skill)}
+        {skill.emoji ? `${skill.emoji} ` : ''}{skillLabel(skill)}
       </Text>
     </Pressable>
   );
@@ -82,7 +82,7 @@ function GroupedSkillChips({
         return (
           <View key={category} className="mb-1">
             <Text className="text-[11px] font-semibold text-gray-400 mb-2">
-              {t(`skillCategory.${category}` as TranslationKey)}
+              {SKILL_CATEGORY_EMOJI[category]} {t(`skillCategory.${category}` as TranslationKey)}
             </Text>
             <View className="flex-row flex-wrap mb-2">
               {skills.map((skill) => (

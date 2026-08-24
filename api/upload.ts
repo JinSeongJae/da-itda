@@ -2,15 +2,26 @@ import type { VercelRequest, VercelResponse } from '@vercel/node';
 import { put } from '@vercel/blob';
 import { applyCors } from './_cors';
 import { requireUser } from './_auth';
+import { testConnection } from './_db';
 
 const MAX_BYTES = 8 * 1024 * 1024; // 8MB — plenty for a quality:0.7 photo, keeps base64 JSON body small
 
-/** Shared upload endpoint for any real-image-needed feature (avatar, ID verification, etc.). */
+/**
+ * Shared upload endpoint for any real-image-needed feature (avatar, etc.).
+ * GET here is unrelated but folded in to stay within Vercel Hobby's 12-function limit —
+ * it's the DATABASE_URL connectivity diagnostic that used to live at api/debug/db.ts.
+ */
 export default async function handler(req: VercelRequest, res: VercelResponse) {
   if (applyCors(req, res)) return;
 
+  if (req.method === 'GET') {
+    const result = await testConnection();
+    res.status(result.ok ? 200 : 500).json(result);
+    return;
+  }
+
   if (req.method !== 'POST') {
-    res.status(405).json({ error: 'POST 요청만 지원합니다.' });
+    res.status(405).json({ error: 'GET 또는 POST 요청만 지원합니다.' });
     return;
   }
 

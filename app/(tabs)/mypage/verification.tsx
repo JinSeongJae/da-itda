@@ -1,16 +1,18 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Feather } from '@expo/vector-icons';
 import { Pressable, ScrollView, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Button } from '../../../components/common/Button';
 import { Header } from '../../../components/common/Header';
-import { IDUploader } from '../../../components/mypage/IDUploader';
+import { IDUploader, type PickedIdPhoto } from '../../../components/mypage/IDUploader';
 import { useAuthStore } from '../../../store/useAuthStore';
 import { useUserStore } from '../../../store/useUserStore';
 import { useVerificationStore } from '../../../store/useVerificationStore';
 import type { VerificationDocumentType } from '../../../types';
 import type { TranslationKey } from '../../../constants/i18n';
 import { useTranslation } from '../../../utils/i18n';
+
+const POLL_INTERVAL_MS = 5000;
 
 const DOC_TYPES: { value: VerificationDocumentType; labelKey: TranslationKey }[] = [
   { value: 'id-card', labelKey: 'verification.docIdCard' },
@@ -28,16 +30,45 @@ export default function VerificationScreen() {
   const currentUserId = useAuthStore((s) => s.currentUserId)!;
   const user = useUserStore((s) => s.usersById[currentUserId]);
   const submitVerification = useVerificationStore((s) => s.submitVerification);
-  const mockAdminApprove = useVerificationStore((s) => s.mockAdminApprove);
-  const mockAdminReject = useVerificationStore((s) => s.mockAdminReject);
+  const fetchMyVerification = useVerificationStore((s) => s.fetchMyVerification);
+  const fetchAllUsers = useUserStore((s) => s.fetchAllUsers);
 
   const [docType, setDocType] = useState<VerificationDocumentType>('id-card');
-  const [imageUri, setImageUri] = useState<string | null>(null);
+  const [photo, setPhoto] = useState<PickedIdPhoto | null>(null);
+  const [submitting, setSubmitting] = useState(false);
+  const [error, setError] = useState('');
+
+  // 승인/반려는 관리자가 서버에서 직접 처리하므로, 내 프로필(verification/badges)도 같이
+  // 새로고침해야 이 화면에 떠 있는 동안 실시간으로 단계가 넘어가는 걸 볼 수 있다.
+  useEffect(() => {
+    fetchMyVerification(currentUserId);
+    fetchAllUsers();
+    const interval = setInterval(() => {
+      fetchMyVerification(currentUserId);
+      fetchAllUsers();
+    }, POLL_INTERVAL_MS);
+    return () => clearInterval(interval);
+  }, [currentUserId, fetchMyVerification, fetchAllUsers]);
 
   if (!user) return null;
 
   const status = user.verification;
   const currentStepIndex = status === 'verified' ? 2 : status === 'pending' || status === 'rejected' ? 1 : 0;
+
+  const handleSubmit = async () => {
+    if (!photo) return;
+    setSubmitting(true);
+    setError('');
+    const result = await submitVerification(currentUserId, docType, photo);
+    setSubmitting(false);
+    if (!result.ok) {
+      if (result.reason === 'minor') setError(t('verification.errorMinor'));
+      else if (result.reason === 'not-found') setError(result.message ?? t('verification.errorNotFound'));
+      else setError(t('verification.errorGeneric'));
+      return;
+    }
+    setPhoto(null);
+  };
 
   return (
     <SafeAreaView className="flex-1 bg-white">
@@ -94,7 +125,11 @@ export default function VerificationScreen() {
               ))}
             </View>
 
-            <IDUploader onPicked={setImageUri} />
+            <IDUploader onPicked={setPhoto} />
+            <View className="flex-row items-start mt-3 mb-1">
+              <Feather name="lock" size={12} color="#9ca3af" style={{ marginTop: 2 }} />
+              <Text className="text-[11px] text-gray-400 ml-1.5 flex-1 leading-4">{t('verification.maskingNotice')}</Text>
+            </View>
 
             {status === 'pending' && (
               <View className="flex-row items-center bg-amber-50 rounded-2xl px-4 py-3 mt-3">
@@ -108,38 +143,20 @@ export default function VerificationScreen() {
                 <Text className="text-red-500 text-xs ml-2 flex-1">{t('verification.rejected')}</Text>
               </View>
             )}
-
-            <Button
-              label={status === 'pending' ? t('verification.resubmit') : t('verification.submit')}
-              className="mt-4"
-              disabled={!imageUri}
-              onPress={() => imageUri && submitVerification(currentUserId, docType, imageUri)}
-            />
-
-            {status === 'pending' && (
-              <View className="mt-8 p-3.5 bg-gray-50 rounded-2xl border border-dashed border-gray-300">
-                <View className="flex-row items-center mb-2">
-                  <Feather name="tool" size={11} color="#9ca3af" />
-                  <Text className="text-xs font-bold text-gray-400 ml-1.5">{t('verification.devTools')}</Text>
-                </View>
-                <View className="flex-row gap-2">
-                  <Button
-                    label={t('verification.approve')}
-                    variant="outline"
-                    fullWidth={false}
-                    className="flex-1"
-                    onPress={() => mockAdminApprove(currentUserId)}
-                  />
-                  <Button
-                    label={t('verification.reject')}
-                    variant="outline"
-                    fullWidth={false}
-                    className="flex-1 ml-2"
-                    onPress={() => mockAdminReject(currentUserId)}
-                  />
-                </View>
+            {!!error && (
+              <View className="flex-row items-center bg-red-50 rounded-2xl px-4 py-3 mt-3">
+                <Feather name="alert-circle" size={14} color="#ef4444" />
+                <Text className="text-red-500 text-xs ml-2 flex-1">{error}</Text>
               </View>
             )}
+
+            <Button
+              label={submitting ? t('verification.submitting') : status === 'pending' ? t('verification.resubmit') : t('verification.submit')}
+              className="mt-4"
+              loading={submitting}
+              disabled={!photo || submitting}
+              onPress={handleSubmit}
+            />
           </>
         )}
       </ScrollView>

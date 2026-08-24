@@ -35,6 +35,7 @@ export interface ActivityCourse {
 
 export interface MicroGroupSuggestion {
   id: string;
+  authorId?: string;
   title: string;
   location: string;
   date: string; // ISO date

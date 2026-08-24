@@ -1,3 +1,4 @@
+import type { ReactNode } from 'react';
 import { Text, View } from 'react-native';
 import { Avatar } from '../common/Avatar';
 import type { CommunityPost, CommunityPostCategory, User } from '../../types';
@@ -14,15 +15,20 @@ const CATEGORY_KEY: Record<CommunityPostCategory, TranslationKey> = {
 export function CommunityFeedList({
   posts,
   usersById,
+  headerAction,
 }: {
   posts: CommunityPost[];
   usersById: Record<string, User>;
+  headerAction?: ReactNode;
 }) {
   const { t } = useTranslation();
   return (
     <View className="mt-9">
       <Text className="text-[13px] font-semibold text-gray-400 mb-1">{t('feed.label')}</Text>
-      <Text className="text-xl font-extrabold text-gray-900 mb-2">{t('feed.title')}</Text>
+      <View className="flex-row items-center justify-between mb-2">
+        <Text className="text-xl font-extrabold text-gray-900">{t('feed.title')}</Text>
+        {headerAction}
+      </View>
       {posts.map((post) => {
         const author = usersById[post.authorId];
         return (

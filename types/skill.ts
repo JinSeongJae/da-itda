@@ -15,4 +15,6 @@ export interface Skill {
   category: SkillCategory;
   label: string;
   description?: string;
+  /** A single emoji shown next to the label to make the chip scannable at a glance. */
+  emoji?: string;
 }

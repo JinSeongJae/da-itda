@@ -16,7 +16,6 @@ type CheckStatus = 'checking' | 'inside' | 'outside' | 'error';
 export default function LocationSetup() {
   const { t } = useTranslation();
   const currentUserId = useAuthStore((s) => s.currentUserId)!;
-  const completeOnboarding = useAuthStore((s) => s.completeOnboarding);
   const updateProfile = useUserStore((s) => s.updateProfile);
 
   const [status, setStatus] = useState<CheckStatus>('checking');
@@ -51,8 +50,7 @@ export default function LocationSetup() {
     updateProfile(currentUserId, {
       location: { city: '경산시', district, lat: coords.lat, lng: coords.lng },
     });
-    completeOnboarding(currentUserId);
-    router.replace('/(tabs)');
+    router.replace('/(onboarding)/tutorial');
   };
 
   return (

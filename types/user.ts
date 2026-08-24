@@ -60,4 +60,5 @@ export interface User {
   points: number;
   volunteerMinutes: number;
   createdAt: string;
+  termsAcceptedAt?: string;
 }

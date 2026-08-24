@@ -1,20 +1,30 @@
+import { useEffect } from 'react';
 import { Feather } from '@expo/vector-icons';
 import { Pressable, ScrollView, Text, View } from 'react-native';
 import { router } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { CommunityFeedList } from '../../components/community/CommunityFeedList';
 import { MicroGroupList } from '../../components/home/MicroGroupList';
-import { SEED_COMMUNITY_POSTS } from '../../mocks/communityPosts';
-import { SEED_USERS } from '../../mocks/users';
 import { useAuthStore } from '../../store/useAuthStore';
+import { useCommunityPostStore } from '../../store/useCommunityPostStore';
 import { useMatchStore } from '../../store/useMatchStore';
+import { useUserStore } from '../../store/useUserStore';
 import { useTranslation } from '../../utils/i18n';
 
 export default function CommunityScreen() {
   const { t } = useTranslation();
   const currentUserId = useAuthStore((s) => s.currentUserId)!;
+  const usersById = useUserStore((s) => s.usersById);
   const microGroups = useMatchStore((s) => s.microGroups);
   const toggleMicroGroupInterest = useMatchStore((s) => s.toggleMicroGroupInterest);
+  const fetchMicroGroups = useMatchStore((s) => s.fetchMicroGroups);
+  const posts = useCommunityPostStore((s) => s.getAllPosts());
+  const fetchPosts = useCommunityPostStore((s) => s.fetchPosts);
+
+  useEffect(() => {
+    fetchMicroGroups();
+    fetchPosts();
+  }, [fetchMicroGroups, fetchPosts]);
 
   return (
     <SafeAreaView edges={['top']} className="flex-1 bg-white">
@@ -40,8 +50,30 @@ export default function CommunityScreen() {
           groups={microGroups}
           currentUserId={currentUserId}
           onToggleInterest={(groupId) => toggleMicroGroupInterest(groupId, currentUserId)}
+          headerAction={
+            <Pressable
+              onPress={() => router.push('/community/new-group')}
+              className="flex-row items-center bg-gray-50 rounded-full px-3 py-1.5"
+            >
+              <Feather name="plus" size={13} color="#374151" />
+              <Text className="text-xs font-semibold text-gray-700 ml-1">{t('community.newGroupButton')}</Text>
+            </Pressable>
+          }
         />
-        <CommunityFeedList posts={SEED_COMMUNITY_POSTS} usersById={SEED_USERS} />
+
+        <CommunityFeedList
+          posts={posts}
+          usersById={usersById}
+          headerAction={
+            <Pressable
+              onPress={() => router.push('/community/new-post')}
+              className="flex-row items-center bg-gray-50 rounded-full px-3 py-1.5"
+            >
+              <Feather name="edit-3" size={13} color="#374151" />
+              <Text className="text-xs font-semibold text-gray-700 ml-1">{t('community.writeButton')}</Text>
+            </Pressable>
+          }
+        />
       </ScrollView>
     </SafeAreaView>
   );

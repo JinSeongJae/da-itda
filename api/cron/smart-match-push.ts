@@ -2,20 +2,11 @@ import type { VercelRequest, VercelResponse } from '@vercel/node';
 import type { User } from '../../types';
 import { findUrgentMatches } from '../../utils/smartMatch';
 import { query } from '../_db';
+import { sendExpoPush } from '../_push';
 
 interface UserRow {
   id: string;
   profile: User;
-}
-
-const EXPO_PUSH_ENDPOINT = 'https://exp.host/--/api/v2/push/send';
-
-async function sendExpoPush(to: string, title: string, body: string, data: Record<string, unknown>) {
-  await fetch(EXPO_PUSH_ENDPOINT, {
-    method: 'POST',
-    headers: { 'content-type': 'application/json', accept: 'application/json' },
-    body: JSON.stringify({ to, title, body, data, sound: 'default', priority: 'high' }),
-  }).catch(() => {});
 }
 
 /**

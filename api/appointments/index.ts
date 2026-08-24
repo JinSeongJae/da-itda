@@ -2,6 +2,7 @@ import type { VercelRequest, VercelResponse } from '@vercel/node';
 import { applyCors } from '../_cors';
 import { query } from '../_db';
 import { requireUser } from '../_auth';
+import { sendPushToUser } from '../_push';
 
 interface AppointmentRow {
   id: string;
@@ -35,13 +36,33 @@ function toAppointmentJson(row: AppointmentRow) {
   };
 }
 
-async function assertParticipant(threadId: string, userId: string): Promise<void> {
-  const rows = await query<{ id: string }>(
-    'SELECT id FROM threads WHERE id = $1 AND (user_a_id = $2 OR user_b_id = $2)',
+async function assertParticipant(threadId: string, userId: string): Promise<string[]> {
+  const rows = await query<{ id: string; user_a_id: string; user_b_id: string }>(
+    'SELECT id, user_a_id, user_b_id FROM threads WHERE id = $1 AND (user_a_id = $2 OR user_b_id = $2)',
     [threadId, userId]
   );
   if (!rows[0]) {
     throw Object.assign(new Error('이 채팅방에 접근할 권한이 없습니다.'), { statusCode: 403 });
+  }
+  return [rows[0].user_a_id, rows[0].user_b_id];
+}
+
+async function notifyAppointmentEvent(
+  actorId: string,
+  recipientId: string,
+  title: string,
+  bodyTemplate: (actorName: string) => string,
+  data: Record<string, unknown>
+): Promise<void> {
+  try {
+    const rows = await query<{ name: string | null }>(
+      "SELECT profile->>'name' AS name FROM app_users WHERE id = $1",
+      [actorId]
+    );
+    const actorName = rows[0]?.name ?? '이웃';
+    await sendPushToUser(recipientId, title, bodyTemplate(actorName), data);
+  } catch {
+    // 알림 발송 실패는 약속 처리 자체를 막지 않는다.
   }
 }
 
@@ -71,7 +92,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         res.status(400).json({ error: 'id, threadId, matchId, date, time, safeZoneId가 필요합니다.' });
         return;
       }
-      await assertParticipant(threadId, userId);
+      const participantIds = await assertParticipant(threadId, userId);
 
       const rows = await query<AppointmentRow>(
         `INSERT INTO appointments (id, thread_id, match_id, date, time, safe_zone_id, purpose, created_by, qr_token)
@@ -91,6 +112,17 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         return;
       }
 
+      const recipientId = participantIds.find((pid) => pid !== userId);
+      if (recipientId) {
+        await notifyAppointmentEvent(
+          userId,
+          recipientId,
+          '새로운 약속 제안',
+          (name) => `${name}님이 ${date} ${time}에 만나자고 제안했어요.`,
+          { type: 'appointment-proposed', appointmentId: rows[0].id }
+        );
+      }
+
       res.status(201).json({ appointment: toAppointmentJson(rows[0]) });
       return;
     }
@@ -102,8 +134,8 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         return;
       }
 
-      const rows = await query<AppointmentRow>(
-        `SELECT a.id, a.created_by, a.status, a.check_ins
+      const rows = await query<AppointmentRow & { user_a_id: string; user_b_id: string }>(
+        `SELECT a.id, a.created_by, a.status, a.check_ins, t.user_a_id, t.user_b_id
          FROM appointments a
          JOIN threads t ON t.id = a.thread_id
          WHERE a.id = $1 AND (t.user_a_id = $2 OR t.user_b_id = $2)`,
@@ -114,6 +146,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         res.status(403).json({ error: '이 약속에 접근할 권한이 없습니다.' });
         return;
       }
+      const counterpartId = appointment.user_a_id === userId ? appointment.user_b_id : appointment.user_a_id;
 
       if (action === 'checkin') {
         const alreadyCheckedIn = appointment.check_ins.some((c) => c.userId === userId);
@@ -126,6 +159,15 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
            RETURNING id, thread_id, match_id, date, time, safe_zone_id, purpose, status, created_by, created_at, qr_token, check_ins`,
           [id, JSON.stringify(checkIns)]
         );
+        if (!alreadyCheckedIn) {
+          await notifyAppointmentEvent(
+            userId,
+            counterpartId,
+            '현장 인증 완료',
+            (name) => `${name}님이 QR 체크인을 완료했어요. 상대방도 체크인해주세요.`,
+            { type: 'appointment-checkin', appointmentId: id }
+          );
+        }
         res.status(200).json({ appointment: toAppointmentJson(updated[0]) });
         return;
       }
@@ -145,6 +187,14 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         `UPDATE appointments SET status = $2 WHERE id = $1
          RETURNING id, thread_id, match_id, date, time, safe_zone_id, purpose, status, created_by, created_at, qr_token, check_ins`,
         [id, newStatus]
+      );
+      await notifyAppointmentEvent(
+        userId,
+        appointment.created_by,
+        action === 'accept' ? '약속이 확정됐어요!' : '약속이 거절됐어요',
+        (name) =>
+          action === 'accept' ? `${name}님이 약속을 수락했어요.` : `${name}님이 약속을 수락하지 않았어요.`,
+        { type: action === 'accept' ? 'appointment-accepted' : 'appointment-rejected', appointmentId: id }
       );
       res.status(200).json({ appointment: toAppointmentJson(updated[0]) });
       return;

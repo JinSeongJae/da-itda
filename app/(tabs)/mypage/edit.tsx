@@ -6,7 +6,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { Avatar } from '../../../components/common/Avatar';
 import { Button } from '../../../components/common/Button';
 import { Header } from '../../../components/common/Header';
-import { ALL_SKILLS, groupSkillsByCategory, SKILL_CATEGORY_ORDER } from '../../../mocks/skills';
+import { ALL_SKILLS, groupSkillsByCategory, SKILL_CATEGORY_EMOJI, SKILL_CATEGORY_ORDER } from '../../../mocks/skills';
 import { useAuthStore } from '../../../store/useAuthStore';
 import { useUserStore } from '../../../store/useUserStore';
 import type { Gender, Skill, TalkStyle } from '../../../types';
@@ -43,7 +43,9 @@ function RemovableTag({ skill, onRemove }: { skill: Skill; onRemove: () => void 
   const { skillLabel } = useTranslation();
   return (
     <View className="flex-row items-center bg-primary-100 rounded-full pl-3 pr-1.5 py-1 mr-2 mb-2">
-      <Text className="text-xs font-medium text-primary-700 mr-1">{skillLabel(skill)}</Text>
+      <Text className="text-xs font-medium text-primary-700 mr-1">
+        {skill.emoji ? `${skill.emoji} ` : ''}{skillLabel(skill)}
+      </Text>
       <Pressable onPress={onRemove} hitSlop={6}>
         <Feather name="x" size={13} color="#047857" />
       </Pressable>
@@ -56,7 +58,9 @@ function AddableChip({ skill, onAdd }: { skill: Skill; onAdd: () => void }) {
   return (
     <Pressable onPress={onAdd} className="flex-row items-center bg-gray-100 rounded-full px-3 py-1 mr-2 mb-2">
       <Feather name="plus" size={12} color="#6b7280" />
-      <Text className="text-xs text-gray-600 ml-1">{skillLabel(skill)}</Text>
+      <Text className="text-xs text-gray-600 ml-1">
+        {skill.emoji ? `${skill.emoji} ` : ''}{skillLabel(skill)}
+      </Text>
     </Pressable>
   );
 }
@@ -72,7 +76,7 @@ function GroupedAddableChips({ skills, onAdd }: { skills: Skill[]; onAdd: (skill
         return (
           <View key={category} className="mb-1">
             <Text className="text-[11px] font-semibold text-gray-400 mb-2">
-              {t(`skillCategory.${category}` as TranslationKey)}
+              {SKILL_CATEGORY_EMOJI[category]} {t(`skillCategory.${category}` as TranslationKey)}
             </Text>
             <View className="flex-row flex-wrap mb-2">
               {categorySkills.map((skill) => (

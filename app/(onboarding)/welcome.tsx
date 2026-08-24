@@ -110,7 +110,7 @@ export default function Welcome() {
         volunteerMinutes: 0,
         createdAt: new Date().toISOString(),
       });
-      router.replace('/(onboarding)/interest-selection');
+      router.replace('/(onboarding)/terms');
     } catch (err) {
       setError(err instanceof Error ? err.message : t('welcome.errorGeneric'));
     } finally {

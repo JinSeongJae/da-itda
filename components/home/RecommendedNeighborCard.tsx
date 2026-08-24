@@ -31,7 +31,9 @@ export function RecommendedNeighborCard({
         </View>
         <Text className="text-[13px] text-gray-400 mt-0.5" numberOfLines={1}>
           {topSkill
-            ? t('neighborCard.offers', { skill: skillLabel(topSkill) })
+            ? t('neighborCard.offers', {
+                skill: topSkill.emoji ? `${topSkill.emoji} ${skillLabel(topSkill)}` : skillLabel(topSkill),
+              })
             : `${candidate.location.district} · ${candidate.nationality}`}
         </Text>
       </View>

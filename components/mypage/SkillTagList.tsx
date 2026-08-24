@@ -29,7 +29,7 @@ export function SkillTagList({
         ) : (
           <>
             {visible.map((s) => (
-              <Tag key={s.id} label={skillLabel(s)} tone={tone} />
+              <Tag key={s.id} label={s.emoji ? `${s.emoji} ${skillLabel(s)}` : skillLabel(s)} tone={tone} />
             ))}
             {hasMore && (
               <Pressable onPress={() => setExpanded((v) => !v)} hitSlop={6} className="px-1.5 py-1">

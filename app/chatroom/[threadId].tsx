@@ -97,6 +97,15 @@ export default function Chatroom() {
           {counterpart?.name ?? t('chatroom.defaultCounterpart')}
           {thread.isDirectChannel ? ` · ${t('chat.directChannelTag')}` : ''}
         </Text>
+        {counterpart && (
+          <Pressable
+            onPress={() => router.push({ pathname: '/report/[targetUserId]', params: { targetUserId: counterpartId, threadId } })}
+            hitSlop={10}
+            className="w-9 h-9 rounded-full bg-gray-50 items-center justify-center mr-1.5"
+          >
+            <Feather name="flag" size={16} color="#6b7280" />
+          </Pressable>
+        )}
         <Pressable
           onPress={handleOpenAppointment}
           hitSlop={10}

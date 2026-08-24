@@ -6,7 +6,21 @@ import { SEED_MICRO_GROUPS } from '../mocks/microGroups';
 import { generateId } from '../utils/id';
 import { computeCompatibilityScore, computeMatchFactorScores, generateActivityCourse } from '../utils/matchAlgorithm';
 import { asyncStorageAdapter } from './storage';
+import { useAuthStore } from './useAuthStore';
 import { useUserStore } from './useUserStore';
+
+interface CreateMicroGroupInput {
+  title: string;
+  location: string;
+  date: string;
+  category: string;
+  maxParticipants: number;
+}
+
+function authHeaders(): Record<string, string> | undefined {
+  const token = useAuthStore.getState().sessionToken;
+  return token ? { authorization: `Bearer ${token}` } : undefined;
+}
 
 interface MatchState {
   matches: MatchResult[];
@@ -18,6 +32,8 @@ interface MatchState {
   acceptMatch: (matchId: string) => void;
   toggleMicroGroupInterest: (groupId: string, userId: string) => void;
   getMatchById: (matchId: string) => MatchResult | undefined;
+  fetchMicroGroups: () => Promise<void>;
+  createMicroGroup: (authorId: string, input: CreateMicroGroupInput) => Promise<MicroGroupSuggestion>;
 }
 
 export const useMatchStore = create<MatchState>()(
@@ -69,21 +85,89 @@ export const useMatchStore = create<MatchState>()(
 
       acceptMatch: (matchId) => get().setMatchStatus(matchId, 'accepted'),
 
-      toggleMicroGroupInterest: (groupId, userId) =>
+      toggleMicroGroupInterest: (groupId, userId) => {
+        const group = get().microGroups.find((g) => g.id === groupId);
+        const wasInterested = !!group?.interestedUserIds.includes(userId);
+
         set((state) => ({
           microGroups: state.microGroups.map((g) =>
             g.id !== groupId
               ? g
               : {
                   ...g,
-                  interestedUserIds: g.interestedUserIds.includes(userId)
+                  interestedUserIds: wasInterested
                     ? g.interestedUserIds.filter((id) => id !== userId)
                     : [...g.interestedUserIds, userId],
                 }
           ),
-        })),
+        }));
+
+        const backendUrl = process.env.EXPO_PUBLIC_BACKEND_URL;
+        const headers = authHeaders();
+        if (!backendUrl || !headers) return;
+        fetch(`${backendUrl}/api/cultural-map/pins`, {
+          method: 'PATCH',
+          headers: { 'content-type': 'application/json', ...headers },
+          body: JSON.stringify({ resource: 'micro-group', id: groupId, action: wasInterested ? 'leave' : 'join' }),
+        }).catch(() => {});
+      },
 
       getMatchById: (matchId) => get().matches.find((m) => m.id === matchId),
+
+      fetchMicroGroups: async () => {
+        const backendUrl = process.env.EXPO_PUBLIC_BACKEND_URL;
+        const headers = authHeaders();
+        if (!backendUrl || !headers) return;
+
+        try {
+          const res = await fetch(`${backendUrl}/api/cultural-map/pins?resource=micro-group`, { headers });
+          if (!res.ok) return;
+          const { microGroups } = (await res.json()) as { microGroups: MicroGroupSuggestion[] };
+          set((state) => {
+            const merged = { ...Object.fromEntries(state.microGroups.map((g) => [g.id, g])) };
+            for (const group of microGroups) {
+              if (group?.id) merged[group.id] = group;
+            }
+            return { microGroups: Object.values(merged) };
+          });
+        } catch {
+          // 오프라인이거나 백엔드 미배포 — 로컬(시드) 상태 그대로 유지
+        }
+      },
+
+      createMicroGroup: async (authorId, input) => {
+        const group: MicroGroupSuggestion = {
+          id: generateId('microgroup'),
+          authorId,
+          title: input.title,
+          location: input.location,
+          date: input.date,
+          category: input.category,
+          maxParticipants: input.maxParticipants,
+          interestedUserIds: [authorId],
+        };
+        set((state) => ({ microGroups: [group, ...state.microGroups] }));
+
+        const backendUrl = process.env.EXPO_PUBLIC_BACKEND_URL;
+        const headers = authHeaders();
+        if (backendUrl && headers) {
+          fetch(`${backendUrl}/api/cultural-map/pins`, {
+            method: 'POST',
+            headers: { 'content-type': 'application/json', ...headers },
+            body: JSON.stringify({
+              resource: 'micro-group',
+              id: group.id,
+              title: group.title,
+              location: group.location,
+              date: group.date,
+              category: group.category,
+              maxParticipants: group.maxParticipants,
+            }),
+          }).catch(() => {});
+        }
+
+        return group;
+      },
     }),
     {
       name: 'daitda-matches',

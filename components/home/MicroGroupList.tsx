@@ -1,4 +1,5 @@
 import { Feather } from '@expo/vector-icons';
+import type { ReactNode } from 'react';
 import { Pressable, Text, View } from 'react-native';
 import { Card } from '../common/Card';
 import type { MicroGroupSuggestion } from '../../types';
@@ -9,14 +10,18 @@ interface Props {
   groups: MicroGroupSuggestion[];
   currentUserId: string;
   onToggleInterest: (groupId: string) => void;
+  headerAction?: ReactNode;
 }
 
-export function MicroGroupList({ groups, currentUserId, onToggleInterest }: Props) {
+export function MicroGroupList({ groups, currentUserId, onToggleInterest, headerAction }: Props) {
   const { t } = useTranslation();
   return (
     <View className="mt-8">
       <Text className="text-[13px] font-semibold text-gray-400 mb-1">{t('microGroup.aiLabel')}</Text>
-      <Text className="text-xl font-extrabold text-gray-900 mb-3">{t('microGroup.title')}</Text>
+      <View className="flex-row items-center justify-between mb-3">
+        <Text className="text-xl font-extrabold text-gray-900">{t('microGroup.title')}</Text>
+        {headerAction}
+      </View>
       {groups.map((group) => {
         const isInterested = group.interestedUserIds.includes(currentUserId);
         return (

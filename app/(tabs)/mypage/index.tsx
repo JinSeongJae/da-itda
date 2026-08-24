@@ -7,6 +7,7 @@ import { LanguagePicker } from '../../../components/common/LanguagePicker';
 import { ProfileHeader } from '../../../components/mypage/ProfileHeader';
 import { SkillTagList } from '../../../components/mypage/SkillTagList';
 import { VerificationStatusCard } from '../../../components/mypage/VerificationStatusCard';
+import { isAdminUser } from '../../../constants/admin';
 import { useAuthStore } from '../../../store/useAuthStore';
 import { useUserStore } from '../../../store/useUserStore';
 import { useTranslation } from '../../../utils/i18n';
@@ -48,6 +49,17 @@ export default function MyPage() {
 
         <Text className="text-xl font-extrabold text-gray-900 px-6 mb-3 mt-4">{t('mypage.earnedBadges')}</Text>
         <BadgeGrid earnedBadgeIds={user.badges} />
+
+        {isAdminUser(currentUserId) && (
+          <Pressable
+            onPress={() => router.push('/admin')}
+            className="flex-row items-center bg-gray-50 rounded-2xl px-4 py-3.5 mx-6 mt-6"
+          >
+            <Feather name="shield" size={16} color="#374151" />
+            <Text className="text-sm font-semibold text-gray-700 ml-2 flex-1">{t('admin.entryLabel')}</Text>
+            <Feather name="chevron-right" size={16} color="#9ca3af" />
+          </Pressable>
+        )}
 
         <Pressable onPress={handleLogout} className="flex-row items-center justify-center mt-8">
           <Feather name="log-out" size={15} color="#ef4444" />

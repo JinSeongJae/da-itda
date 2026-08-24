@@ -127,6 +127,35 @@ async function createSchema(): Promise<void> {
 
     CREATE INDEX IF NOT EXISTS reviews_appointment_id_idx ON reviews(appointment_id);
 
+    CREATE TABLE IF NOT EXISTS verification_requests (
+      id TEXT PRIMARY KEY,
+      user_id TEXT NOT NULL,
+      document_type TEXT NOT NULL,
+      masked_image_url TEXT NOT NULL,
+      birth_date DATE,
+      status TEXT NOT NULL DEFAULT 'pending',
+      submitted_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+      reviewed_at TIMESTAMPTZ,
+      reviewed_by TEXT
+    );
+
+    CREATE INDEX IF NOT EXISTS verification_requests_user_id_idx ON verification_requests(user_id);
+
+    CREATE TABLE IF NOT EXISTS reports (
+      id TEXT PRIMARY KEY,
+      reporter_id TEXT NOT NULL,
+      target_user_id TEXT NOT NULL,
+      reason TEXT NOT NULL,
+      detail TEXT,
+      thread_id TEXT,
+      status TEXT NOT NULL DEFAULT 'open',
+      created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+      resolved_at TIMESTAMPTZ,
+      resolved_by TEXT
+    );
+
+    CREATE INDEX IF NOT EXISTS reports_target_user_id_idx ON reports(target_user_id);
+
     CREATE TABLE IF NOT EXISTS cultural_pins (
       id TEXT PRIMARY KEY,
       author_id TEXT NOT NULL,
@@ -141,6 +170,31 @@ async function createSchema(): Promise<void> {
     );
 
     CREATE INDEX IF NOT EXISTS cultural_pins_author_id_idx ON cultural_pins(author_id);
+
+    CREATE TABLE IF NOT EXISTS community_posts (
+      id TEXT PRIMARY KEY,
+      author_id TEXT NOT NULL,
+      category TEXT NOT NULL,
+      title TEXT NOT NULL,
+      body TEXT NOT NULL,
+      created_at TIMESTAMPTZ NOT NULL DEFAULT now()
+    );
+
+    CREATE INDEX IF NOT EXISTS community_posts_created_at_idx ON community_posts(created_at DESC);
+
+    CREATE TABLE IF NOT EXISTS micro_groups (
+      id TEXT PRIMARY KEY,
+      author_id TEXT NOT NULL,
+      title TEXT NOT NULL,
+      location TEXT NOT NULL,
+      meetup_date TIMESTAMPTZ NOT NULL,
+      category TEXT NOT NULL,
+      max_participants INT NOT NULL,
+      interested_user_ids JSONB NOT NULL DEFAULT '[]',
+      created_at TIMESTAMPTZ NOT NULL DEFAULT now()
+    );
+
+    CREATE INDEX IF NOT EXISTS micro_groups_created_at_idx ON micro_groups(created_at DESC);
   `);
 }
 
