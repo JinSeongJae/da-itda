@@ -73,8 +73,7 @@ export async function generateAppointmentSuggestion({
       },
     ],
     generationConfig: {
-      // gemini-3.6-flash가 기본으로 쓰는 "생각" 토큰 + 서두 문구가 예산을 먹어 응답이 잘리는
-      // 문제를 막기 위해 예산을 넉넉히 준다.
+      thinkingConfig: { thinkingLevel: 'low' },
       maxOutputTokens: 800,
       responseMimeType: 'application/json',
       responseSchema: {
@@ -174,6 +173,7 @@ export async function generateSafeZoneRecommendations({
       },
     ],
     generationConfig: {
+      thinkingConfig: { thinkingLevel: 'low' },
       maxOutputTokens: 1200,
       responseMimeType: 'application/json',
       responseSchema: {

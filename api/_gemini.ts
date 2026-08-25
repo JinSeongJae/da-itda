@@ -44,10 +44,10 @@ export async function analyzeIdDocument(base64Image: string, mimeType: string): 
         },
       ],
       generationConfig: {
-        // gemini-3.6-flash는 기본으로 "생각" 토큰을 쓰고, 응답 앞에 "Here is the JSON:" 같은
-        // 서두와 마크다운 코드펜스를 덧붙이는 경우가 있다 — 이 전부가 maxOutputTokens 예산을
-        // 먹어서 실제 JSON이 나오기 전에 응답이 잘리는 문제가 있었다(thinkingConfig로 생각을
-        // 끄는 건 이 모델에서 400 에러가 나서 예산을 넉넉히 주는 방식으로 대응한다).
+        // gemini-3.6-flash는 기본으로 "생각" 토큰을 많이 써서(이미지 분석은 특히 더) 응답이
+        // JSON을 완성하기 전에 잘리는 문제가 있었다. 레거시 필드인 thinkingBudget은 이 모델에서
+        // 400 에러가 나므로, Gemini 3 계열의 thinkingLevel로 생각 양을 줄인다.
+        thinkingConfig: { thinkingLevel: 'low' },
         maxOutputTokens: 1024,
         responseMimeType: 'application/json',
         responseSchema: {
