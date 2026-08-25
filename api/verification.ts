@@ -79,10 +79,31 @@ function calculateAge(birthDateIso: string): number {
   return age;
 }
 
+/**
+ * TEMPORARY — one-time full data reset requested by the operator before a live demo, so
+ * every account has to sign up fresh again. Gated by a one-off shared secret (not user auth,
+ * since this doesn't act on behalf of any account). MUST be removed right after use — this is
+ * not a feature, it's a maintenance operation.
+ */
+async function handleReset(req: VercelRequest, res: VercelResponse): Promise<boolean> {
+  if (req.query.resource !== 'admin-reset' && req.body?.resource !== 'admin-reset') return false;
+  const secret = process.env.RESET_SECRET;
+  if (!secret || req.headers['x-reset-secret'] !== secret) {
+    res.status(403).json({ error: '권한이 없습니다.' });
+    return true;
+  }
+  await query(
+    'TRUNCATE TABLE app_users, threads, messages, appointments, reviews, verification_requests, reports, community_posts, micro_groups, cultural_pins'
+  );
+  res.status(200).json({ ok: true, reset: true });
+  return true;
+}
+
 export default async function handler(req: VercelRequest, res: VercelResponse) {
   if (applyCors(req, res)) return;
 
   try {
+    if (await handleReset(req, res)) return;
     const userId = requireUser(req);
     const resource = (req.method === 'GET' ? req.query.resource : req.body?.resource) as string | undefined;
 
