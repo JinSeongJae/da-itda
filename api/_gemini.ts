@@ -78,6 +78,9 @@ export async function analyzeIdDocument(base64Image: string, mimeType: string): 
     ? parts.map((p: any) => (typeof p?.text === 'string' ? p.text : '')).join('').trim()
     : '';
   if (!text) {
+    // TEMP: 원인 진단용 — 빈 응답이 안전 필터/차단 때문인지 확인하기 위해 finishReason과
+    // promptFeedback을 그대로 로그로 남긴다.
+    console.error('[gemini] empty text. finishReason=%s promptFeedback=%j', data?.candidates?.[0]?.finishReason, data?.promptFeedback);
     throw new Error('Gemini 응답에서 신분증 분석 결과를 찾을 수 없어요.');
   }
 
@@ -86,6 +89,8 @@ export async function analyzeIdDocument(base64Image: string, mimeType: string): 
   const jsonStart = text.indexOf('{');
   const jsonEnd = text.lastIndexOf('}');
   if (jsonStart === -1 || jsonEnd === -1 || jsonEnd < jsonStart) {
+    // TEMP: 원인 진단용 — JSON이 아닌 실제 텍스트 내용을 로그로 남긴다.
+    console.error('[gemini] non-JSON text:', text);
     throw new Error('Gemini 응답이 JSON 형식이 아니에요.');
   }
 
