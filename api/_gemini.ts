@@ -81,5 +81,13 @@ export async function analyzeIdDocument(base64Image: string, mimeType: string): 
     throw new Error('Gemini 응답에서 신분증 분석 결과를 찾을 수 없어요.');
   }
 
-  return JSON.parse(text) as IdAnalysisResult;
+  // responseMimeType: 'application/json'을 지정해도 최신 모델은 가끔 "Here is the JSON:" 같은
+  // 서두를 덧붙인다 — 전체를 파싱하는 대신 첫 '{'부터 마지막 '}'까지만 추출해서 파싱한다.
+  const jsonStart = text.indexOf('{');
+  const jsonEnd = text.lastIndexOf('}');
+  if (jsonStart === -1 || jsonEnd === -1 || jsonEnd < jsonStart) {
+    throw new Error('Gemini 응답이 JSON 형식이 아니에요.');
+  }
+
+  return JSON.parse(text.slice(jsonStart, jsonEnd + 1)) as IdAnalysisResult;
 }

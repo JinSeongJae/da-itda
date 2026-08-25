@@ -14,6 +14,20 @@ function extractText(data: any): string | undefined {
   return text.length > 0 ? text : undefined;
 }
 
+// responseMimeType: 'application/json'을 지정해도 최신 모델은 가끔 "Here is the JSON:" 같은
+// 서두를 덧붙인다 — 전체를 파싱하는 대신 실제 JSON 값(객체 또는 배열)만 추출해서 파싱한다.
+function parseJsonValue(text: string): any {
+  const objStart = text.indexOf('{');
+  const arrStart = text.indexOf('[');
+  const isArray = arrStart !== -1 && (objStart === -1 || arrStart < objStart);
+  const start = isArray ? arrStart : objStart;
+  const end = isArray ? text.lastIndexOf(']') : text.lastIndexOf('}');
+  if (start === -1 || end === -1 || end < start) {
+    throw new Error('Gemini 응답이 JSON 형식이 아니에요.');
+  }
+  return JSON.parse(text.slice(start, end + 1));
+}
+
 async function callGemini(apiKey: string, body: Record<string, unknown>): Promise<any> {
   const response = await fetch(`${GEMINI_ENDPOINT}?key=${apiKey}`, {
     method: 'POST',
@@ -78,7 +92,7 @@ export async function generateAppointmentSuggestion({
     throw new Error('Gemini 응답에서 약속 추천 결과를 찾을 수 없어요.');
   }
 
-  const parsed = JSON.parse(text);
+  const parsed = parseJsonValue(text);
   if (!parsed.date || !parsed.time || !parsed.purpose) {
     throw new Error('Gemini 약속 추천 결과가 올바르지 않아요.');
   }
@@ -180,7 +194,7 @@ export async function generateSafeZoneRecommendations({
     throw new Error('Gemini 응답에서 안심존 추천 결과를 찾을 수 없어요.');
   }
 
-  const parsed = JSON.parse(text);
+  const parsed = parseJsonValue(text);
   if (!Array.isArray(parsed) || parsed.length === 0) {
     throw new Error('Gemini 안심존 추천 결과가 올바르지 않아요.');
   }
