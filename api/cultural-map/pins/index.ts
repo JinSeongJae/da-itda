@@ -217,10 +217,30 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     if (req.method === 'PATCH') {
       const resource = resolveResource((req.body ?? {}).resource);
 
+      if (resource === 'post') {
+        const { id, action } = req.body ?? {};
+        if (typeof id !== 'string' || action !== 'delete') {
+          res.status(400).json({ error: "id와 action('delete')이 필요합니다." });
+          return;
+        }
+        const rows = await query<PostRow>('SELECT id, author_id FROM community_posts WHERE id = $1', [id]);
+        if (!rows[0]) {
+          res.status(404).json({ error: '글을 찾을 수 없습니다.' });
+          return;
+        }
+        if (rows[0].author_id !== userId) {
+          res.status(403).json({ error: '본인이 쓴 글만 삭제할 수 있습니다.' });
+          return;
+        }
+        await query('DELETE FROM community_posts WHERE id = $1', [id]);
+        res.status(200).json({ ok: true });
+        return;
+      }
+
       if (resource === 'micro-group') {
         const { id, action } = req.body ?? {};
-        if (typeof id !== 'string' || (action !== 'join' && action !== 'leave')) {
-          res.status(400).json({ error: "id와 action('join'|'leave')이 필요합니다." });
+        if (typeof id !== 'string' || (action !== 'join' && action !== 'leave' && action !== 'delete')) {
+          res.status(400).json({ error: "id와 action('join'|'leave'|'delete')이 필요합니다." });
           return;
         }
 
@@ -232,6 +252,16 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         const group = rows[0];
         if (!group) {
           res.status(404).json({ error: '소모임을 찾을 수 없습니다.' });
+          return;
+        }
+
+        if (action === 'delete') {
+          if (group.author_id !== userId) {
+            res.status(403).json({ error: '본인이 만든 소모임만 삭제할 수 있습니다.' });
+            return;
+          }
+          await query('DELETE FROM micro_groups WHERE id = $1', [id]);
+          res.status(200).json({ ok: true });
           return;
         }
 
@@ -249,6 +279,26 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
           [id, JSON.stringify(nextInterested)]
         );
         res.status(200).json({ microGroup: toMicroGroupJson(updated[0]) });
+        return;
+      }
+
+      if ((req.body ?? {}).action === 'delete') {
+        const { pinId: deletePinId } = req.body ?? {};
+        if (typeof deletePinId !== 'string') {
+          res.status(400).json({ error: 'pinId가 필요합니다.' });
+          return;
+        }
+        const rows = await query<PinRow>('SELECT id, author_id FROM cultural_pins WHERE id = $1', [deletePinId]);
+        if (!rows[0]) {
+          res.status(404).json({ error: '핀을 찾을 수 없습니다.' });
+          return;
+        }
+        if (rows[0].author_id !== userId) {
+          res.status(403).json({ error: '본인이 등록한 핀만 삭제할 수 있습니다.' });
+          return;
+        }
+        await query('DELETE FROM cultural_pins WHERE id = $1', [deletePinId]);
+        res.status(200).json({ ok: true });
         return;
       }
 

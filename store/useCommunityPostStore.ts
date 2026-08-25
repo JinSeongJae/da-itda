@@ -22,6 +22,7 @@ interface CommunityPostState {
   getAllPosts: () => CommunityPost[];
   fetchPosts: () => Promise<void>;
   createPost: (authorId: string, input: CreatePostInput) => CommunityPost;
+  deletePost: (postId: string) => Promise<boolean>;
 }
 
 export const useCommunityPostStore = create<CommunityPostState>()(
@@ -77,6 +78,35 @@ export const useCommunityPostStore = create<CommunityPostState>()(
         }
 
         return post;
+      },
+
+      deletePost: async (postId) => {
+        const backendUrl = process.env.EXPO_PUBLIC_BACKEND_URL;
+        const headers = authHeaders();
+        if (!backendUrl || !headers) return false;
+
+        const previous = get().postsById[postId];
+        set((state) => {
+          const next = { ...state.postsById };
+          delete next[postId];
+          return { postsById: next };
+        });
+
+        try {
+          const res = await fetch(`${backendUrl}/api/cultural-map/pins`, {
+            method: 'PATCH',
+            headers: { 'content-type': 'application/json', ...headers },
+            body: JSON.stringify({ resource: 'post', id: postId, action: 'delete' }),
+          });
+          if (!res.ok && previous) {
+            set((state) => ({ postsById: { ...state.postsById, [postId]: previous } }));
+            return false;
+          }
+          return true;
+        } catch {
+          if (previous) set((state) => ({ postsById: { ...state.postsById, [postId]: previous } }));
+          return false;
+        }
       },
     }),
     {

@@ -30,6 +30,7 @@ interface CulturalMapState {
   verifyPin: (pinId: string, location: { lat: number; lng: number }) => Promise<VerifyResult>;
   getPinById: (pinId: string) => CulturalPin | undefined;
   fetchPins: () => Promise<void>;
+  deletePin: (pinId: string) => Promise<boolean>;
 }
 
 export const useCulturalMapStore = create<CulturalMapState>()(
@@ -125,6 +126,35 @@ export const useCulturalMapStore = create<CulturalMapState>()(
           set({ pinsById: Object.fromEntries(pins.filter((p) => p?.id).map((p) => [p.id, p])) });
         } catch {
           // 오프라인이거나 백엔드 미배포 — 로컬(시드) 상태 그대로 유지
+        }
+      },
+
+      deletePin: async (pinId) => {
+        const backendUrl = process.env.EXPO_PUBLIC_BACKEND_URL;
+        const headers = authHeaders();
+        if (!backendUrl || !headers) return false;
+
+        const previous = get().pinsById[pinId];
+        set((state) => {
+          const next = { ...state.pinsById };
+          delete next[pinId];
+          return { pinsById: next };
+        });
+
+        try {
+          const res = await fetch(`${backendUrl}/api/cultural-map/pins`, {
+            method: 'PATCH',
+            headers: { 'content-type': 'application/json', ...headers },
+            body: JSON.stringify({ pinId, action: 'delete' }),
+          });
+          if (!res.ok && previous) {
+            set((state) => ({ pinsById: { ...state.pinsById, [pinId]: previous } }));
+            return false;
+          }
+          return true;
+        } catch {
+          if (previous) set((state) => ({ pinsById: { ...state.pinsById, [pinId]: previous } }));
+          return false;
         }
       },
     }),

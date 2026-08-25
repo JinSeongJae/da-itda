@@ -1,8 +1,8 @@
 import { useState } from 'react';
 import { Feather } from '@expo/vector-icons';
-import { ScrollView, Text, View } from 'react-native';
+import { Alert, ScrollView, Text, View } from 'react-native';
 import * as Location from 'expo-location';
-import { useLocalSearchParams } from 'expo-router';
+import { router, useLocalSearchParams } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Avatar } from '../../components/common/Avatar';
 import { Button } from '../../components/common/Button';
@@ -20,6 +20,7 @@ export default function CulturalPinDetail() {
   const currentUserId = useAuthStore((s) => s.currentUserId)!;
   const pin = useCulturalMapStore((s) => s.pinsById[pinId]);
   const verifyPin = useCulturalMapStore((s) => s.verifyPin);
+  const deletePin = useCulturalMapStore((s) => s.deletePin);
   const author = useUserStore((s) => (pin ? s.usersById[pin.authorId] : undefined));
 
   const [verifying, setVerifying] = useState(false);
@@ -121,10 +122,29 @@ export default function CulturalPinDetail() {
 
       <View className="px-6 pt-3 pb-4 border-t border-gray-100 bg-white">
         {isAuthor ? (
-          <View className="flex-row items-center justify-center py-4">
-            <Feather name="star" size={15} color="#059669" />
-            <Text className="text-sm font-semibold text-primary-700 ml-2">{t('culturalMap.isAuthorLabel')}</Text>
-          </View>
+          <>
+            <View className="flex-row items-center justify-center py-4">
+              <Feather name="star" size={15} color="#059669" />
+              <Text className="text-sm font-semibold text-primary-700 ml-2">{t('culturalMap.isAuthorLabel')}</Text>
+            </View>
+            <Button
+              label={t('common.delete')}
+              variant="outline"
+              onPress={() =>
+                Alert.alert(t('common.deleteConfirmTitle'), t('common.deleteConfirmBody'), [
+                  { text: t('common.cancel'), style: 'cancel' },
+                  {
+                    text: t('common.delete'),
+                    style: 'destructive',
+                    onPress: async () => {
+                      await deletePin(pin.id);
+                      router.back();
+                    },
+                  },
+                ])
+              }
+            />
+          </>
         ) : (
           <Button
             label={

@@ -18,8 +18,10 @@ export default function CommunityScreen() {
   const microGroups = useMatchStore((s) => s.microGroups);
   const toggleMicroGroupInterest = useMatchStore((s) => s.toggleMicroGroupInterest);
   const fetchMicroGroups = useMatchStore((s) => s.fetchMicroGroups);
+  const deleteMicroGroup = useMatchStore((s) => s.deleteMicroGroup);
   const postsById = useCommunityPostStore((s) => s.postsById);
   const fetchPosts = useCommunityPostStore((s) => s.fetchPosts);
+  const deletePost = useCommunityPostStore((s) => s.deletePost);
   // getAllPosts() sorts into a brand-new array every call — selecting it directly would hand
   // React 18's useSyncExternalStore a different reference on every render and infinite-loop.
   const posts = useMemo(
@@ -56,6 +58,7 @@ export default function CommunityScreen() {
           groups={microGroups}
           currentUserId={currentUserId}
           onToggleInterest={(groupId) => toggleMicroGroupInterest(groupId, currentUserId)}
+          onDelete={(groupId) => deleteMicroGroup(groupId)}
           headerAction={
             <Pressable
               onPress={() => router.push('/community/new-group')}
@@ -70,6 +73,8 @@ export default function CommunityScreen() {
         <CommunityFeedList
           posts={posts}
           usersById={usersById}
+          currentUserId={currentUserId}
+          onDelete={(postId) => deletePost(postId)}
           headerAction={
             <Pressable
               onPress={() => router.push('/community/new-post')}

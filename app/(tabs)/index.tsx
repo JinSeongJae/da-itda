@@ -13,10 +13,11 @@ import { useChatStore } from '../../store/useChatStore';
 import { useMatchStore } from '../../store/useMatchStore';
 import { useUserStore } from '../../store/useUserStore';
 import { rankCandidates } from '../../utils/matchAlgorithm';
+import { generateMatchRationales } from '../../utils/gemini';
 import { useTranslation } from '../../utils/i18n';
 
 export default function Home() {
-  const { t } = useTranslation();
+  const { t, skillLabel } = useTranslation();
   const currentUserId = useAuthStore((s) => s.currentUserId)!;
   const usersById = useUserStore((s) => s.usersById);
   const currentUser = usersById[currentUserId];
@@ -28,13 +29,12 @@ export default function Home() {
   const getUpcomingAppointmentForUser = useAppointmentStore((s) => s.getUpcomingAppointmentForUser);
   const fetchAppointments = useAppointmentStore((s) => s.fetchAppointments);
   const [matchingWithId, setMatchingWithId] = useState<string | null>(null);
+  const [rationalesById, setRationalesById] = useState<Record<string, string>>({});
 
   useEffect(() => {
     fetchAllUsers();
     fetchAppointments();
   }, [fetchAllUsers, fetchAppointments]);
-
-  if (!currentUser) return null;
 
   // 이미 매칭한(=매칭하기를 눌러 채팅이 시작된) 이웃은 추천에서 다시 뜨지 않게 제외한다.
   const alreadyMatchedIds = new Set(
@@ -45,7 +45,48 @@ export default function Home() {
   const candidates = Object.values(usersById).filter(
     (u) => u.id !== currentUserId && !alreadyMatchedIds.has(u.id)
   );
-  const topRecommendations = rankCandidates(currentUser, candidates).slice(0, 3);
+  const topRecommendations = currentUser ? rankCandidates(currentUser, candidates).slice(0, 3) : [];
+
+  // 매칭 순위·점수는 그대로 알고리즘이 계산한 걸 쓰고, AI는 "왜 잘 맞는지" 한 줄 설명만 덧붙인다
+  // — 순서에는 영향을 주지 않는다. 실패해도 카드 자체는 설명 없이 정상적으로 보인다.
+  const topRecommendationIdsKey = topRecommendations.map((r) => r.candidate.id).join(',');
+  useEffect(() => {
+    const apiKey = process.env.EXPO_PUBLIC_GEMINI_API_KEY;
+    if (!apiKey || !currentUser || topRecommendations.length === 0) return;
+
+    let cancelled = false;
+    generateMatchRationales({
+      apiKey,
+      selfOfferedLabels: currentUser.skillsOffered.map(skillLabel),
+      selfWantedLabels: currentUser.skillsWanted.map(skillLabel),
+      candidates: topRecommendations.map(({ candidate, compatibilityScore }) => ({
+        id: candidate.id,
+        name: candidate.name,
+        offeredLabels: candidate.skillsOffered.map(skillLabel),
+        wantedLabels: candidate.skillsWanted.map(skillLabel),
+        compatibilityScore,
+      })),
+    })
+      .then((results) => {
+        if (cancelled) return;
+        setRationalesById((prev) => {
+          const next = { ...prev };
+          for (const r of results) {
+            if (r.candidateId && r.rationale) next[r.candidateId] = r.rationale;
+          }
+          return next;
+        });
+      })
+      .catch(() => {
+        // 장식성 설명일 뿐이라 실패해도 카드 자체는 그대로 보인다 — 조용히 무시한다.
+      });
+    return () => {
+      cancelled = true;
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [topRecommendationIdsKey, currentUser?.id]);
+
+  if (!currentUser) return null;
 
   const upcomingAppointment = getUpcomingAppointmentForUser(currentUserId);
   const upcomingMatch = upcomingAppointment ? getMatchById(upcomingAppointment.matchId) : undefined;
@@ -98,6 +139,7 @@ export default function Home() {
                   onMatch={() => handleMatch(candidate.id)}
                   matching={matchingWithId === candidate.id}
                   topPick={index === 0}
+                  aiRationale={rationalesById[candidate.id]}
                 />
               ))}
             </View>

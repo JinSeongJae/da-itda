@@ -66,7 +66,28 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       return;
     }
 
-    res.status(405).json({ error: 'GET 또는 POST 요청만 지원합니다.' });
+    if (req.method === 'PATCH') {
+      const { id, action } = req.body ?? {};
+      if (typeof id !== 'string' || action !== 'delete') {
+        res.status(400).json({ error: "id와 action('delete')이 필요합니다." });
+        return;
+      }
+      const rows = await query<ThreadRow>(
+        'SELECT id FROM threads WHERE id = $1 AND (user_a_id = $2 OR user_b_id = $2)',
+        [id, userId]
+      );
+      if (!rows[0]) {
+        res.status(403).json({ error: '이 채팅방에 접근할 권한이 없습니다.' });
+        return;
+      }
+      await query('DELETE FROM messages WHERE thread_id = $1', [id]);
+      await query('DELETE FROM appointments WHERE thread_id = $1', [id]);
+      await query('DELETE FROM threads WHERE id = $1', [id]);
+      res.status(200).json({ ok: true });
+      return;
+    }
+
+    res.status(405).json({ error: 'GET, POST 또는 PATCH 요청만 지원합니다.' });
   } catch (error) {
     const statusCode = (error as { statusCode?: number })?.statusCode ?? 500;
     res.status(statusCode).json({ error: error instanceof Error ? error.message : '알 수 없는 오류가 발생했습니다.' });

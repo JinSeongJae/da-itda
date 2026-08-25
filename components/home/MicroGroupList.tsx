@@ -1,6 +1,6 @@
 import { Feather } from '@expo/vector-icons';
 import type { ReactNode } from 'react';
-import { Pressable, Text, View } from 'react-native';
+import { Alert, Pressable, Text, View } from 'react-native';
 import { Card } from '../common/Card';
 import type { MicroGroupSuggestion } from '../../types';
 import { formatDate } from '../../utils/formatters';
@@ -10,11 +10,20 @@ interface Props {
   groups: MicroGroupSuggestion[];
   currentUserId: string;
   onToggleInterest: (groupId: string) => void;
+  onDelete?: (groupId: string) => void;
   headerAction?: ReactNode;
 }
 
-export function MicroGroupList({ groups, currentUserId, onToggleInterest, headerAction }: Props) {
+export function MicroGroupList({ groups, currentUserId, onToggleInterest, onDelete, headerAction }: Props) {
   const { t } = useTranslation();
+
+  const confirmDelete = (groupId: string) => {
+    Alert.alert(t('common.deleteConfirmTitle'), t('common.deleteConfirmBody'), [
+      { text: t('common.cancel'), style: 'cancel' },
+      { text: t('common.delete'), style: 'destructive', onPress: () => onDelete?.(groupId) },
+    ]);
+  };
+
   return (
     <View className="mt-8">
       <Text className="text-[13px] font-semibold text-gray-400 mb-1">{t('microGroup.aiLabel')}</Text>
@@ -24,9 +33,17 @@ export function MicroGroupList({ groups, currentUserId, onToggleInterest, header
       </View>
       {groups.map((group) => {
         const isInterested = group.interestedUserIds.includes(currentUserId);
+        const isAuthor = group.authorId === currentUserId;
         return (
           <Card key={group.id} className="mb-3">
-            <Text className="text-[15px] font-bold text-gray-900">{group.title}</Text>
+            <View className="flex-row items-center justify-between">
+              <Text className="text-[15px] font-bold text-gray-900 flex-1">{group.title}</Text>
+              {isAuthor && (
+                <Pressable onPress={() => confirmDelete(group.id)} hitSlop={8} className="ml-2">
+                  <Feather name="trash-2" size={14} color="#9ca3af" />
+                </Pressable>
+              )}
+            </View>
             <View className="flex-row items-center mt-2">
               <Feather name="map-pin" size={13} color="#9ca3af" />
               <Text className="text-[13px] text-gray-500 ml-1">{group.location}</Text>

@@ -10,15 +10,17 @@ export function ChatListItem({
   counterpart,
   isBestFriendNeighbor,
   onPress,
+  onLongPress,
 }: {
   thread: ChatThread;
   counterpart: User;
   isBestFriendNeighbor?: boolean;
   onPress: () => void;
+  onLongPress?: () => void;
 }) {
   const { t } = useTranslation();
   return (
-    <Pressable onPress={onPress} className="flex-row items-center py-4">
+    <Pressable onPress={onPress} onLongPress={onLongPress} delayLongPress={400} className="flex-row items-center py-4">
       <Avatar uri={counterpart.avatarUrl} size={52} />
       <View className="ml-3.5 flex-1">
         <View className="flex-row items-center">

@@ -34,6 +34,7 @@ interface MatchState {
   getMatchById: (matchId: string) => MatchResult | undefined;
   fetchMicroGroups: () => Promise<void>;
   createMicroGroup: (authorId: string, input: CreateMicroGroupInput) => Promise<MicroGroupSuggestion>;
+  deleteMicroGroup: (groupId: string) => Promise<boolean>;
 }
 
 export const useMatchStore = create<MatchState>()(
@@ -163,6 +164,31 @@ export const useMatchStore = create<MatchState>()(
         }
 
         return group;
+      },
+
+      deleteMicroGroup: async (groupId) => {
+        const backendUrl = process.env.EXPO_PUBLIC_BACKEND_URL;
+        const headers = authHeaders();
+        if (!backendUrl || !headers) return false;
+
+        const previous = get().microGroups;
+        set((state) => ({ microGroups: state.microGroups.filter((g) => g.id !== groupId) }));
+
+        try {
+          const res = await fetch(`${backendUrl}/api/cultural-map/pins`, {
+            method: 'PATCH',
+            headers: { 'content-type': 'application/json', ...headers },
+            body: JSON.stringify({ resource: 'micro-group', id: groupId, action: 'delete' }),
+          });
+          if (!res.ok) {
+            set({ microGroups: previous });
+            return false;
+          }
+          return true;
+        } catch {
+          set({ microGroups: previous });
+          return false;
+        }
       },
     }),
     {

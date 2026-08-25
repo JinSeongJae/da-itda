@@ -202,3 +202,95 @@ export async function generateSafeZoneRecommendations({
   }
   return parsed as SafeZoneRecommendation[];
 }
+
+export interface MatchRationaleCandidateInput {
+  id: string;
+  name: string;
+  offeredLabels: string[];
+  wantedLabels: string[];
+  compatibilityScore: number;
+}
+
+export interface MatchRationaleResult {
+  candidateId: string;
+  rationale: string;
+}
+
+/**
+ * 홈 화면 추천 이웃 카드에 붙는 한 줄 설명 생성 — 매칭 순위·점수는 그대로 기존 규칙 기반
+ * 알고리즘(utils/matchAlgorithm.ts)이 계산한 결과를 쓰고, 이 함수는 "왜" 그 조합이 좋은지
+ * 자연어로 설명만 덧붙인다. 순서를 바꾸지 않는다 — 안심존 추천에서 AI가 순서까지 바꾸면
+ * "가까운 곳"의 의미가 사라졌던 것과 같은 이유로, 매칭 순위도 알고리즘 결과를 그대로 존중한다.
+ */
+export async function generateMatchRationales({
+  apiKey,
+  selfOfferedLabels,
+  selfWantedLabels,
+  candidates,
+}: {
+  apiKey: string;
+  selfOfferedLabels: string[];
+  selfWantedLabels: string[];
+  candidates: MatchRationaleCandidateInput[];
+}): Promise<MatchRationaleResult[]> {
+  const candidateLines = candidates
+    .map(
+      (c, i) =>
+        `${i + 1}. id=${c.id} / ${c.name} · 호환도 ${c.compatibilityScore}% · ` +
+        `줄 수 있어요: ${c.offeredLabels.join(', ') || '없음'} · 받고 싶어요: ${c.wantedLabels.join(', ') || '없음'}`
+    )
+    .join('\n');
+
+  const data = await callGemini(apiKey, {
+    systemInstruction: {
+      parts: [
+        {
+          text:
+            `${BASE_SYSTEM_INSTRUCTION}\n\n` +
+            '너는 이미 계산된 이웃 추천 목록에 "왜 이 조합이 잘 맞는지" 한 문장씩 설명을 붙이는 역할이야. ' +
+            '순위나 점수를 새로 매기지 말고, 주어진 점수와 재능 목록을 근거로 구체적으로 설명해. ' +
+            '두 사람이 서로 주고받을 수 있는 재능이 겹치면 그 부분을 짚어주고, 겹치는 게 약하면 억지로 미화하지 말고 담백하게 설명해.',
+        },
+      ],
+    },
+    contents: [
+      {
+        role: 'user',
+        parts: [
+          {
+            text:
+              `[내 재능]\n줄 수 있어요: ${selfOfferedLabels.join(', ') || '없음'}\n받고 싶어요: ${selfWantedLabels.join(', ') || '없음'}\n\n` +
+              `[추천된 이웃 목록]\n${candidateLines}`,
+          },
+        ],
+      },
+    ],
+    generationConfig: {
+      thinkingConfig: { thinkingLevel: 'low' },
+      maxOutputTokens: 1000,
+      responseMimeType: 'application/json',
+      responseSchema: {
+        type: 'array',
+        items: {
+          type: 'object',
+          properties: {
+            candidateId: { type: 'string', description: '후보 목록의 id 값 그대로' },
+            rationale: { type: 'string', description: '추천 이유를 한국어 한 문장으로' },
+          },
+          required: ['candidateId', 'rationale'],
+        },
+      },
+    },
+  });
+
+  const text = extractText(data);
+  if (!text) {
+    throw new Error('Gemini 응답에서 매칭 설명 결과를 찾을 수 없어요.');
+  }
+
+  const parsed = parseJsonValue(text);
+  if (!Array.isArray(parsed)) {
+    throw new Error('Gemini 매칭 설명 결과가 올바르지 않아요.');
+  }
+  return parsed as MatchRationaleResult[];
+}

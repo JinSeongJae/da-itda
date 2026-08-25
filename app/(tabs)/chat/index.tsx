@@ -1,5 +1,5 @@
 import { useEffect } from 'react';
-import { FlatList, Text, View } from 'react-native';
+import { Alert, FlatList, Text, View } from 'react-native';
 import { router } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { ChatListItem } from '../../../components/chat/ChatListItem';
@@ -14,6 +14,7 @@ export default function ChatList() {
   const currentUserId = useAuthStore((s) => s.currentUserId)!;
   const threadsById = useChatStore((s) => s.threadsById);
   const fetchThreads = useChatStore((s) => s.fetchThreads);
+  const deleteThread = useChatStore((s) => s.deleteThread);
   const usersById = useUserStore((s) => s.usersById);
   const fetchAllUsers = useUserStore((s) => s.fetchAllUsers);
   const currentUser = usersById[currentUserId];
@@ -47,6 +48,12 @@ export default function ChatList() {
               counterpart={counterpart}
               isBestFriendNeighbor={currentUser?.bestFriendNeighborIds?.includes(counterpart.id)}
               onPress={() => router.push(`/chatroom/${item.id}`)}
+              onLongPress={() =>
+                Alert.alert(t('common.deleteConfirmTitle'), t('common.deleteConfirmBody'), [
+                  { text: t('common.cancel'), style: 'cancel' },
+                  { text: t('common.delete'), style: 'destructive', onPress: () => deleteThread(item.id) },
+                ])
+              }
             />
           );
         }}

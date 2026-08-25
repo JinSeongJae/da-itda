@@ -43,6 +43,8 @@ interface ChatState {
   fetchThreads: () => Promise<void>;
   /** Hydrates a thread's messages from the Vercel backend, if configured. No-op otherwise. */
   syncMessagesFromServer: (threadId: string) => Promise<void>;
+  /** Deletes a thread (and its messages/appointments) for both participants. */
+  deleteThread: (threadId: string) => Promise<boolean>;
 }
 
 function detectCulturalTip(text: string, tips: CulturalGuideTip[]): CulturalGuideTip | undefined {
@@ -295,6 +297,48 @@ export const useChatStore = create<ChatState>()(
           });
         } catch {
           // 오프라인이거나 백엔드 미배포 — 로컬 상태 그대로 유지
+        }
+      },
+
+      deleteThread: async (threadId) => {
+        const backendUrl = process.env.EXPO_PUBLIC_BACKEND_URL;
+        const token = useAuthStore.getState().sessionToken;
+        if (!backendUrl || !token) return false;
+
+        const previousThread = get().threadsById[threadId];
+        const previousMessages = get().messagesByThread[threadId];
+        set((state) => {
+          const threads = { ...state.threadsById };
+          const messages = { ...state.messagesByThread };
+          delete threads[threadId];
+          delete messages[threadId];
+          return { threadsById: threads, messagesByThread: messages };
+        });
+
+        try {
+          const res = await fetch(`${backendUrl}/api/threads`, {
+            method: 'PATCH',
+            headers: { 'content-type': 'application/json', authorization: `Bearer ${token}` },
+            body: JSON.stringify({ id: threadId, action: 'delete' }),
+          });
+          if (!res.ok) {
+            if (previousThread) {
+              set((state) => ({
+                threadsById: { ...state.threadsById, [threadId]: previousThread },
+                messagesByThread: { ...state.messagesByThread, [threadId]: previousMessages ?? [] },
+              }));
+            }
+            return false;
+          }
+          return true;
+        } catch {
+          if (previousThread) {
+            set((state) => ({
+              threadsById: { ...state.threadsById, [threadId]: previousThread },
+              messagesByThread: { ...state.messagesByThread, [threadId]: previousMessages ?? [] },
+            }));
+          }
+          return false;
         }
       },
     }),

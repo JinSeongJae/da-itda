@@ -331,6 +331,10 @@ export type TranslationKey =
   | 'terms.continueButton'
   | 'terms.closeButton'
   | 'terms.mustAgreeHint'
+  | 'common.cancel'
+  | 'common.delete'
+  | 'common.deleteConfirmTitle'
+  | 'common.deleteConfirmBody'
   | 'report.title'
   | 'report.subtitle'
   | 'report.reasonLabel'
@@ -711,6 +715,10 @@ export const TRANSLATIONS: Record<Locale, Record<TranslationKey, string>> = {
     'terms.continueButton': '동의하고 계속하기',
     'terms.closeButton': '닫기',
     'terms.mustAgreeHint': '약관에 동의해야 다음 단계로 진행할 수 있어요.',
+    'common.cancel': '취소',
+    'common.delete': '삭제',
+    'common.deleteConfirmTitle': '삭제하시겠어요?',
+    'common.deleteConfirmBody': '삭제하면 되돌릴 수 없어요.',
     'report.title': '신고하기',
     'report.subtitle': '신고 내용은 운영자만 확인하며, 신고자 정보는 상대방에게 공개되지 않아요.',
     'report.reasonLabel': '신고 이유',
@@ -1100,6 +1108,10 @@ export const TRANSLATIONS: Record<Locale, Record<TranslationKey, string>> = {
     'terms.continueButton': 'Agree and continue',
     'terms.closeButton': 'Close',
     'terms.mustAgreeHint': 'You must agree to the terms to continue.',
+    'common.cancel': 'Cancel',
+    'common.delete': 'Delete',
+    'common.deleteConfirmTitle': 'Delete this?',
+    'common.deleteConfirmBody': 'This cannot be undone.',
     'report.title': 'Report',
     'report.subtitle': 'Only our operators see report details, and your identity is never shared with the reported user.',
     'report.reasonLabel': 'Reason',
@@ -1490,6 +1502,10 @@ export const TRANSLATIONS: Record<Locale, Record<TranslationKey, string>> = {
     'terms.continueButton': 'Sumang-ayon at magpatuloy',
     'terms.closeButton': 'Isara',
     'terms.mustAgreeHint': 'Dapat sumang-ayon sa mga tuntunin para magpatuloy.',
+    'common.cancel': 'Kanselahin',
+    'common.delete': 'Tanggalin',
+    'common.deleteConfirmTitle': 'Tanggalin ba ito?',
+    'common.deleteConfirmBody': 'Hindi na ito maibabalik pagkatapos.',
     'report.title': 'I-report',
     'report.subtitle': 'Tanging ang mga operator namin ang makakakita ng detalye ng report, at hindi ipinapakita ang iyong pagkakakilanlan sa na-report na user.',
     'report.reasonLabel': 'Dahilan',
@@ -1878,6 +1894,10 @@ export const TRANSLATIONS: Record<Locale, Record<TranslationKey, string>> = {
     'terms.continueButton': 'Đồng ý và tiếp tục',
     'terms.closeButton': 'Đóng',
     'terms.mustAgreeHint': 'Bạn cần đồng ý với điều khoản để tiếp tục.',
+    'common.cancel': 'Hủy',
+    'common.delete': 'Xóa',
+    'common.deleteConfirmTitle': 'Xóa mục này?',
+    'common.deleteConfirmBody': 'Không thể hoàn tác sau khi xóa.',
     'report.title': 'Báo cáo',
     'report.subtitle': 'Chỉ quản trị viên của chúng tôi xem được nội dung báo cáo, danh tính của bạn không được chia sẻ với người bị báo cáo.',
     'report.reasonLabel': 'Lý do',
