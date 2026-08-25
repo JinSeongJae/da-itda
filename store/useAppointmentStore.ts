@@ -237,19 +237,18 @@ export const useAppointmentStore = create<AppointmentState>()(
           });
 
           const byId = new Map(recommendations.map((r) => [r.safeZoneId, r]));
-          const ranked: RankedSafeZone[] = [];
-          for (const zone of fallbackZones) {
+          const combined: RankedSafeZone[] = fallbackZones.map((zone) => {
             const rec = byId.get(zone.id);
-            if (rec) ranked.push({ ...zone, matchScore: rec.matchScore, aiRationale: rec.rationale, aiRanked: true });
-          }
-          ranked.sort((a, b) => b.matchScore - a.matchScore);
+            return rec
+              ? { ...zone, matchScore: rec.matchScore, aiRationale: rec.rationale, aiRanked: true }
+              : { ...zone, matchScore: zone.safetyScore, aiRanked: false };
+          });
 
-          const rankedIds = new Set(ranked.map((z) => z.id));
-          const unranked = fallbackZones
-            .filter((zone) => !rankedIds.has(zone.id))
-            .map((zone) => ({ ...zone, matchScore: zone.safetyScore, aiRanked: false }));
+          // AI 매칭 점수/추천 이유는 각 장소 설명에만 쓰고, 정렬 기준은 항상 두 사용자
+          // GPS 중간지점에서 가까운 순으로 고정한다 — "안심존 추천"의 핵심은 거리이지,
+          // AI가 먼 곳을 1순위로 올리면 안심존의 의미가 없어진다.
+          combined.sort((a, b) => haversineDistanceKm(mid, a) - haversineDistanceKm(mid, b));
 
-          const combined = [...ranked, ...unranked];
           return combined.length > 0 ? combined : asFallback();
         } catch {
           return asFallback();

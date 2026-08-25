@@ -118,8 +118,10 @@ export default function Chatroom() {
 
       {contextHeader && <AIContextHeader data={contextHeader} />}
 
-      {/* 안드로이드는 windowSoftInputMode가 기본 "resize"라 OS가 이미 화면을 줄여준다 — 여기서
-          또 'height'로 수동으로 줄이면 이중으로 줄어들어 입력 칸이 화면 밖으로 밀려난다. */}
+      {/* app.json에서 안드로이드 windowSoftInputMode를 "pan"으로 명시했다 — edge-to-edge가
+          기본인 최신 Expo/RN에서는 "resize"가 실제로 창을 줄여주지 않는 경우가 있어(원인 불명확),
+          OS가 확실히 화면을 위로 밀어 올려주는 "pan"으로 고정하고 여기서는 JS로 추가 조정을 하지
+          않는다(behavior: undefined) — 두 방식을 같이 쓰면 이중으로 조정돼 입력 칸이 어긋난다. */}
       <KeyboardAvoidingView
         behavior={Platform.OS === 'ios' ? 'padding' : undefined}
         className="flex-1"
