@@ -129,6 +129,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         try {
           analysis = await analyzeIdDocument(base64, contentType);
         } catch (e) {
+          console.error('[verification] analyzeIdDocument failed:', e);
           res.status(502).json({ error: e instanceof Error ? e.message : 'AI 분석에 실패했습니다.' });
           return;
         }
