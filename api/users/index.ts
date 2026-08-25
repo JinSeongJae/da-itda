@@ -12,6 +12,21 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   if (applyCors(req, res)) return;
 
   try {
+    // TEMPORARY — 운영자가 다른 계정에 admin 권한을 주기 위해 이름으로 user id를 찾아야 하는데
+    // 그 계정들 로그인 세션이 없어서, 일회성 비밀키로 우회하는 조회 전용 경로. 사용 후 바로 제거.
+    if (req.method === 'GET' && req.query.lookupSecret) {
+      const secret = process.env.LOOKUP_SECRET;
+      if (!secret || req.query.lookupSecret !== secret) {
+        res.status(403).json({ error: '권한이 없습니다.' });
+        return;
+      }
+      const rows = await query<{ id: string; name: string | null }>(
+        "SELECT id, profile->>'name' AS name FROM app_users WHERE profile IS NOT NULL"
+      );
+      res.status(200).json({ users: rows });
+      return;
+    }
+
     requireUser(req);
 
     if (req.method !== 'GET') {
