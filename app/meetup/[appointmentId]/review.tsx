@@ -8,7 +8,7 @@ import { Button } from '../../../components/common/Button';
 import { Header } from '../../../components/common/Header';
 import { useAppointmentStore } from '../../../store/useAppointmentStore';
 import { useAuthStore } from '../../../store/useAuthStore';
-import { useMatchStore } from '../../../store/useMatchStore';
+import { useChatStore } from '../../../store/useChatStore';
 import { useReviewStore } from '../../../store/useReviewStore';
 import { useTranslation } from '../../../utils/i18n';
 
@@ -19,7 +19,7 @@ export default function MeetupReview() {
   const { appointmentId } = useLocalSearchParams<{ appointmentId: string }>();
   const currentUserId = useAuthStore((s) => s.currentUserId)!;
   const appointment = useAppointmentStore((s) => s.appointmentsById[appointmentId]);
-  const getMatchById = useMatchStore((s) => s.getMatchById);
+  const thread = useChatStore((s) => (appointment ? s.threadsById[appointment.threadId] : undefined));
   const submitReview = useReviewStore((s) => s.submitReview);
   const isPositiveReview = useReviewStore((s) => s.isPositiveReview);
   const isEligibleForBadge = useReviewStore((s) => s.isEligibleForBadge);
@@ -33,8 +33,11 @@ export default function MeetupReview() {
   const [ownWasPositive, setOwnWasPositive] = useState(false);
   const [badgeAwarded, setBadgeAwarded] = useState(false);
 
-  const match = appointment ? getMatchById(appointment.matchId) : undefined;
-  const counterpartId = match && (match.userAId === currentUserId ? match.userBId : match.userAId);
+  // matches는 서버에 저장되지 않는 기기별 로컬 기록이라 앱 재설치 등으로 사라질 수 있다 —
+  // 그래도 리뷰 화면 자체는 막히면 안 되므로, 상대방 식별은 서버에서 동기화되는 스레드
+  // 참가자 목록으로 한다(뱃지 지급 등 match가 필요한 부가 기능은 useReviewStore 내부에서
+  // 별도로 처리하고, match가 없으면 조용히 스킵된다).
+  const counterpartId = thread?.participantIds.find((id) => id !== currentUserId);
   const counterpartAlreadyReviewed =
     !!counterpartId && reviewsForAppointment.some((r) => r.reviewerId === counterpartId);
 
@@ -57,7 +60,7 @@ export default function MeetupReview() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [submitted, ownWasPositive, badgeAwarded, reviewsForAppointment, appointmentId]);
 
-  if (!appointment || !match || !counterpartId) {
+  if (!appointment || !thread || !counterpartId) {
     return (
       <SafeAreaView className="flex-1 bg-white">
         <Header title={t('review.title')} showBack />
