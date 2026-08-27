@@ -1,6 +1,6 @@
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { ScrollView, Text, View } from 'react-native';
-import { router } from 'expo-router';
+import { router, useFocusEffect } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { ConfirmedAppointmentBanner } from '../../components/home/ConfirmedAppointmentBanner';
 import { LocationHeader } from '../../components/home/LocationHeader';
@@ -31,10 +31,14 @@ export default function Home() {
   const [matchingWithId, setMatchingWithId] = useState<string | null>(null);
   const [rationalesById, setRationalesById] = useState<Record<string, string>>({});
 
-  useEffect(() => {
-    fetchAllUsers();
-    fetchAppointments();
-  }, [fetchAllUsers, fetchAppointments]);
+  // 상대방이 다른 기기에서 먼저 매칭하면 이 목록/추천에 반영돼야 하는데, 마운트 시 한 번만
+  // 불러오면 이 탭이 이미 떠있던 세션에선 갱신이 안 된다 — 탭에 들어올 때마다 새로고침한다.
+  useFocusEffect(
+    useCallback(() => {
+      fetchAllUsers();
+      fetchAppointments();
+    }, [fetchAllUsers, fetchAppointments])
+  );
 
   // 이미 매칭한(=매칭하기를 눌러 채팅이 시작된) 이웃은 추천에서 다시 뜨지 않게 제외한다.
   const alreadyMatchedIds = new Set(

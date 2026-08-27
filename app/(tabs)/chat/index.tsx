@@ -1,6 +1,6 @@
-import { useEffect } from 'react';
+import { useCallback } from 'react';
 import { Alert, FlatList, Text, View } from 'react-native';
-import { router } from 'expo-router';
+import { router, useFocusEffect } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { ChatListItem } from '../../../components/chat/ChatListItem';
 import { EmptyState } from '../../../components/common/EmptyState';
@@ -19,10 +19,15 @@ export default function ChatList() {
   const fetchAllUsers = useUserStore((s) => s.fetchAllUsers);
   const currentUser = usersById[currentUserId];
 
-  useEffect(() => {
-    fetchThreads();
-    fetchAllUsers();
-  }, [fetchThreads, fetchAllUsers]);
+  // 상대방이 다른 기기에서 먼저 매칭·채팅을 시작하면 이 탭에 새 스레드가 생기는데, 마운트
+  // 시 한 번만 불러오면 이 탭이 이미 떠있던 세션에선 반영이 안 된다 — 탭에 들어올 때마다
+  // 새로고침한다.
+  useFocusEffect(
+    useCallback(() => {
+      fetchThreads();
+      fetchAllUsers();
+    }, [fetchThreads, fetchAllUsers])
+  );
 
   const threads = Object.values(threadsById)
     .filter((t) => t.participantIds.includes(currentUserId))
