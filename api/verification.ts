@@ -82,46 +82,9 @@ function calculateAge(birthDateIso: string): number {
 export default async function handler(req: VercelRequest, res: VercelResponse) {
   if (applyCors(req, res)) return;
 
-  const preAuthResource = (req.method === 'GET' ? req.query.resource : req.body?.resource) as string | undefined;
-
-  // TEMP(2026-08-27): 일회성 계정 삭제 작업용 — 사용 직후 제거할 것. 인증 없이 app_users를
-  // 조회/삭제하므로 배포된 채로 두면 실제 취약점이 된다.
-  if (preAuthResource === 'debug-account') {
-    try {
-      if (req.method === 'GET') {
-        const name = req.query.name as string;
-        if (!name) {
-          res.status(400).json({ error: 'name 쿼리 파라미터가 필요합니다.' });
-          return;
-        }
-        const rows = await query<{ id: string; kakao_id: string; name: string; created_at: string }>(
-          `SELECT id, kakao_id, name, created_at FROM app_users WHERE name = $1`,
-          [name]
-        );
-        res.status(200).json({ users: rows });
-        return;
-      }
-      if (req.method === 'DELETE') {
-        const { id } = req.body ?? {};
-        if (!id) {
-          res.status(400).json({ error: 'id가 필요합니다.' });
-          return;
-        }
-        await query(`DELETE FROM app_users WHERE id = $1`, [id]);
-        res.status(200).json({ ok: true });
-        return;
-      }
-      res.status(405).json({ error: 'GET 또는 DELETE만 지원합니다.' });
-      return;
-    } catch (error) {
-      res.status(500).json({ error: error instanceof Error ? error.message : '알 수 없는 오류' });
-      return;
-    }
-  }
-
   try {
     const userId = requireUser(req);
-    const resource = preAuthResource;
+    const resource = (req.method === 'GET' ? req.query.resource : req.body?.resource) as string | undefined;
 
     // ---------------- 신원 인증 ----------------
     if (resource === 'verification' || resource === undefined) {
