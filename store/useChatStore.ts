@@ -8,6 +8,11 @@ import { useAuthStore } from './useAuthStore';
 import { useMatchStore } from './useMatchStore';
 import { useUserStore } from './useUserStore';
 
+// 스토어 셀렉터가 매 렌더마다 새 배열을 반환하면 안 된다 — `messagesByThread[id] ?? []`처럼
+// 인라인으로 만들면 참조가 계속 바뀌어 무한 리렌더에 빠진다. 이 미존재 스레드용 기본값을
+// 공유해서 쓴다.
+export const EMPTY_MESSAGES: ChatMessage[] = [];
+
 /** Best-effort sync to the Vercel backend — never blocks or breaks the local-only demo flow. */
 function syncMessageToServer(message: ChatMessage): void {
   const backendUrl = process.env.EXPO_PUBLIC_BACKEND_URL;

@@ -10,7 +10,7 @@ import { Button } from '../../components/common/Button';
 import { Header } from '../../components/common/Header';
 import { useAppointmentStore } from '../../store/useAppointmentStore';
 import { useAuthStore } from '../../store/useAuthStore';
-import { useChatStore } from '../../store/useChatStore';
+import { EMPTY_MESSAGES, useChatStore } from '../../store/useChatStore';
 import { useMatchStore } from '../../store/useMatchStore';
 import { useUserStore } from '../../store/useUserStore';
 import { generateAppointmentSuggestion } from '../../utils/gemini';
@@ -28,7 +28,7 @@ export default function AppointmentFormScreen() {
   const recommendSafeZonesWithAI = useAppointmentStore((s) => s.recommendSafeZonesWithAI);
   const createAppointment = useAppointmentStore((s) => s.createAppointment);
   const attachAppointmentMessage = useChatStore((s) => s.attachAppointmentMessage);
-  const messages = useChatStore((s) => s.messagesByThread[threadId] ?? []);
+  const messages = useChatStore((s) => s.messagesByThread[threadId] ?? EMPTY_MESSAGES);
   const [aiSuggesting, setAiSuggesting] = useState(false);
 
   const match = thread ? getMatchById(thread.matchId) : undefined;

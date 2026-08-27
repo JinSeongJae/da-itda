@@ -10,7 +10,7 @@ import { SmartReplySuggestions } from '../../components/chat/SmartReplySuggestio
 import { Avatar } from '../../components/common/Avatar';
 import { useAppointmentStore } from '../../store/useAppointmentStore';
 import { useAuthStore } from '../../store/useAuthStore';
-import { useChatStore } from '../../store/useChatStore';
+import { EMPTY_MESSAGES, useChatStore } from '../../store/useChatStore';
 import { useUserStore } from '../../store/useUserStore';
 import type { ChatMessage } from '../../types';
 import { useTranslation } from '../../utils/i18n';
@@ -25,7 +25,7 @@ export default function Chatroom() {
   const currentUser = usersById[currentUserId];
 
   const thread = useChatStore((s) => s.threadsById[threadId]);
-  const messages = useChatStore((s) => s.messagesByThread[threadId] ?? []);
+  const messages = useChatStore((s) => s.messagesByThread[threadId] ?? EMPTY_MESSAGES);
   const sendMessage = useChatStore((s) => s.sendMessage);
   const getContextHeader = useChatStore((s) => s.getContextHeader);
   const syncMessagesFromServer = useChatStore((s) => s.syncMessagesFromServer);
