@@ -1,7 +1,7 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node';
 import { put } from '@vercel/blob';
 import { applyCors } from './_cors';
-import { query } from './_db';
+import { query, testConnection } from './_db';
 import { requireUser } from './_auth';
 import { generateId } from './_id';
 import { analyzeIdDocument } from './_gemini';
@@ -81,6 +81,13 @@ function calculateAge(birthDateIso: string): number {
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {
   if (applyCors(req, res)) return;
+
+  // TEMP(2026-08-27): 일회성 진단용, 읽기 전용 — 사용 직후 제거할 것.
+  if (req.method === 'GET' && req.query.resource === 'debug-dbtest') {
+    const result = await testConnection();
+    res.status(200).json(result);
+    return;
+  }
 
   try {
     const userId = requireUser(req);
