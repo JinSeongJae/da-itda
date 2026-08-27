@@ -1,6 +1,7 @@
+import { useCallback } from 'react';
 import { Feather } from '@expo/vector-icons';
 import { Pressable, ScrollView, Text, View } from 'react-native';
-import { router } from 'expo-router';
+import { router, useFocusEffect } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { BadgeGrid } from '../../../components/mypage/BadgeGrid';
 import { LanguagePicker } from '../../../components/common/LanguagePicker';
@@ -17,6 +18,16 @@ export default function MyPage() {
   const currentUserId = useAuthStore((s) => s.currentUserId)!;
   const logout = useAuthStore((s) => s.logout);
   const user = useUserStore((s) => s.usersById[currentUserId]);
+  const fetchAllUsers = useUserStore((s) => s.fetchAllUsers);
+
+  // 안심인증 승인/반려처럼 다른 화면(관리자 승인 등)에서 내 profile이 바뀔 수 있어서,
+  // 이 탭에 들어올 때마다 서버 최신 상태로 새로고침한다 — 마운트 시 한 번만으로는 탭을
+  // 넘나들 때 승인 상태가 반영되지 않는다.
+  useFocusEffect(
+    useCallback(() => {
+      fetchAllUsers();
+    }, [fetchAllUsers])
+  );
 
   if (!user) return null;
 
