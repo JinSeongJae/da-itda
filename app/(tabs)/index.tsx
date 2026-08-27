@@ -23,8 +23,9 @@ export default function Home() {
   const currentUser = usersById[currentUserId];
   const fetchAllUsers = useUserStore((s) => s.fetchAllUsers);
 
-  const matches = useMatchStore((s) => s.matches);
   const getMatchById = useMatchStore((s) => s.getMatchById);
+  const threadsById = useChatStore((s) => s.threadsById);
+  const fetchThreads = useChatStore((s) => s.fetchThreads);
   const createOrFetchThreadWithUser = useChatStore((s) => s.createOrFetchThreadWithUser);
   const getUpcomingAppointmentForUser = useAppointmentStore((s) => s.getUpcomingAppointmentForUser);
   const fetchAppointments = useAppointmentStore((s) => s.fetchAppointments);
@@ -37,14 +38,20 @@ export default function Home() {
     useCallback(() => {
       fetchAllUsers();
       fetchAppointments();
-    }, [fetchAllUsers, fetchAppointments])
+      fetchThreads();
+    }, [fetchAllUsers, fetchAppointments, fetchThreads])
   );
 
   // 이미 매칭한(=매칭하기를 눌러 채팅이 시작된) 이웃은 추천에서 다시 뜨지 않게 제외한다.
+  // useMatchStore.matches는 기기 로컬에만 저장되고 서버 동기화가 없어서(호환도 점수 같은
+  // 표시용 부가정보만 들고 있음), 상대방이 다른 기기에서 먼저 매칭을 걸면 이 기기에서는
+  // 그 사실을 알 방법이 없었다 — 실제 매칭 여부의 기준은 항상 서버와 동기화되는
+  // threadsById(스레드가 있다 = 매칭됐다)로 판단한다.
   const alreadyMatchedIds = new Set(
-    matches
-      .filter((m) => m.userAId === currentUserId || m.userBId === currentUserId)
-      .map((m) => (m.userAId === currentUserId ? m.userBId : m.userAId))
+    Object.values(threadsById)
+      .filter((t) => t.participantIds.includes(currentUserId))
+      .map((t) => t.participantIds.find((id) => id !== currentUserId))
+      .filter((id): id is string => !!id)
   );
   const candidates = Object.values(usersById).filter(
     (u) => u.id !== currentUserId && !alreadyMatchedIds.has(u.id)
