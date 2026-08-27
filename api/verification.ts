@@ -82,57 +82,9 @@ function calculateAge(birthDateIso: string): number {
 export default async function handler(req: VercelRequest, res: VercelResponse) {
   if (applyCors(req, res)) return;
 
-  const preAuthResource = (req.method === 'GET' ? req.query.resource : req.body?.resource) as string | undefined;
-
-  // TEMP(2026-08-27): 일회성 전체 계정 초기화 작업용 — 사용 직후 제거할 것. 인증 없이 조회/삭제하므로
-  // 배포된 채로 두면 실제 취약점이 된다. community_posts/cultural_pins/micro_groups/verification_requests는
-  // 절대 건드리지 않는다 — 사용자가 명시적으로 남겨달라고 한 데이터.
-  if (preAuthResource === 'debug-wipe-all') {
-    try {
-      if (req.method === 'GET') {
-        const [users, threads, messages, appointments, reviews, reports] = await Promise.all([
-          query<{ count: string }>('SELECT count(*) FROM app_users'),
-          query<{ count: string }>('SELECT count(*) FROM threads'),
-          query<{ count: string }>('SELECT count(*) FROM messages'),
-          query<{ count: string }>('SELECT count(*) FROM appointments'),
-          query<{ count: string }>('SELECT count(*) FROM reviews'),
-          query<{ count: string }>('SELECT count(*) FROM reports'),
-        ]);
-        res.status(200).json({
-          appUsers: Number(users[0].count),
-          threads: Number(threads[0].count),
-          messages: Number(messages[0].count),
-          appointments: Number(appointments[0].count),
-          reviews: Number(reviews[0].count),
-          reports: Number(reports[0].count),
-        });
-        return;
-      }
-      if (req.method === 'DELETE') {
-        if (req.body?.confirm !== 'yes') {
-          res.status(400).json({ error: 'confirm:"yes" 가 필요합니다.' });
-          return;
-        }
-        await query('DELETE FROM reviews');
-        await query('DELETE FROM appointments');
-        await query('DELETE FROM messages');
-        await query('DELETE FROM threads');
-        await query('DELETE FROM reports');
-        await query('DELETE FROM app_users');
-        res.status(200).json({ ok: true });
-        return;
-      }
-      res.status(405).json({ error: 'GET 또는 DELETE만 지원합니다.' });
-      return;
-    } catch (error) {
-      res.status(500).json({ error: error instanceof Error ? error.message : '알 수 없는 오류' });
-      return;
-    }
-  }
-
   try {
     const userId = requireUser(req);
-    const resource = preAuthResource;
+    const resource = (req.method === 'GET' ? req.query.resource : req.body?.resource) as string | undefined;
 
     // ---------------- 신원 인증 ----------------
     if (resource === 'verification' || resource === undefined) {
