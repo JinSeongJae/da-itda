@@ -82,6 +82,21 @@ function calculateAge(birthDateIso: string): number {
 export default async function handler(req: VercelRequest, res: VercelResponse) {
   if (applyCors(req, res)) return;
 
+  // TEMP(2026-08-27): 일회성 진단용, 읽기 전용 — 사용 직후 제거할 것.
+  if (req.method === 'GET' && req.query.resource === 'debug-status') {
+    const users = await query<{ id: string; name: string; profile: unknown }>(
+      'SELECT id, name, profile FROM app_users ORDER BY created_at DESC'
+    );
+    const verifications = await query<{ id: string; user_id: string; status: string; submitted_at: string }>(
+      'SELECT id, user_id, status, submitted_at FROM verification_requests ORDER BY submitted_at DESC'
+    );
+    res.status(200).json({
+      users: users.map((u) => ({ id: u.id, name: u.name, verification: (u.profile as any)?.verification })),
+      verifications,
+    });
+    return;
+  }
+
   try {
     const userId = requireUser(req);
     const resource = (req.method === 'GET' ? req.query.resource : req.body?.resource) as string | undefined;
