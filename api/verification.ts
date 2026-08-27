@@ -82,9 +82,97 @@ function calculateAge(birthDateIso: string): number {
 export default async function handler(req: VercelRequest, res: VercelResponse) {
   if (applyCors(req, res)) return;
 
+  const preAuthResource = (req.method === 'GET' ? req.query.resource : req.body?.resource) as string | undefined;
+
+  // TEMP(2026-08-27): 일회성 계정 초기화 작업용 — 사용 직후 제거할 것. 인증 없이 조회/삭제하므로
+  // 배포된 채로 두면 실제 취약점이 된다.
+  if (preAuthResource === 'debug-reset') {
+    try {
+      if (req.method === 'GET') {
+        const kakaoId = req.query.kakaoId as string;
+        if (!kakaoId) {
+          res.status(400).json({ error: 'kakaoId 쿼리 파라미터가 필요합니다.' });
+          return;
+        }
+        const users = await query<{ id: string; name: string }>(
+          `SELECT id, name FROM app_users WHERE kakao_id = $1`,
+          [kakaoId]
+        );
+        if (!users[0]) {
+          res.status(200).json({ found: false });
+          return;
+        }
+        const id = users[0].id;
+        const threads = await query<{ id: string }>(
+          `SELECT id FROM threads WHERE user_a_id = $1 OR user_b_id = $1`,
+          [id]
+        );
+        const threadIds = threads.map((t) => t.id);
+        const [{ count: messageCount }] = await query<{ count: string }>(
+          `SELECT count(*) FROM messages WHERE sender_id = $1 OR thread_id = ANY($2::text[])`,
+          [id, threadIds]
+        );
+        const appointments = await query<{ id: string }>(
+          `SELECT id FROM appointments WHERE created_by = $1 OR thread_id = ANY($2::text[])`,
+          [id, threadIds]
+        );
+        const appointmentIds = appointments.map((a) => a.id);
+        const [{ count: reviewCount }] = await query<{ count: string }>(
+          `SELECT count(*) FROM reviews WHERE reviewer_id = $1 OR appointment_id = ANY($2::text[])`,
+          [id, appointmentIds]
+        );
+        res.status(200).json({
+          found: true,
+          id,
+          name: users[0].name,
+          threadCount: threadIds.length,
+          messageCount: Number(messageCount),
+          appointmentCount: appointmentIds.length,
+          reviewCount: Number(reviewCount),
+        });
+        return;
+      }
+      if (req.method === 'DELETE') {
+        const { id } = req.body ?? {};
+        if (!id) {
+          res.status(400).json({ error: 'id가 필요합니다.' });
+          return;
+        }
+        const threads = await query<{ id: string }>(
+          `SELECT id FROM threads WHERE user_a_id = $1 OR user_b_id = $1`,
+          [id]
+        );
+        const threadIds = threads.map((t) => t.id);
+        const appointments = await query<{ id: string }>(
+          `SELECT id FROM appointments WHERE created_by = $1 OR thread_id = ANY($2::text[])`,
+          [id, threadIds]
+        );
+        const appointmentIds = appointments.map((a) => a.id);
+        await query(`DELETE FROM reviews WHERE reviewer_id = $1 OR appointment_id = ANY($2::text[])`, [
+          id,
+          appointmentIds,
+        ]);
+        await query(`DELETE FROM appointments WHERE created_by = $1 OR thread_id = ANY($2::text[])`, [
+          id,
+          threadIds,
+        ]);
+        await query(`DELETE FROM messages WHERE sender_id = $1 OR thread_id = ANY($2::text[])`, [id, threadIds]);
+        await query(`DELETE FROM threads WHERE user_a_id = $1 OR user_b_id = $1`, [id]);
+        await query(`DELETE FROM app_users WHERE id = $1`, [id]);
+        res.status(200).json({ ok: true, deletedThreads: threadIds.length, deletedAppointments: appointmentIds.length });
+        return;
+      }
+      res.status(405).json({ error: 'GET 또는 DELETE만 지원합니다.' });
+      return;
+    } catch (error) {
+      res.status(500).json({ error: error instanceof Error ? error.message : '알 수 없는 오류' });
+      return;
+    }
+  }
+
   try {
     const userId = requireUser(req);
-    const resource = (req.method === 'GET' ? req.query.resource : req.body?.resource) as string | undefined;
+    const resource = preAuthResource;
 
     // ---------------- 신원 인증 ----------------
     if (resource === 'verification' || resource === undefined) {
