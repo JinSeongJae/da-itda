@@ -49,6 +49,12 @@ function buildPoolConfig(): PoolConfig {
   return {
     connectionString: url.toString(),
     ssl: { rejectUnauthorized: false },
+    // Supabase의 세션 모드 풀러는 pool_size 15로 제한된다. 서버리스 환경에서는 워밍된 함수
+    // 인스턴스마다 자기 자신의 Pool을 갖게 되므로, 인스턴스당 max를 낮고 idleTimeoutMillis를
+    // 짧게 둬야 유휴 커넥션이 빨리 반납되어 "max clients reached"로 전체가 막히지 않는다.
+    max: 3,
+    idleTimeoutMillis: 5000,
+    connectionTimeoutMillis: 5000,
   };
 }
 
