@@ -64,7 +64,7 @@ export default function VerificationScreen() {
     if (!result.ok) {
       if (result.reason === 'minor') setError(t('verification.errorMinor'));
       else if (result.reason === 'not-found') setError(result.message ?? t('verification.errorNotFound'));
-      else setError(t('verification.errorGeneric'));
+      else setError(result.message ?? t('verification.errorGeneric'));
       return;
     }
     setPhoto(null);
