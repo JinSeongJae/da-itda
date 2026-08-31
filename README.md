@@ -4,7 +4,7 @@
 
 **경산시 이주민과 선주민을 잇는, 신뢰 기반 하이퍼로컬 재능 교환 플랫폼**
 
-[![서비스 보러가기](https://img.shields.io/badge/📱_서비스_보러가기-APK_다운로드-10b981?style=for-the-badge)](https://expo.dev/artifacts/eas/iCDQ502SBVxaCE2wcTYRZV_P2iC1U4WC92a5b2Ddigs.apk)
+[![서비스 보러가기](https://img.shields.io/badge/📱_서비스_보러가기-APK_다운로드-10b981?style=for-the-badge)](https://expo.dev/artifacts/eas/HJsmN8cxuE_JI4ZJ5rR3r6hllVJpc6gI645BS3RM6-Q.apk)
 
 </div>
 
