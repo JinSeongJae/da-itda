@@ -82,55 +82,6 @@ function calculateAge(birthDateIso: string): number {
 export default async function handler(req: VercelRequest, res: VercelResponse) {
   if (applyCors(req, res)) return;
 
-  // TEMP(2026-08-31): 일회성 발표용 스크린샷 세팅 — 사용 직후 제거할 것.
-  if (req.method === 'POST' && req.body?.resource === 'debug-bestfriend') {
-    const { selfId, counterpartId } = req.body ?? {};
-    if (!selfId || !counterpartId) {
-      res.status(400).json({ error: 'selfId, counterpartId가 필요합니다.' });
-      return;
-    }
-
-    const existing = await query<{ id: string }>(
-      `SELECT id FROM threads WHERE (user_a_id = $1 AND user_b_id = $2) OR (user_a_id = $2 AND user_b_id = $1)`,
-      [selfId, counterpartId]
-    );
-    let threadId = existing[0]?.id;
-    if (!threadId) {
-      threadId = `thread_${crypto.randomUUID()}`;
-      await query(`INSERT INTO threads (id, user_a_id, user_b_id) VALUES ($1, $2, $3)`, [
-        threadId,
-        selfId,
-        counterpartId,
-      ]);
-    }
-
-    await query(
-      `INSERT INTO messages (id, thread_id, sender_id, text) VALUES ($1, $2, $3, $4)`,
-      [`msg_${crypto.randomUUID()}`, threadId, counterpartId, '오늘 정말 즐거웠어요! 다음에 또 봐요 :)']
-    );
-
-    await query(
-      `UPDATE app_users
-       SET profile = jsonb_set(
-         jsonb_set(profile, '{badges}',
-           CASE WHEN profile->'badges' @> '["best-friend-neighbor"]'::jsonb
-                THEN profile->'badges'
-                ELSE COALESCE(profile->'badges', '[]'::jsonb) || '["best-friend-neighbor"]'::jsonb
-           END),
-         '{bestFriendNeighborIds}',
-         CASE WHEN profile->'bestFriendNeighborIds' @> $2::jsonb
-              THEN profile->'bestFriendNeighborIds'
-              ELSE COALESCE(profile->'bestFriendNeighborIds', '[]'::jsonb) || $2::jsonb
-         END
-       )
-       WHERE id = $1`,
-      [selfId, JSON.stringify([counterpartId])]
-    );
-
-    res.status(200).json({ ok: true, threadId });
-    return;
-  }
-
   try {
     const userId = requireUser(req);
     const resource = (req.method === 'GET' ? req.query.resource : req.body?.resource) as string | undefined;
